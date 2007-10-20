@@ -108,11 +108,10 @@ void PKCS10_Request::handle_attribute(const Attribute& attr)
       }
    else if(attr.oid == OIDS::lookup("PKCS9.ExtensionRequest"))
       {
-      Extensions extensions;
       value.decode(extensions).verify_end();
 
-      Data_Store issuer_info;
-      extensions.contents_to(info, issuer_info);
+      Data_Store unused_issuer_info;
+      extensions.contents_to(info, unused_issuer_info);
       }
    }
 
@@ -153,9 +152,58 @@ Public_Key* PKCS10_Request::subject_public_key() const
 /*************************************************
 * Return the alternative names of the requestor  *
 *************************************************/
-AlternativeName PKCS10_Request::subject_alt_name() const
+Cert_Extension::Subject_Alternative_Name
+PKCS10_Request::subject_alt_name() const
    {
-   return create_alt_name(info);
+   std::vector<Certificate_Extensions*>::iterator i =
+      std::find_if(extensions.extensions.begin(),
+                   extensions.extensions.end(),
+                   std::bind2nd(std::equals<OID>(),
+                                OIDS::lookup("X509v3.SubjectAlternativeName")));
+
+   if(i != ext.end())
+      return j->
+      {
+      alt_name
+
+      }
+
+   Cert_Extension::Subject_Alternative_Name alt_name;
+   return alt_name;
+
+   class AltName_Matcher : public Data_Store::Matcher
+      {
+      public:
+         bool operator()(const std::string& key, const std::string&) const
+            {
+            for(u32bit j = 0; j != matches.size(); ++j)
+               if(key.compare(matches[j]) == 0)
+                  {
+                  printf("match for %s\n", key.c_str());
+                  return true;
+                  }
+            printf("no match for %s\n", key.c_str());
+            return false;
+            }
+
+         AltName_Matcher(const std::string& match_any_of)
+            {
+            matches = split_on(match_any_of, '/');
+            }
+      private:
+         std::vector<std::string> matches;
+      };
+
+   std::multimap<std::string, std::string> names =
+      info.search_with(AltName_Matcher("RFC822/DNS/URI/IP/PKIX.XMPPAddr"));
+
+   Cert_Extension::Subject_Alternative_Name alt_name;
+
+   std::multimap<std::string, std::string>::iterator j;
+   for(j = names.begin(); j != names.end(); ++j)
+      alt_name.add_attribute(j->first, j->second);
+
+   return alt_name;
    }
 
 /*************************************************

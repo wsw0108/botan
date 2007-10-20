@@ -23,10 +23,14 @@ void X509_GlobalState::add(Extension_Prototype* proto)
 *************************************************/
 Certificate_Extension* X509_GlobalState::get_extension(const OID& oid) const
    {
-   Certificate_Extension* extension = 0;
-   for(u32bit j = 0; j != prototypes.size() && !extension; ++j)
-      extension = prototypes[j]->make(oid);
-   return extension;
+   for(u32bit j = 0; j != prototypes.size(); ++j)
+      {
+      Certificate_Extension* extension = prototypes[j]->make(oid);
+      if(extension)
+         return extension;
+      }
+
+   return 0;
    }
 
 /*************************************************
@@ -34,7 +38,6 @@ Certificate_Extension* X509_GlobalState::get_extension(const OID& oid) const
 *************************************************/
 X509_GlobalState::X509_GlobalState()
    {
-
 #define CREATE_PROTOTYPE(NAME, TYPE)                         \
    do {                                                      \
       struct TYPE ## _Prototype : public Extension_Prototype \
