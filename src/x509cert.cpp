@@ -325,40 +325,4 @@ X509_DN create_dn(const Data_Store& info)
    return dn;
    }
 
-/*************************************************
-* Create and populate an AlternativeName         *
-*************************************************/
-AlternativeName create_alt_name(const Data_Store& info)
-   {
-   class AltName_Matcher : public Data_Store::Matcher
-      {
-      public:
-         bool operator()(const std::string& key, const std::string&) const
-            {
-            for(u32bit j = 0; j != matches.size(); ++j)
-               if(key.compare(matches[j]) == 0)
-                  return true;
-            return false;
-            }
-
-         AltName_Matcher(const std::string& match_any_of)
-            {
-            matches = split_on(match_any_of, '/');
-            }
-      private:
-         std::vector<std::string> matches;
-      };
-
-   std::multimap<std::string, std::string> names =
-      info.search_with(AltName_Matcher("RFC822/DNS/URI/IP"));
-
-   AlternativeName alt_name;
-
-   std::multimap<std::string, std::string>::iterator j;
-   for(j = names.begin(); j != names.end(); ++j)
-      alt_name.add_attribute(j->first, j->second);
-
-   return alt_name;
-   }
-
 }

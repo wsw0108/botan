@@ -7,6 +7,7 @@
 #define BOTAN_PKCS10_H__
 
 #include <botan/x509_obj.h>
+#include <botan/x509_ext.h>
 #include <botan/pkcs8.h>
 #include <botan/datastor.h>
 #include <vector>
@@ -23,7 +24,8 @@ class PKCS10_Request : public X509_Object
 
       MemoryVector<byte> raw_public_key() const;
       X509_DN subject_dn() const;
-      AlternativeName subject_alt_name() const;
+
+      Cert_Extension::Subject_Alternative_Name subject_alt_name() const;
       Key_Constraints constraints() const;
       std::vector<OID> ex_constraints() const;
 
@@ -38,6 +40,7 @@ class PKCS10_Request : public X509_Object
       void force_decode();
       void handle_attribute(const Attribute&);
 
+      Extensions extensions;
       Data_Store info;
    };
 

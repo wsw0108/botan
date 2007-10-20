@@ -65,7 +65,6 @@ bool operator!=(const X509_Certificate&, const X509_Certificate&);
 * Data Store Extraction Operations               *
 *************************************************/
 X509_DN create_dn(const Data_Store&);
-AlternativeName create_alt_name(const Data_Store&);
 
 }
 
