@@ -34,6 +34,8 @@ class Data_Store
 
       bool operator==(const Data_Store&) const;
 
+      std::multimap<std::string, std::string> get_contents() const;
+
       std::multimap<std::string, std::string>
          search_with(const Matcher&) const;
 

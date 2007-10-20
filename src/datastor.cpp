@@ -37,6 +37,14 @@ bool Data_Store::has_value(const std::string& key) const
    }
 
 /*************************************************
+* Return everything in the store                 *
+*************************************************/
+std::multimap<std::string, std::string> Data_Store::get_contents() const
+   {
+   return contents;
+   }
+
+/*************************************************
 * Search based on an arbitrary predicate         *
 *************************************************/
 std::multimap<std::string, std::string>
