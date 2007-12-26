@@ -110,32 +110,6 @@ class X509_DN : public ASN1_Object
    };
 
 /*************************************************
-* Alternative Name                               *
-*************************************************/
-class AlternativeName : public ASN1_Object
-   {
-   public:
-      void encode_into(class DER_Encoder&) const;
-      void decode_from(class BER_Decoder&);
-
-      std::multimap<std::string, std::string> contents() const;
-
-      void add_attribute(const std::string&, const std::string&);
-      std::multimap<std::string, std::string> get_attributes() const;
-
-      void add_othername(const OID&, const std::string&, ASN1_Tag);
-      std::multimap<OID, ASN1_String> get_othernames() const;
-
-      bool has_items() const;
-
-      AlternativeName(const std::string& = "", const std::string& = "",
-                      const std::string& = "", const std::string& = "");
-   private:
-      std::multimap<std::string, std::string> alt_info;
-      std::multimap<OID, ASN1_String> othernames;
-   };
-
-/*************************************************
 * Comparison Operations                          *
 *************************************************/
 bool operator==(const AlgorithmIdentifier&, const AlgorithmIdentifier&);

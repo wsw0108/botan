@@ -37,22 +37,36 @@ MemoryVector<byte> shared_setup(const X509_Cert_Options& opts,
    return key_encoder.read_all();
    }
 
-/*************************************************
-* Load information from the X509_Cert_Options    *
-*************************************************/
-void load_info(const X509_Cert_Options& opts, X509_DN& subject_dn,
-               AlternativeName& subject_alt)
+X509_DN make_dn(const X509_Cert_Options& opts)
    {
-   subject_dn.add_attribute("X520.CommonName", opts.common_name);
-   subject_dn.add_attribute("X520.Country", opts.country);
-   subject_dn.add_attribute("X520.State", opts.state);
-   subject_dn.add_attribute("X520.Locality", opts.locality);
-   subject_dn.add_attribute("X520.Organization", opts.organization);
-   subject_dn.add_attribute("X520.OrganizationalUnit", opts.org_unit);
-   subject_dn.add_attribute("X520.SerialNumber", opts.serial_number);
-   subject_alt = AlternativeName(opts.email, opts.uri, opts.dns, opts.ip);
-   subject_alt.add_othername(OIDS::lookup("PKIX.XMPPAddr"),
-                             opts.xmpp, UTF8_STRING);
+   X509_DN dn;
+
+   dn.add_attribute("X520.CommonName", opts.common_name);
+   dn.add_attribute("X520.Country", opts.country);
+   dn.add_attribute("X520.State", opts.state);
+   dn.add_attribute("X520.Locality", opts.locality);
+   dn.add_attribute("X520.Organization", opts.organization);
+   dn.add_attribute("X520.OrganizationalUnit", opts.org_unit);
+   dn.add_attribute("X520.SerialNumber", opts.serial_number);
+
+   return dn;
+   }
+
+Cert_Extension::Subject_Alternative_Name*
+make_alt_name(const X509_Cert_Options& opts)
+   {
+   Cert_Extension::Subject_Alternative_Name* alt_name =
+      new Cert_Extension::Subject_Alternative_Name();
+
+   alt_name->add_attribute("RFC822", opts.email);
+   alt_name->add_attribute("DNS", opts.dns);
+   alt_name->add_attribute("URI", opts.uri);
+   alt_name->add_attribute("IP", opts.ip);
+
+   alt_name->add_othername(OIDS::lookup("PKIX.XMPPAddr"),
+                           opts.xmpp, UTF8_STRING);
+
+   return alt_name;
    }
 
 }
@@ -65,13 +79,9 @@ namespace X509 {
 X509_Certificate create_self_signed_cert(const X509_Cert_Options& opts,
                                          const Private_Key& key)
    {
-   AlgorithmIdentifier sig_algo;
-   X509_DN subject_dn;
-   AlternativeName subject_alt;
-
    MemoryVector<byte> pub_key = shared_setup(opts, key);
-   std::auto_ptr<PK_Signer> signer(choose_sig_format(key, sig_algo));
-   load_info(opts, subject_dn, subject_alt);
+
+   X509_DN subject_dn = make_dn(opts);
 
    Key_Constraints constraints;
    if(opts.is_CA)
@@ -85,10 +95,15 @@ X509_Certificate create_self_signed_cert(const X509_Cert_Options& opts,
    extensions.add(new Cert_Extension::Key_Usage(constraints));
    extensions.add(
       new Cert_Extension::Extended_Key_Usage(opts.ex_constraints));
-   extensions.add(
-      new Cert_Extension::Subject_Alternative_Name(subject_alt));
+
+   extensions.add(make_alt_name(opts));
+
    extensions.add(
       new Cert_Extension::Basic_Constraints(opts.is_CA, opts.path_limit));
+
+   AlgorithmIdentifier sig_algo;
+
+   std::auto_ptr<PK_Signer> signer(choose_sig_format(key, sig_algo));
 
    return X509_CA::make_cert(signer.get(), sig_algo, pub_key,
                              opts.start, opts.end,
@@ -102,13 +117,9 @@ X509_Certificate create_self_signed_cert(const X509_Cert_Options& opts,
 PKCS10_Request create_cert_req(const X509_Cert_Options& opts,
                                const Private_Key& key)
    {
-   AlgorithmIdentifier sig_algo;
-   X509_DN subject_dn;
-   AlternativeName subject_alt;
-
    MemoryVector<byte> pub_key = shared_setup(opts, key);
-   std::auto_ptr<PK_Signer> signer(choose_sig_format(key, sig_algo));
-   load_info(opts, subject_dn, subject_alt);
+
+   X509_DN subject_dn = make_dn(opts);
 
    const u32bit PKCS10_VERSION = 0;
 
@@ -124,8 +135,7 @@ PKCS10_Request create_cert_req(const X509_Cert_Options& opts,
       );
    extensions.add(
       new Cert_Extension::Extended_Key_Usage(opts.ex_constraints));
-   extensions.add(
-      new Cert_Extension::Subject_Alternative_Name(subject_alt));
+   extensions.add(make_alt_name(opts));
 
    DER_Encoder tbs_req;
 
@@ -157,6 +167,10 @@ PKCS10_Request create_cert_req(const X509_Cert_Options& opts,
       )
       .end_explicit()
       .end_cons();
+
+   AlgorithmIdentifier sig_algo;
+
+   std::auto_ptr<PK_Signer> signer(choose_sig_format(key, sig_algo));
 
    DataSource_Memory source(
       X509_Object::make_signed(signer.get(), sig_algo,

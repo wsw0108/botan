@@ -57,23 +57,35 @@ X509_Certificate X509_CA::sign_request(const PKCS10_Request& req,
 
    Extensions extensions;
 
-   extensions.add(new Cert_Extension::Authority_Key_ID(cert.subject_key_id()));
-   extensions.add(new Cert_Extension::Subject_Key_ID(req.raw_public_key()));
+   extensions.add(
+      new Cert_Extension::Authority_Key_ID(cert.subject_key_id())
+      );
 
    extensions.add(
-      new Cert_Extension::Basic_Constraints(req.is_CA(), req.path_limit()));
-
-   extensions.add(new Cert_Extension::Key_Usage(constraints));
-   extensions.add(
-      new Cert_Extension::Extended_Key_Usage(req.ex_constraints()));
+      new Cert_Extension::Subject_Key_ID(req.raw_public_key())
+      );
 
    extensions.add(
-      new Cert_Extension::Subject_Alternative_Name(req.subject_alt_name()));
+      new Cert_Extension::Basic_Constraints(req.is_CA(), req.path_limit())
+      );
 
-   /*
    extensions.add(
-      new Cert_Extension::Issuer_Alternative_Name(issuer_alt));
-   */
+      new Cert_Extension::Key_Usage(constraints)
+      );
+
+   extensions.add(
+      new Cert_Extension::Extended_Key_Usage(req.ex_constraints())
+      );
+
+   extensions.add(
+      new Cert_Extension::Subject_Alternative_Name(req.subject_alt_name())
+      );
+
+#if 0
+   extensions.add(
+      new Cert_Extension::Issuer_Alternative_Name(cert.subject_alt_name())
+      );
+#endif
 
    if(expire_time == 0)
       expire_time = global_config().option_as_time("x509/ca/default_expire");

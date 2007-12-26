@@ -53,11 +53,11 @@ class Extensions : public ASN1_Object
       Extensions& operator=(const Extensions& e)
          { return copy_this(e); }
 
+      Extensions& copy_this(const Extensions&);
       Extensions(bool st = true) : should_throw(st) {}
       Extensions(const Extensions& e) : ASN1_Object() { copy_this(e); }
       ~Extensions();
-   private:
-      Extensions& copy_this(const Extensions&);
+
       std::vector<Certificate_Extension*> extensions;
       bool should_throw;
    };
@@ -167,24 +167,25 @@ class Authority_Key_ID : public Certificate_Extension
 class Alternative_Name : public Certificate_Extension
    {
    public:
-      AlternativeName get_alt_name() const { return alt_name; }
+      std::multimap<std::string, std::string> contents() const;
 
-   protected:
-      Alternative_Name(const AlternativeName&,
-                       const std::string&, const std::string&);
+      void add_attribute(const std::string&, const std::string&);
+      void add_othername(const OID&, const std::string&, ASN1_Tag);
 
-      Alternative_Name(const std::string&, const std::string&);
+      std::multimap<std::string, std::string> get_attributes() const
+         { return alt_info; }
+      std::multimap<OID, ASN1_String> get_othernames() const
+         { return othernames; }
+
+      bool has_items() const
+         { return (!alt_info.empty() || !othernames.empty()); }
    private:
-      std::string config_id() const { return config_name_str; }
-      std::string oid_name() const { return oid_name_str; }
-
-      bool should_encode() const { return alt_name.has_items(); }
+      bool should_encode() const { return has_items(); }
       MemoryVector<byte> encode_inner() const;
       void decode_inner(const MemoryRegion<byte>&);
-      void contents_to(Data_Store&, Data_Store&) const;
 
-      std::string config_name_str, oid_name_str;
-      AlternativeName alt_name;
+      std::multimap<std::string, std::string> alt_info;
+      std::multimap<OID, ASN1_String> othernames;
    };
 
 /*************************************************
@@ -194,9 +195,16 @@ class Subject_Alternative_Name : public Alternative_Name
    {
    public:
       Subject_Alternative_Name* copy() const
-         { return new Subject_Alternative_Name(get_alt_name()); }
+         { return new Subject_Alternative_Name(*this); }
 
-      Subject_Alternative_Name(const AlternativeName& = AlternativeName());
+      Subject_Alternative_Name(const std::string& = "",
+                               const std::string& = "",
+                               const std::string& = "",
+                               const std::string& = "");
+   private:
+      std::string config_id() const { return "subject_alternative_name"; }
+      std::string oid_name() const { return "X509v3.SubjectAlternativeName"; }
+      void contents_to(Data_Store&, Data_Store&) const;
    };
 
 /*************************************************
@@ -206,9 +214,16 @@ class Issuer_Alternative_Name : public Alternative_Name
    {
    public:
       Issuer_Alternative_Name* copy() const
-         { return new Issuer_Alternative_Name(get_alt_name()); }
+         { return new Issuer_Alternative_Name(*this); }
 
-      Issuer_Alternative_Name(const AlternativeName& = AlternativeName());
+      Issuer_Alternative_Name(const std::string& = "",
+                              const std::string& = "",
+                              const std::string& = "",
+                              const std::string& = "");
+   private:
+      std::string config_id() const { return "issuer_alternative_name"; }
+      std::string oid_name() const { return "X509v3.IssuerAlternativeName"; }
+      void contents_to(Data_Store&, Data_Store&) const;
    };
 
 /*************************************************
