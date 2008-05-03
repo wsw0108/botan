@@ -14,7 +14,7 @@ namespace Botan {
 /*************************************************
 * Derive a key                                   *
 *************************************************/
-SecureVector<byte> KDF::derive_key(u32bit key_len,
+SecureVector<byte> KDF::derive_key(length_type key_len,
                                    const MemoryRegion<byte>& secret,
                                    const std::string& salt) const
    {
@@ -26,9 +26,10 @@ SecureVector<byte> KDF::derive_key(u32bit key_len,
 /*************************************************
 * Derive a key                                   *
 *************************************************/
-SecureVector<byte> KDF::derive_key(u32bit key_len,
+SecureVector<byte> KDF::derive_key(length_type key_len,
                                    const MemoryRegion<byte>& secret,
-                                   const byte salt[], u32bit salt_len) const
+                                   const byte salt[],
+                                   length_type salt_len) const
    {
    return derive_key(key_len, secret.begin(), secret.size(),
                      salt, salt_len);
@@ -37,7 +38,7 @@ SecureVector<byte> KDF::derive_key(u32bit key_len,
 /*************************************************
 * Derive a key                                   *
 *************************************************/
-SecureVector<byte> KDF::derive_key(u32bit key_len,
+SecureVector<byte> KDF::derive_key(length_type key_len,
                                    const MemoryRegion<byte>& secret,
                                    const MemoryRegion<byte>& salt) const
    {
@@ -48,8 +49,8 @@ SecureVector<byte> KDF::derive_key(u32bit key_len,
 /*************************************************
 * Derive a key                                   *
 *************************************************/
-SecureVector<byte> KDF::derive_key(u32bit key_len,
-                                   const byte secret[], u32bit secret_len,
+SecureVector<byte> KDF::derive_key(length_type key_len,
+                                   const byte secret[], length_type secret_len,
                                    const std::string& salt) const
    {
    return derive_key(key_len, secret, secret_len,
@@ -60,9 +61,9 @@ SecureVector<byte> KDF::derive_key(u32bit key_len,
 /*************************************************
 * Derive a key                                   *
 *************************************************/
-SecureVector<byte> KDF::derive_key(u32bit key_len,
-                                   const byte secret[], u32bit secret_len,
-                                   const byte salt[], u32bit salt_len) const
+SecureVector<byte> KDF::derive_key(length_type key_len,
+                                   const byte secret[], length_type secret_len,
+                                   const byte salt[], length_type salt_len) const
    {
    return derive(key_len, secret, secret_len, salt, salt_len);
    }
@@ -70,9 +71,9 @@ SecureVector<byte> KDF::derive_key(u32bit key_len,
 /*************************************************
 * KDF1 Key Derivation Mechanism                  *
 *************************************************/
-SecureVector<byte> KDF1::derive(u32bit,
-                                const byte secret[], u32bit secret_len,
-                                const byte P[], u32bit P_len) const
+SecureVector<byte> KDF1::derive(length_type,
+                                const byte secret[], length_type secret_len,
+                                const byte P[], length_type P_len) const
    {
    std::auto_ptr<HashFunction> hash(get_hash(hash_name));
 
@@ -93,9 +94,9 @@ KDF1::KDF1(const std::string& h_name) : hash_name(h_name)
 /*************************************************
 * KDF2 Key Derivation Mechanism                  *
 *************************************************/
-SecureVector<byte> KDF2::derive(u32bit out_len,
-                                const byte secret[], u32bit secret_len,
-                                const byte P[], u32bit P_len) const
+SecureVector<byte> KDF2::derive(length_type out_len,
+                                const byte secret[], length_type secret_len,
+                                const byte P[], length_type P_len) const
    {
    SecureVector<byte> output;
    u32bit counter = 1;
@@ -104,12 +105,12 @@ SecureVector<byte> KDF2::derive(u32bit out_len,
    while(out_len && counter)
       {
       hash->update(secret, secret_len);
-      for(u32bit j = 0; j != 4; ++j)
+      for(length_type j = 0; j != 4; ++j)
          hash->update(get_byte(j, counter));
       hash->update(P, P_len);
       SecureVector<byte> hash_result = hash->final();
 
-      u32bit added = std::min(hash_result.size(), out_len);
+      length_type added = std::min(hash_result.size(), out_len);
       output.append(hash_result, added);
       out_len -= added;
 

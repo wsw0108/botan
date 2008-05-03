@@ -35,11 +35,11 @@ void Buffering_Filter::end_msg()
 /*************************************************
 * Buffer input into blocks                       *
 *************************************************/
-void Buffering_Filter::write(const byte input[], u32bit length)
+void Buffering_Filter::write(const byte input[], length_type length)
    {
    if(initial_block_pos != INITIAL_BLOCK_SIZE)
       {
-      u32bit copied = std::min(INITIAL_BLOCK_SIZE - initial_block_pos, length);
+      length_type copied = std::min(INITIAL_BLOCK_SIZE - initial_block_pos, length);
       initial.copy(initial_block_pos, input, copied);
       input += copied;
       length -= copied;

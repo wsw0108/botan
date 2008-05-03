@@ -31,7 +31,7 @@ class BOTAN_DLL DataSink : public Filter
 class BOTAN_DLL DataSink_Stream : public DataSink
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
 
       DataSink_Stream(std::ostream&, const std::string& = "");
       DataSink_Stream(const std::string&, bool = false);

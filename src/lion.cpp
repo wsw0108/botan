@@ -53,7 +53,7 @@ void Lion::dec(const byte in[], byte out[]) const
 /*************************************************
 * Lion Key Schedule                              *
 *************************************************/
-void Lion::key(const byte key[], u32bit length)
+void Lion::key(const byte key[], length_type length)
    {
    clear();
 
@@ -94,7 +94,7 @@ void Lion::clear() throw()
 * Lion Constructor                               *
 *************************************************/
 Lion::Lion(const std::string& hash_name, const std::string& sc_name,
-           u32bit block_len) :
+           length_type block_len) :
    BlockCipher(block_len, 2, 2*output_length_of(hash_name), 2),
    LEFT_SIZE(output_length_of(hash_name)), RIGHT_SIZE(BLOCK_SIZE - LEFT_SIZE)
    {

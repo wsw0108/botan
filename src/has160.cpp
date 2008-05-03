@@ -58,7 +58,7 @@ inline void F4(u32bit A, u32bit& B, u32bit C, u32bit D, u32bit& E,
 *************************************************/
 void HAS_160::hash(const byte input[])
    {
-   for(u32bit j = 0; j != 16; ++j)
+   for(length_type j = 0; j != 16; ++j)
       X[j] = load_le<u32bit>(input, j);
 
    u32bit A = digest[0], B = digest[1], C = digest[2],
@@ -121,7 +121,7 @@ void HAS_160::hash(const byte input[])
 *************************************************/
 void HAS_160::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; j += 4)
+   for(length_type j = 0; j != OUTPUT_LENGTH; j += 4)
       store_le(digest[j/4], output + j);
    }
 

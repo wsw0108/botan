@@ -44,7 +44,7 @@ bool DN_Check::match(const X509_Certificate& cert) const
    {
    std::vector<std::string> info = cert.subject_info(dn_entry);
 
-   for(u32bit j = 0; j != info.size(); ++j)
+   for(length_type j = 0; j != info.size(); ++j)
       if(compare(info[j], looking_for))
          return true;
    return false;

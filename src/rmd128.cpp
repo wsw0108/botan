@@ -58,7 +58,7 @@ inline void F4(u32bit& A, u32bit B, u32bit C, u32bit D,
 *************************************************/
 void RIPEMD_128::hash(const byte input[])
    {
-   for(u32bit j = 0; j != 16; ++j)
+   for(length_type j = 0; j != 16; ++j)
       M[j] = load_le<u32bit>(input, j);
 
    u32bit A1 = digest[0], A2 = A1, B1 = digest[1], B2 = B1,
@@ -146,7 +146,7 @@ void RIPEMD_128::hash(const byte input[])
 *************************************************/
 void RIPEMD_128::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; j += 4)
+   for(length_type j = 0; j != OUTPUT_LENGTH; j += 4)
       store_le(digest[j/4], output + j);
    }
 

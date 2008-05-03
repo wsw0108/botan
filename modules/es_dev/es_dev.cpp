@@ -25,7 +25,7 @@ class Device_Reader
 
       Device_Reader(fd_type device_fd) : fd(device_fd) {}
       ~Device_Reader() { if(fd > 0) { ::close(fd); } }
-      u32bit get(byte out[], u32bit length);
+      length_type get(byte out[], length_type length);
 
       static fd_type open(const std::string& pathname);
    private:
@@ -35,7 +35,7 @@ class Device_Reader
 /*************************************************
 * Read from a device file                        *
 *************************************************/
-u32bit Device_Reader::get(byte out[], u32bit length)
+length_type Device_Reader::get(byte out[], length_type length)
    {
    if(fd < 0)
       return 0;
@@ -43,7 +43,7 @@ u32bit Device_Reader::get(byte out[], u32bit length)
    if(fd >= FD_SETSIZE)
       return 0;
 
-   const u32bit READ_WAIT_MS = 10;
+   const length_type READ_WAIT_MS = 10;
 
    fd_set read_set;
    FD_ZERO(&read_set);
@@ -63,7 +63,7 @@ u32bit Device_Reader::get(byte out[], u32bit length)
    if(got <= 0)
       return 0;
 
-   const u32bit ret = static_cast<u32bit>(got);
+   const length_type ret = static_cast<length_type>(got);
 
    if(ret > length)
       return 0;
@@ -93,9 +93,9 @@ int Device_Reader::open(const std::string& pathname)
 /*************************************************
 * Gather entropy from a RNG device               *
 *************************************************/
-u32bit Device_EntropySource::slow_poll(byte output[], u32bit length)
+length_type Device_EntropySource::slow_poll(byte output[], length_type length)
    {
-   u32bit read = 0;
+   length_type read = 0;
 
    for(size_t j = 0; j != fsnames.size(); ++j)
       {

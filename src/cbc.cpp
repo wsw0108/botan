@@ -41,11 +41,11 @@ CBC_Encryption::CBC_Encryption(const std::string& cipher_name,
 /*************************************************
 * Encrypt in CBC mode                            *
 *************************************************/
-void CBC_Encryption::write(const byte input[], u32bit length)
+void CBC_Encryption::write(const byte input[], length_type length)
    {
    while(length)
       {
-      u32bit xored = std::min(BLOCK_SIZE - position, length);
+      length_type xored = std::min(BLOCK_SIZE - position, length);
       xor_buf(state + position, input, xored);
       input += xored;
       length -= xored;
@@ -112,7 +112,7 @@ CBC_Decryption::CBC_Decryption(const std::string& cipher_name,
 /*************************************************
 * Decrypt in CBC mode                            *
 *************************************************/
-void CBC_Decryption::write(const byte input[], u32bit length)
+void CBC_Decryption::write(const byte input[], length_type length)
    {
    while(length)
       {
@@ -124,7 +124,7 @@ void CBC_Decryption::write(const byte input[], u32bit length)
          state = buffer;
          position = 0;
          }
-      u32bit added = std::min(BLOCK_SIZE - position, length);
+      length_type added = std::min(BLOCK_SIZE - position, length);
       buffer.copy(position, input, added);
       input += added;
       length -= added;

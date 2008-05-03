@@ -20,8 +20,8 @@ class BOTAN_DLL PKCS5_PBKDF1 : public S2K
       S2K* clone() const { return new PKCS5_PBKDF1(hash_name); }
       PKCS5_PBKDF1(const std::string&);
    private:
-      OctetString derive(u32bit, const std::string&,
-                          const byte[], u32bit, u32bit) const;
+      OctetString derive(length_type, const std::string&,
+                          const byte[], length_type, length_type) const;
       const std::string hash_name;
    };
 
@@ -35,8 +35,8 @@ class BOTAN_DLL PKCS5_PBKDF2 : public S2K
       S2K* clone() const { return new PKCS5_PBKDF2(hash_name); }
       PKCS5_PBKDF2(const std::string&);
    private:
-      OctetString derive(u32bit, const std::string&,
-                          const byte[], u32bit, u32bit) const;
+      OctetString derive(length_type, const std::string&,
+                          const byte[], length_type, length_type) const;
       const std::string hash_name;
    };
 

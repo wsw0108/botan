@@ -16,7 +16,7 @@ void Blowfish::enc(const byte in[], byte out[]) const
    u32bit L = load_be<u32bit>(in, 0);
    u32bit R = load_be<u32bit>(in, 1);
 
-   for(u32bit j = 0; j != 16; j += 2)
+   for(length_type j = 0; j != 16; j += 2)
       {
       L ^= P[j];
       R ^= ((S1[get_byte(0, L)]  + S2[get_byte(1, L)]) ^
@@ -40,7 +40,7 @@ void Blowfish::dec(const byte in[], byte out[]) const
    u32bit L = load_be<u32bit>(in, 0);
    u32bit R = load_be<u32bit>(in, 1);
 
-   for(u32bit j = 17; j != 1; j -= 2)
+   for(length_type j = 17; j != 1; j -= 2)
       {
       L ^= P[j];
       R ^= ((S1[get_byte(0, L)]  + S2[get_byte(1, L)]) ^
@@ -59,11 +59,11 @@ void Blowfish::dec(const byte in[], byte out[]) const
 /*************************************************
 * Blowfish Key Schedule                          *
 *************************************************/
-void Blowfish::key(const byte key[], u32bit length)
+void Blowfish::key(const byte key[], length_type length)
    {
    clear();
 
-   for(u32bit j = 0, k = 0; j != 18; ++j, k += 4)
+   for(length_type j = 0, k = 0; j != 18; ++j, k += 4)
       P[j] ^= make_u32bit(key[(k  ) % length], key[(k+1) % length],
                           key[(k+2) % length], key[(k+3) % length]);
 
@@ -81,9 +81,9 @@ void Blowfish::key(const byte key[], u32bit length)
 void Blowfish::generate_sbox(u32bit Box[], u32bit size,
                              u32bit& L, u32bit& R) const
    {
-   for(u32bit j = 0; j != size; j += 2)
+   for(length_type j = 0; j != size; j += 2)
       {
-      for(u32bit k = 0; k != 16; k += 2)
+      for(length_type k = 0; k != 16; k += 2)
          {
          L ^= P[k];
          R ^= ((S1[get_byte(0, L)]  + S2[get_byte(1, L)]) ^

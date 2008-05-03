@@ -150,7 +150,7 @@ Key_Constraints find_constraints(const Public_Key& pub_key,
                                  Key_Constraints limits)
    {
    const Public_Key* key = &pub_key;
-   u32bit constraints = 0;
+   length_type constraints = 0;
 
    if(dynamic_cast<const PK_Encrypting_Key*>(key))
       constraints |= KEY_ENCIPHERMENT | DATA_ENCIPHERMENT;

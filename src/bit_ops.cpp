@@ -23,9 +23,9 @@ bool power_of_2(u64bit arg)
 /*************************************************
 * Return the index of the highest set bit        *
 *************************************************/
-u32bit high_bit(u64bit n)
+length_type high_bit(u64bit n)
    {
-   for(u32bit count = 64; count > 0; --count)
+   for(length_type count = 64; count > 0; --count)
       if((n >> (count - 1)) & 0x01)
          return count;
    return 0;
@@ -34,9 +34,9 @@ u32bit high_bit(u64bit n)
 /*************************************************
 * Return the index of the lowest set bit         *
 *************************************************/
-u32bit low_bit(u64bit n)
+length_type low_bit(u64bit n)
    {
-   for(u32bit count = 0; count != 64; ++count)
+   for(length_type count = 0; count != 64; ++count)
       if((n >> count) & 0x01)
          return (count + 1);
    return 0;
@@ -45,9 +45,9 @@ u32bit low_bit(u64bit n)
 /*************************************************
 * Return the number of significant bytes in n    *
 *************************************************/
-u32bit significant_bytes(u64bit n)
+length_type significant_bytes(u64bit n)
    {
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       if(get_byte(j, n))
          return 8-j;
    return 0;
@@ -56,10 +56,10 @@ u32bit significant_bytes(u64bit n)
 /*************************************************
 * Return the Hamming weight of n                 *
 *************************************************/
-u32bit hamming_weight(u64bit n)
+length_type hamming_weight(u64bit n)
    {
-   u32bit weight = 0;
-   for(u32bit j = 0; j != 64; ++j)
+   length_type weight = 0;
+   for(length_type j = 0; j != 64; ++j)
       if((n >> j) & 0x01)
          ++weight;
    return weight;

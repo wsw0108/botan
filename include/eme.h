@@ -16,14 +16,14 @@ namespace Botan {
 class BOTAN_DLL EME1 : public EME
    {
    public:
-      u32bit maximum_input_size(u32bit) const;
+      length_type maximum_input_size(length_type) const;
 
       EME1(const std::string&, const std::string&, const std::string& = "");
       ~EME1() { delete mgf; }
    private:
-      SecureVector<byte> pad(const byte[], u32bit, u32bit) const;
-      SecureVector<byte> unpad(const byte[], u32bit, u32bit) const;
-      const u32bit HASH_LENGTH;
+      SecureVector<byte> pad(const byte[], length_type, length_type) const;
+      SecureVector<byte> unpad(const byte[], length_type, length_type) const;
+      const length_type HASH_LENGTH;
       SecureVector<byte> Phash;
       MGF* mgf;
    };
@@ -34,10 +34,10 @@ class BOTAN_DLL EME1 : public EME
 class BOTAN_DLL EME_PKCS1v15 : public EME
    {
    public:
-      u32bit maximum_input_size(u32bit) const;
+      length_type maximum_input_size(length_type) const;
    private:
-      SecureVector<byte> pad(const byte[], u32bit, u32bit) const;
-      SecureVector<byte> unpad(const byte[], u32bit, u32bit) const;
+      SecureVector<byte> pad(const byte[], length_type, length_type) const;
+      SecureVector<byte> unpad(const byte[], length_type, length_type) const;
    };
 
 }

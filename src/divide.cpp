@@ -35,7 +35,7 @@ void divide(const BigInt& x, const BigInt& y_arg, BigInt& q, BigInt& r)
       throw BigInt::DivideByZero();
 
    BigInt y = y_arg;
-   const u32bit y_words = y.sig_words();
+   const length_type y_words = y.sig_words();
    r = x;
 
    r.set_sign(BigInt::Positive);
@@ -52,13 +52,13 @@ void divide(const BigInt& x, const BigInt& y_arg, BigInt& q, BigInt& r)
       }
    else
       {
-      u32bit shifts = 0;
+      length_type shifts = 0;
       word y_top = y[y.sig_words()-1];
       while(y_top < MP_WORD_TOP_BIT) { y_top <<= 1; ++shifts; }
       y <<= shifts;
       r <<= shifts;
 
-      const u32bit n = r.sig_words() - 1, t = y_words - 1;
+      const length_type n = r.sig_words() - 1, t = y_words - 1;
 
       q.get_reg().create(n - t + 1);
       if(n <= t)
@@ -73,7 +73,7 @@ void divide(const BigInt& x, const BigInt& y_arg, BigInt& q, BigInt& r)
 
       while(r >= temp) { r -= temp; ++q[n-t]; }
 
-      for(u32bit j = n; j != t; --j)
+      for(length_type j = n; j != t; --j)
          {
          const word x_j0  = r.word_at(j);
          const word x_j1 = r.word_at(j-1);

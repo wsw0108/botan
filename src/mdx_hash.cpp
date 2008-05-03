@@ -11,9 +11,11 @@ namespace Botan {
 /*************************************************
 * MDx_HashFunction Constructor                   *
 *************************************************/
-MDx_HashFunction::MDx_HashFunction(u32bit hash_len, u32bit block_len,
-                                   bool byte_end, bool bit_end,
-                                   u32bit cnt_size) :
+MDx_HashFunction::MDx_HashFunction(length_type hash_len,
+                                   length_type block_len,
+                                   bool byte_end,
+                                   bool bit_end,
+                                   length_type cnt_size) :
    HashFunction(hash_len, block_len), buffer(block_len),
    BIG_BYTE_ENDIAN(byte_end), BIG_BIT_ENDIAN(bit_end), COUNT_SIZE(cnt_size)
    {
@@ -34,7 +36,7 @@ void MDx_HashFunction::clear() throw()
 /*************************************************
 * Update the hash                                *
 *************************************************/
-void MDx_HashFunction::add_data(const byte input[], u32bit length)
+void MDx_HashFunction::add_data(const byte input[], length_type length)
    {
    count += length;
 
@@ -69,7 +71,7 @@ void MDx_HashFunction::add_data(const byte input[], u32bit length)
 void MDx_HashFunction::final_result(byte output[])
    {
    buffer[position] = (BIG_BIT_ENDIAN ? 0x80 : 0x01);
-   for(u32bit j = position+1; j != HASH_BLOCK_SIZE; ++j)
+   for(length_type j = position+1; j != HASH_BLOCK_SIZE; ++j)
       buffer[j] = 0;
    if(position >= HASH_BLOCK_SIZE - COUNT_SIZE)
       {

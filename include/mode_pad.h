@@ -17,10 +17,10 @@ namespace Botan {
 class BOTAN_DLL BlockCipherModePaddingMethod
    {
    public:
-      virtual void pad(byte[], u32bit, u32bit) const = 0;
-      virtual u32bit unpad(const byte[], u32bit) const = 0;
-      virtual u32bit pad_bytes(u32bit, u32bit) const;
-      virtual bool valid_blocksize(u32bit) const = 0;
+      virtual void pad(byte[], length_type, length_type) const = 0;
+      virtual length_type unpad(const byte[], length_type) const = 0;
+      virtual length_type pad_bytes(length_type, length_type) const;
+      virtual bool valid_blocksize(length_type) const = 0;
       virtual std::string name() const = 0;
       virtual ~BlockCipherModePaddingMethod() {}
    };
@@ -31,9 +31,9 @@ class BOTAN_DLL BlockCipherModePaddingMethod
 class BOTAN_DLL PKCS7_Padding : public BlockCipherModePaddingMethod
    {
    public:
-      void pad(byte[], u32bit, u32bit) const;
-      u32bit unpad(const byte[], u32bit) const;
-      bool valid_blocksize(u32bit) const;
+      void pad(byte[], length_type, length_type) const;
+      length_type unpad(const byte[], length_type) const;
+      bool valid_blocksize(length_type) const;
       std::string name() const { return "PKCS7"; }
    };
 
@@ -43,9 +43,9 @@ class BOTAN_DLL PKCS7_Padding : public BlockCipherModePaddingMethod
 class BOTAN_DLL ANSI_X923_Padding : public BlockCipherModePaddingMethod
    {
    public:
-      void pad(byte[], u32bit, u32bit) const;
-      u32bit unpad(const byte[], u32bit) const;
-      bool valid_blocksize(u32bit) const;
+      void pad(byte[], length_type, length_type) const;
+      length_type unpad(const byte[], length_type) const;
+      bool valid_blocksize(length_type) const;
       std::string name() const { return "X9.23"; }
    };
 
@@ -55,9 +55,9 @@ class BOTAN_DLL ANSI_X923_Padding : public BlockCipherModePaddingMethod
 class BOTAN_DLL OneAndZeros_Padding : public BlockCipherModePaddingMethod
    {
    public:
-      void pad(byte[], u32bit, u32bit) const;
-      u32bit unpad(const byte[], u32bit) const;
-      bool valid_blocksize(u32bit) const;
+      void pad(byte[], length_type, length_type) const;
+      length_type unpad(const byte[], length_type) const;
+      bool valid_blocksize(length_type) const;
       std::string name() const { return "OneAndZeros"; }
    };
 
@@ -67,10 +67,10 @@ class BOTAN_DLL OneAndZeros_Padding : public BlockCipherModePaddingMethod
 class BOTAN_DLL Null_Padding : public BlockCipherModePaddingMethod
    {
    public:
-      void pad(byte[], u32bit, u32bit) const { return; }
-      u32bit unpad(const byte[], u32bit size) const { return size; }
-      u32bit pad_bytes(u32bit, u32bit) const { return 0; }
-      bool valid_blocksize(u32bit) const { return true; }
+      void pad(byte[], length_type, length_type) const { return; }
+      length_type unpad(const byte[], length_type size) const { return size; }
+      length_type pad_bytes(length_type, length_type) const { return 0; }
+      bool valid_blocksize(length_type) const { return true; }
       std::string name() const { return "NoPadding"; }
    };
 

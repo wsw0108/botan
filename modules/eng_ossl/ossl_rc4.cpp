@@ -21,13 +21,13 @@ class OpenSSL_ARC4 : public StreamCipher
       void clear() throw() { std::memset(&state, 0, sizeof(state)); }
       std::string name() const;
       StreamCipher* clone() const { return new OpenSSL_ARC4(SKIP); }
-      OpenSSL_ARC4(u32bit s = 0) : StreamCipher(1, 32), SKIP(s) { clear(); }
+      OpenSSL_ARC4(length_type s = 0) : StreamCipher(1, 32), SKIP(s) { clear(); }
       ~OpenSSL_ARC4() { clear(); }
    private:
-      void cipher(const byte[], byte[], u32bit);
-      void key(const byte[], u32bit);
+      void cipher(const byte[], byte[], length_type);
+      void key(const byte[], length_type);
 
-      const u32bit SKIP;
+      const length_type SKIP;
       RC4_KEY state;
    };
 
@@ -44,18 +44,18 @@ std::string OpenSSL_ARC4::name() const
 /*************************************************
 * ARC4 Key Schedule                              *
 *************************************************/
-void OpenSSL_ARC4::key(const byte key[], u32bit length)
+void OpenSSL_ARC4::key(const byte key[], length_type length)
    {
    RC4_set_key(&state, length, key);
    byte dummy = 0;
-   for(u32bit j = 0; j != SKIP; j++)
+   for(length_type j = 0; j != SKIP; j++)
       RC4(&state, 1, &dummy, &dummy);
    }
 
 /*************************************************
 * ARC4 Encryption                                *
 *************************************************/
-void OpenSSL_ARC4::cipher(const byte in[], byte out[], u32bit length)
+void OpenSSL_ARC4::cipher(const byte in[], byte out[], length_type length)
    {
    RC4(&state, length, in, out);
    }
@@ -79,7 +79,7 @@ OpenSSL_Engine::find_stream_cipher(const std::string& algo_spec) const
       if(name.size() == 1)                          \
          return new TYPE(DEFAULT);                  \
       if(name.size() == 2)                          \
-         return new TYPE(to_u32bit(name[1]));       \
+         return new TYPE(to_length_type(name[1]));       \
       throw Invalid_Algorithm_Name(algo_spec);      \
       }
 

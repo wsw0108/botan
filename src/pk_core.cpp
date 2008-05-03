@@ -14,7 +14,7 @@ namespace Botan {
 
 namespace {
 
-const u32bit BLINDING_BITS = BOTAN_PRIVATE_KEY_OP_BLINDING_BITS;
+const length_type BLINDING_BITS = BOTAN_PRIVATE_KEY_OP_BLINDING_BITS;
 
 }
 
@@ -106,8 +106,8 @@ DSA_Core& DSA_Core::operator=(const DSA_Core& core)
 /*************************************************
 * DSA Verification Operation                     *
 *************************************************/
-bool DSA_Core::verify(const byte msg[], u32bit msg_length,
-                      const byte sig[], u32bit sig_length) const
+bool DSA_Core::verify(const byte msg[], length_type msg_length,
+                      const byte sig[], length_type sig_length) const
    {
    return op->verify(msg, msg_length, sig, sig_length);
    }
@@ -115,7 +115,7 @@ bool DSA_Core::verify(const byte msg[], u32bit msg_length,
 /*************************************************
 * DSA Signature Operation                        *
 *************************************************/
-SecureVector<byte> DSA_Core::sign(const byte in[], u32bit length,
+SecureVector<byte> DSA_Core::sign(const byte in[], length_type length,
                                   const BigInt& k) const
    {
    return op->sign(in, length, k);
@@ -153,7 +153,7 @@ NR_Core& NR_Core::operator=(const NR_Core& core)
 /*************************************************
 * NR Verification Operation                      *
 *************************************************/
-SecureVector<byte> NR_Core::verify(const byte in[], u32bit length) const
+SecureVector<byte> NR_Core::verify(const byte in[], length_type length) const
    {
    return op->verify(in, length);
    }
@@ -161,7 +161,7 @@ SecureVector<byte> NR_Core::verify(const byte in[], u32bit length) const
 /*************************************************
 * NR Signature Operation                         *
 *************************************************/
-SecureVector<byte> NR_Core::sign(const byte in[], u32bit length,
+SecureVector<byte> NR_Core::sign(const byte in[], length_type length,
                                  const BigInt& k) const
    {
    return op->sign(in, length, k);
@@ -214,7 +214,7 @@ ELG_Core& ELG_Core::operator=(const ELG_Core& core)
 /*************************************************
 * ElGamal Encrypt Operation                      *
 *************************************************/
-SecureVector<byte> ELG_Core::encrypt(const byte in[], u32bit length,
+SecureVector<byte> ELG_Core::encrypt(const byte in[], length_type length,
                                      const BigInt& k) const
    {
    return op->encrypt(in, length, k);
@@ -223,7 +223,7 @@ SecureVector<byte> ELG_Core::encrypt(const byte in[], u32bit length,
 /*************************************************
 * ElGamal Decrypt Operation                      *
 *************************************************/
-SecureVector<byte> ELG_Core::decrypt(const byte in[], u32bit length) const
+SecureVector<byte> ELG_Core::decrypt(const byte in[], length_type length) const
    {
    if(length != 2*p_bytes)
       throw Invalid_Argument("ELG_Core::decrypt: Invalid message");

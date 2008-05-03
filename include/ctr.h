@@ -20,7 +20,7 @@ class BOTAN_DLL CTR_BE : public BlockCipherMode
       CTR_BE(const std::string&,
              const SymmetricKey&, const InitializationVector&);
    private:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void increment_counter();
    };
 

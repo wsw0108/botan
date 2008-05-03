@@ -16,15 +16,15 @@ namespace Botan {
 class BOTAN_DLL MDx_HashFunction : public HashFunction
    {
    public:
-      MDx_HashFunction(u32bit, u32bit, bool, bool, u32bit = 8);
+      MDx_HashFunction(length_type, length_type, bool, bool, length_type = 8);
       virtual ~MDx_HashFunction() {}
    protected:
       void clear() throw();
       SecureVector<byte> buffer;
       u64bit count;
-      u32bit position;
+      length_type position;
    private:
-      void add_data(const byte[], u32bit);
+      void add_data(const byte[], length_type);
       void final_result(byte output[]);
 
       virtual void hash(const byte[]) = 0;
@@ -32,7 +32,7 @@ class BOTAN_DLL MDx_HashFunction : public HashFunction
       virtual void write_count(byte[]);
 
       const bool BIG_BYTE_ENDIAN, BIG_BIT_ENDIAN;
-      const u32bit COUNT_SIZE;
+      const length_type COUNT_SIZE;
    };
 
 }

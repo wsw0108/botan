@@ -40,9 +40,9 @@ void MD2::hash(const byte input[])
    X.copy(16, input, HASH_BLOCK_SIZE);
    xor_buf(X + 32, X, X + 16, HASH_BLOCK_SIZE);
    byte T = 0;
-   for(u32bit j = 0; j != 18; ++j)
+   for(length_type j = 0; j != 18; ++j)
       {
-      for(u32bit k = 0; k != 48; k += 8)
+      for(length_type k = 0; k != 48; k += 8)
          {
          T = X[k  ] ^= SBOX[T]; T = X[k+1] ^= SBOX[T];
          T = X[k+2] ^= SBOX[T]; T = X[k+3] ^= SBOX[T];
@@ -52,14 +52,14 @@ void MD2::hash(const byte input[])
       T += j;
       }
    T = checksum[15];
-   for(u32bit j = 0; j != HASH_BLOCK_SIZE; ++j)
+   for(length_type j = 0; j != HASH_BLOCK_SIZE; ++j)
       T = checksum[j] ^= SBOX[input[j] ^ T];
    }
 
 /*************************************************
 * Update the hash                                *
 *************************************************/
-void MD2::add_data(const byte input[], u32bit length)
+void MD2::add_data(const byte input[], length_type length)
    {
    buffer.copy(position, input, length);
    if(position + length >= HASH_BLOCK_SIZE)
@@ -84,7 +84,7 @@ void MD2::add_data(const byte input[], u32bit length)
 *************************************************/
 void MD2::final_result(byte output[])
    {
-   for(u32bit j = position; j != HASH_BLOCK_SIZE; ++j)
+   for(length_type j = position; j != HASH_BLOCK_SIZE; ++j)
       buffer[j] = static_cast<byte>(HASH_BLOCK_SIZE - position);
    hash(buffer);
    hash(checksum);

@@ -19,7 +19,7 @@ void Twofish::enc(const byte in[], byte out[]) const
    u32bit C = load_le<u32bit>(in, 2) ^ round_key[2];
    u32bit D = load_le<u32bit>(in, 3) ^ round_key[3];
 
-   for(u32bit j = 0; j != 16; j += 2)
+   for(length_type j = 0; j != 16; j += 2)
       {
       u32bit X, Y;
 
@@ -64,7 +64,7 @@ void Twofish::dec(const byte in[], byte out[]) const
    u32bit C = load_le<u32bit>(in, 2) ^ round_key[6];
    u32bit D = load_le<u32bit>(in, 3) ^ round_key[7];
 
-   for(u32bit j = 0; j != 16; j += 2)
+   for(length_type j = 0; j != 16; j += 2)
       {
       u32bit X, Y;
 
@@ -102,23 +102,23 @@ void Twofish::dec(const byte in[], byte out[]) const
 /*************************************************
 * Twofish Key Schedule                           *
 *************************************************/
-void Twofish::key(const byte key[], u32bit length)
+void Twofish::key(const byte key[], length_type length)
    {
    SecureBuffer<byte, 16> S;
 
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       rs_mul(S + 4*(j/8), key[j], j);
 
    if(length == 16)
       {
-      for(u32bit j = 0; j != 256; ++j)
+      for(length_type j = 0; j != 256; ++j)
          {
          SBox0[j] = MDS0[Q0[Q0[j]^S[ 0]]^S[ 4]];
          SBox1[j] = MDS1[Q0[Q1[j]^S[ 1]]^S[ 5]];
          SBox2[j] = MDS2[Q1[Q0[j]^S[ 2]]^S[ 6]];
          SBox3[j] = MDS3[Q1[Q1[j]^S[ 3]]^S[ 7]];
          }
-      for(u32bit j = 0; j != 40; j += 2)
+      for(length_type j = 0; j != 40; j += 2)
          {
          u32bit X = MDS0[Q0[Q0[j  ]^key[ 8]]^key[ 0]] ^
                     MDS1[Q0[Q1[j  ]^key[ 9]]^key[ 1]] ^
@@ -134,14 +134,14 @@ void Twofish::key(const byte key[], u32bit length)
       }
    else if(length == 24)
       {
-      for(u32bit j = 0; j != 256; ++j)
+      for(length_type j = 0; j != 256; ++j)
          {
          SBox0[j] = MDS0[Q0[Q0[Q1[j]^S[ 0]]^S[ 4]]^S[ 8]];
          SBox1[j] = MDS1[Q0[Q1[Q1[j]^S[ 1]]^S[ 5]]^S[ 9]];
          SBox2[j] = MDS2[Q1[Q0[Q0[j]^S[ 2]]^S[ 6]]^S[10]];
          SBox3[j] = MDS3[Q1[Q1[Q0[j]^S[ 3]]^S[ 7]]^S[11]];
          }
-      for(u32bit j = 0; j != 40; j += 2)
+      for(length_type j = 0; j != 40; j += 2)
          {
          u32bit X = MDS0[Q0[Q0[Q1[j  ]^key[16]]^key[ 8]]^key[ 0]] ^
                     MDS1[Q0[Q1[Q1[j  ]^key[17]]^key[ 9]]^key[ 1]] ^
@@ -157,14 +157,14 @@ void Twofish::key(const byte key[], u32bit length)
       }
    else if(length == 32)
       {
-      for(u32bit j = 0; j != 256; ++j)
+      for(length_type j = 0; j != 256; ++j)
          {
          SBox0[j] = MDS0[Q0[Q0[Q1[Q1[j]^S[ 0]]^S[ 4]]^S[ 8]]^S[12]];
          SBox1[j] = MDS1[Q0[Q1[Q1[Q0[j]^S[ 1]]^S[ 5]]^S[ 9]]^S[13]];
          SBox2[j] = MDS2[Q1[Q0[Q0[Q0[j]^S[ 2]]^S[ 6]]^S[10]]^S[14]];
          SBox3[j] = MDS3[Q1[Q1[Q0[Q1[j]^S[ 3]]^S[ 7]]^S[11]]^S[15]];
          }
-      for(u32bit j = 0; j != 40; j += 2)
+      for(length_type j = 0; j != 40; j += 2)
          {
          u32bit X = MDS0[Q0[Q0[Q1[Q1[j  ]^key[24]]^key[16]]^key[ 8]]^key[ 0]] ^
                     MDS1[Q0[Q1[Q1[Q0[j  ]^key[25]]^key[17]]^key[ 9]]^key[ 1]] ^
@@ -183,7 +183,7 @@ void Twofish::key(const byte key[], u32bit length)
 /*************************************************
 * Do one column of the RS matrix multiplcation   *
 *************************************************/
-void Twofish::rs_mul(byte S[4], byte key, u32bit offset)
+void Twofish::rs_mul(byte S[4], byte key, length_type offset)
    {
    if(key)
       {

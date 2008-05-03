@@ -13,25 +13,26 @@ namespace Botan {
 /*************************************************
 * Derive a key using the OpenPGP S2K algorithm   *
 *************************************************/
-OctetString OpenPGP_S2K::derive(u32bit key_len, const std::string& passphrase,
-                                const byte salt_buf[], u32bit salt_size,
-                                u32bit iterations) const
+OctetString OpenPGP_S2K::derive(length_type key_len,
+                                const std::string& passphrase,
+                                const byte salt_buf[], length_type salt_size,
+                                length_type iterations) const
    {
    SecureVector<byte> key(key_len), hash_buf;
 
-   u32bit pass = 0, generated = 0,
+   length_type pass = 0, generated = 0,
           total_size = passphrase.size() + salt_size;
-   u32bit to_hash = std::max(iterations, total_size);
+   length_type to_hash = std::max(iterations, total_size);
 
    std::auto_ptr<HashFunction> hash(get_hash(hash_name));
 
    hash->clear();
    while(key_len > generated)
       {
-      for(u32bit j = 0; j != pass; ++j)
+      for(length_type j = 0; j != pass; ++j)
          hash->update(0);
 
-      u32bit left = to_hash;
+      length_type left = to_hash;
       while(left >= total_size)
          {
          hash->update(salt_buf, salt_size);

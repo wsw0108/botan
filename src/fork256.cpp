@@ -62,7 +62,7 @@ void FORK_256::hash(const byte input[])
    G1 = G2 = G3 = G4 = digest[6];
    H1 = H2 = H3 = H4 = digest[7];
 
-   for(u32bit j = 0; j != 16; ++j)
+   for(length_type j = 0; j != 16; ++j)
       M[j] = load_be<u32bit>(input, j);
 
    step(A1, B1, C1, D1, E1, F1, G1, H1, M[ 0], M[ 1], DELTA[ 0], DELTA[ 1]);
@@ -120,7 +120,7 @@ void FORK_256::hash(const byte input[])
 *************************************************/
 void FORK_256::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; j += 4)
+   for(length_type j = 0; j != OUTPUT_LENGTH; j += 4)
       store_be(digest[j/4], output + j);
    }
 

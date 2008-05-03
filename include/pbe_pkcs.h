@@ -18,7 +18,7 @@ namespace Botan {
 class BOTAN_DLL PBE_PKCS5v15 : public PBE
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void start_msg();
       void end_msg();
       PBE_PKCS5v15(const std::string&, const std::string&, Cipher_Dir);
@@ -32,7 +32,7 @@ class BOTAN_DLL PBE_PKCS5v15 : public PBE
       const Cipher_Dir direction;
       const std::string digest, cipher;
       SecureVector<byte> salt, key, iv;
-      u32bit iterations;
+      length_type iterations;
       Pipe pipe;
    };
 
@@ -42,7 +42,7 @@ class BOTAN_DLL PBE_PKCS5v15 : public PBE
 class BOTAN_DLL PBE_PKCS5v20 : public PBE
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void start_msg();
       void end_msg();
       PBE_PKCS5v20(DataSource&);
@@ -59,7 +59,7 @@ class BOTAN_DLL PBE_PKCS5v20 : public PBE
       const Cipher_Dir direction;
       std::string digest, cipher, cipher_algo;
       SecureVector<byte> salt, key, iv;
-      u32bit iterations, key_length;
+      length_type iterations, key_length;
       Pipe pipe;
    };
 

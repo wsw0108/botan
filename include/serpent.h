@@ -23,7 +23,7 @@ class BOTAN_DLL Serpent : public BlockCipher
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
 
       SecureBuffer<u32bit, 132> round_key;
    };

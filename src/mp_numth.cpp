@@ -15,7 +15,7 @@ namespace Botan {
 *************************************************/
 BigInt square(const BigInt& x)
    {
-   const u32bit x_sw = x.sig_words();
+   const length_type x_sw = x.sig_words();
 
    BigInt z(BigInt::Positive, round_up(2*x_sw, 16));
    SecureVector<word> workspace(z.size());
@@ -37,17 +37,17 @@ BigInt mul_add(const BigInt& a, const BigInt& b, const BigInt& c)
    if(a.sign() != b.sign())
       sign = BigInt::Negative;
 
-   const u32bit a_sw = a.sig_words();
-   const u32bit b_sw = b.sig_words();
-   const u32bit c_sw = c.sig_words();
+   const length_type a_sw = a.sig_words();
+   const length_type b_sw = b.sig_words();
+   const length_type c_sw = c.sig_words();
 
-   BigInt r(sign, std::max(a.size() + b.size(), c_sw) + 1);
+   BigInt r(sign, std::max<length_type>(a.size() + b.size(), c_sw) + 1);
    SecureVector<word> workspace(r.size());
 
    bigint_mul(r.get_reg(), r.size(), workspace,
               a.data(), a.size(), a_sw,
               b.data(), b.size(), b_sw);
-   const u32bit r_size = std::max(r.sig_words(), c_sw);
+   const length_type r_size = std::max<length_type>(r.sig_words(), c_sw);
    bigint_add2(r.get_reg(), r_size, c.data(), c_sw);
    return r;
    }

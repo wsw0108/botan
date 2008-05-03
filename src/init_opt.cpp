@@ -92,7 +92,7 @@ InitializerOptions::InitializerOptions(const std::string& arg_string)
    {
    const std::vector<std::string> arg_list = split_on(arg_string, ' ');
 
-   for(u32bit j = 0; j != arg_list.size(); ++j)
+   for(length_type j = 0; j != arg_list.size(); ++j)
       {
       if(arg_list[j].size() == 0)
          continue;

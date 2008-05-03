@@ -21,7 +21,7 @@ void Whirlpool::hash(const byte in[])
       0xFBEE7C66DD17479E, 0xCA2DBF07AD5A8333
    };
 
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       M[j] = load_be<u64bit>(in, j);
 
    u64bit K0, K1, K2, K3, K4, K5, K6, K7;
@@ -32,7 +32,7 @@ void Whirlpool::hash(const byte in[])
    B0 = K0 ^ M[0]; B1 = K1 ^ M[1]; B2 = K2 ^ M[2]; B3 = K3 ^ M[3];
    B4 = K4 ^ M[4]; B5 = K5 ^ M[5]; B6 = K6 ^ M[6]; B7 = K7 ^ M[7];
 
-   for(u32bit j = 0; j != 10; ++j)
+   for(length_type j = 0; j != 10; ++j)
       {
       u64bit T0, T1, T2, T3, T4, T5, T6, T7;
       T0 = C0[get_byte(0, K0)] ^ C1[get_byte(1, K7)] ^
@@ -123,7 +123,7 @@ void Whirlpool::hash(const byte in[])
 *************************************************/
 void Whirlpool::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; j += 8)
+   for(length_type j = 0; j != OUTPUT_LENGTH; j += 8)
       store_be(digest[j/8], output + j);
    }
 

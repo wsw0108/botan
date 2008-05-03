@@ -23,7 +23,7 @@ class FTW_EntropySource : public Buffered_EntropySource
       void gather_from_dir(const std::string&);
       void gather_from_file(const std::string&);
       const std::string path;
-      u32bit files_read, max_read;
+      length_type files_read, max_read;
    };
 
 }

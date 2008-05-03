@@ -30,7 +30,7 @@ void DH_PublicKey::X509_load_hook()
 /*************************************************
 * Return the maximum input size in bits          *
 *************************************************/
-u32bit DH_PublicKey::max_input_bits() const
+length_type DH_PublicKey::max_input_bits() const
    {
    return group_p().bits();
    }
@@ -96,7 +96,7 @@ MemoryVector<byte> DH_PrivateKey::public_value() const
 * Derive a key                                   *
 *************************************************/
 SecureVector<byte> DH_PrivateKey::derive_key(const byte w[],
-                                             u32bit w_len) const
+                                             length_type w_len) const
    {
    return derive_key(BigInt::decode(w, w_len));
    }

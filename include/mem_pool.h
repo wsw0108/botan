@@ -20,31 +20,31 @@ namespace Botan {
 class BOTAN_DLL Pooling_Allocator : public Allocator
    {
    public:
-      void* allocate(u32bit);
-      void deallocate(void*, u32bit);
+      void* allocate(length_type);
+      void deallocate(void*, length_type);
 
       void destroy();
 
       Pooling_Allocator();
       ~Pooling_Allocator();
    private:
-      void get_more_core(u32bit);
-      byte* allocate_blocks(u32bit);
+      void get_more_core(length_type);
+      byte* allocate_blocks(length_type);
 
-      virtual void* alloc_block(u32bit) = 0;
-      virtual void dealloc_block(void*, u32bit) = 0;
+      virtual void* alloc_block(length_type) = 0;
+      virtual void dealloc_block(void*, length_type) = 0;
 
       class BOTAN_DLL Memory_Block
          {
          public:
             Memory_Block(void*);
 
-            static u32bit bitmap_size() { return BITMAP_SIZE; }
-            static u32bit block_size() { return BLOCK_SIZE; }
+            static length_type bitmap_size() { return BITMAP_SIZE; }
+            static length_type block_size() { return BLOCK_SIZE; }
 
-            bool contains(void*, u32bit) const throw();
-            byte* alloc(u32bit) throw();
-            void free(void*, u32bit) throw();
+            bool contains(void*, length_type) const throw();
+            byte* alloc(length_type) throw();
+            void free(void*, length_type) throw();
 
             bool operator<(const Memory_Block& other) const
                {
@@ -54,18 +54,18 @@ class BOTAN_DLL Pooling_Allocator : public Allocator
                }
          private:
             typedef u64bit bitmap_type;
-            static const u32bit BITMAP_SIZE = 8 * sizeof(bitmap_type);
-            static const u32bit BLOCK_SIZE = 64;
+            static const length_type BITMAP_SIZE = 8 * sizeof(bitmap_type);
+            static const length_type BLOCK_SIZE = 64;
 
             bitmap_type bitmap;
             byte* buffer, *buffer_end;
          };
 
-      static const u32bit PREF_SIZE = BOTAN_MEM_POOL_CHUNK_SIZE;
+      static const length_type PREF_SIZE = BOTAN_MEM_POOL_CHUNK_SIZE;
 
       std::vector<Memory_Block> blocks;
       std::vector<Memory_Block>::iterator last_used;
-      std::vector<std::pair<void*, u32bit> > allocated;
+      std::vector<std::pair<void*, length_type> > allocated;
       Mutex* mutex;
    };
 

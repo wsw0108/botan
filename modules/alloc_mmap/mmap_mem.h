@@ -18,8 +18,8 @@ class MemoryMapping_Allocator : public Pooling_Allocator
    public:
       std::string type() const { return "mmap"; }
    private:
-      void* alloc_block(u32bit);
-      void dealloc_block(void*, u32bit);
+      void* alloc_block(length_type);
+      void dealloc_block(void*, length_type);
    };
 
 }

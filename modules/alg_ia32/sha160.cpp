@@ -8,7 +8,7 @@
 
 namespace Botan {
 
-extern "C" void sha160_core(u32bit[5], const byte[64], u32bit[81]);
+extern "C" void sha160_core(length_type[5], const byte[64], length_type[81]);
 
 /*************************************************
 * SHA-160 Compression Function                   *
@@ -23,7 +23,7 @@ void SHA_160::hash(const byte input[])
 *************************************************/
 void SHA_160::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; ++j)
+   for(length_type j = 0; j != OUTPUT_LENGTH; ++j)
       output[j] = get_byte(j % 4, digest[j/4]);
    }
 

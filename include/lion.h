@@ -19,13 +19,13 @@ class BOTAN_DLL Lion : public BlockCipher
       void clear() throw();
       std::string name() const;
       BlockCipher* clone() const;
-      Lion(const std::string&, const std::string&, u32bit);
+      Lion(const std::string&, const std::string&, length_type);
       ~Lion() { delete hash; delete cipher; }
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
-      const u32bit LEFT_SIZE, RIGHT_SIZE;
+      void key(const byte[], length_type);
+      const length_type LEFT_SIZE, RIGHT_SIZE;
       HashFunction* hash;
       StreamCipher* cipher;
       SecureVector<byte> key1, key2;

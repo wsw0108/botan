@@ -28,7 +28,7 @@ namespace {
 class Null_Filter : public Filter
    {
    public:
-      void write(const byte input[], u32bit length)
+      void write(const byte input[], length_type length)
          { send(input, length); }
    };
 
@@ -49,10 +49,10 @@ Pipe::Pipe(Filter* f1, Filter* f2, Filter* f3, Filter* f4)
 /*************************************************
 * Pipe Constructor                               *
 *************************************************/
-Pipe::Pipe(Filter* filter_array[], u32bit count)
+Pipe::Pipe(Filter* filter_array[], length_type count)
    {
    init();
-   for(u32bit j = 0; j != count; ++j)
+   for(length_type j = 0; j != count; ++j)
       append(filter_array[j]);
    }
 
@@ -95,7 +95,7 @@ void Pipe::destruct(Filter* to_kill)
    {
    if(!to_kill || dynamic_cast<SecureQueue*>(to_kill))
       return;
-   for(u32bit j = 0; j != to_kill->total_ports(); ++j)
+   for(length_type j = 0; j != to_kill->total_ports(); ++j)
       destruct(to_kill->next[j]);
    delete to_kill;
    }
@@ -121,7 +121,7 @@ void Pipe::set_default_msg(message_id msg)
 /*************************************************
 * Process a full message at once                 *
 *************************************************/
-void Pipe::process_msg(const byte input[], u32bit length)
+void Pipe::process_msg(const byte input[], length_type length)
    {
    start_msg();
    write(input, length);
@@ -192,7 +192,7 @@ void Pipe::end_msg()
 *************************************************/
 void Pipe::find_endpoints(Filter* f)
    {
-   for(u32bit j = 0; j != f->total_ports(); ++j)
+   for(length_type j = 0; j != f->total_ports(); ++j)
       if(f->next[j] && !dynamic_cast<SecureQueue*>(f->next[j]))
          find_endpoints(f->next[j]);
       else
@@ -209,7 +209,7 @@ void Pipe::find_endpoints(Filter* f)
 void Pipe::clear_endpoints(Filter* f)
    {
    if(!f) return;
-   for(u32bit j = 0; j != f->total_ports(); ++j)
+   for(length_type j = 0; j != f->total_ports(); ++j)
       {
       if(f->next[j] && dynamic_cast<SecureQueue*>(f->next[j]))
          f->next[j] = 0;
@@ -272,7 +272,7 @@ void Pipe::pop()
       throw Invalid_State("Cannot pop off a Filter with multiple ports");
 
    Filter* f = pipe;
-   u32bit owns = f->owns();
+   length_type owns = f->owns();
    pipe = pipe->next[0];
    delete f;
 

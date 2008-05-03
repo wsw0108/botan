@@ -17,13 +17,13 @@ namespace Botan {
 class BOTAN_DLL SecureQueue : public Fanout_Filter, public DataSource
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
 
-      u32bit read(byte[], u32bit);
-      u32bit peek(byte[], u32bit, u32bit = 0) const;
+      length_type read(byte[], length_type);
+      length_type peek(byte[], length_type, length_type = 0) const;
 
       bool end_of_data() const;
-      u32bit size() const;
+      length_type size() const;
       bool attachable() { return false; }
 
       SecureQueue& operator=(const SecureQueue&);

@@ -18,7 +18,7 @@ namespace Botan {
 class BOTAN_DLL Pipe : public DataSource
    {
    public:
-      typedef u32bit message_id;
+      typedef length_type message_id;
 
       class Invalid_Message_Number : public Invalid_Argument
          {
@@ -29,29 +29,29 @@ class BOTAN_DLL Pipe : public DataSource
       static const message_id LAST_MESSAGE;
       static const message_id DEFAULT_MESSAGE;
 
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void write(const MemoryRegion<byte>&);
       void write(const std::string&);
       void write(DataSource&);
       void write(byte);
 
-      void process_msg(const byte[], u32bit);
+      void process_msg(const byte[], length_type);
       void process_msg(const MemoryRegion<byte>&);
       void process_msg(const std::string&);
       void process_msg(DataSource&);
 
-      u32bit remaining(message_id = DEFAULT_MESSAGE) const;
+      length_type remaining(message_id = DEFAULT_MESSAGE) const;
 
-      u32bit read(byte[], u32bit);
-      u32bit read(byte[], u32bit, message_id);
-      u32bit read(byte&, message_id = DEFAULT_MESSAGE);
+      length_type read(byte[], length_type);
+      length_type read(byte[], length_type, message_id);
+      length_type read(byte&, message_id = DEFAULT_MESSAGE);
 
       SecureVector<byte> read_all(message_id = DEFAULT_MESSAGE);
       std::string read_all_as_string(message_id = DEFAULT_MESSAGE);
 
-      u32bit peek(byte[], u32bit, u32bit) const;
-      u32bit peek(byte[], u32bit, u32bit, message_id) const;
-      u32bit peek(byte&, u32bit, message_id = DEFAULT_MESSAGE) const;
+      length_type peek(byte[], length_type, length_type) const;
+      length_type peek(byte[], length_type, length_type, message_id) const;
+      length_type peek(byte&, length_type, message_id = DEFAULT_MESSAGE) const;
 
       message_id default_msg() const { return default_read; }
       void set_default_msg(message_id);
@@ -67,7 +67,7 @@ class BOTAN_DLL Pipe : public DataSource
       void reset();
 
       Pipe(Filter* = 0, Filter* = 0, Filter* = 0, Filter* = 0);
-      Pipe(Filter*[], u32bit);
+      Pipe(Filter*[], length_type);
       ~Pipe();
    private:
       Pipe(const Pipe&) : DataSource() {}

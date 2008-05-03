@@ -39,7 +39,7 @@ void KASUMI::enc(const byte in[], byte out[]) const
    u16bit B2 = load_be<u16bit>(in, 2);
    u16bit B3 = load_be<u16bit>(in, 3);
 
-   for(u32bit j = 0; j != 8; j += 2)
+   for(length_type j = 0; j != 8; j += 2)
       {
       const u16bit* K = EK + 8*j;
 
@@ -77,7 +77,7 @@ void KASUMI::dec(const byte in[], byte out[]) const
    u16bit B2 = load_be<u16bit>(in, 2);
    u16bit B3 = load_be<u16bit>(in, 3);
 
-   for(u32bit j = 0; j != 8; j += 2)
+   for(length_type j = 0; j != 8; j += 2)
       {
       const u16bit* K = EK + 8*(6-j);
 
@@ -110,19 +110,19 @@ void KASUMI::dec(const byte in[], byte out[]) const
 /*************************************************
 * KASUMI Key Schedule                            *
 *************************************************/
-void KASUMI::key(const byte key[], u32bit)
+void KASUMI::key(const byte key[], length_type)
    {
    static const u16bit RC[] = { 0x0123, 0x4567, 0x89AB, 0xCDEF,
                                 0xFEDC, 0xBA98, 0x7654, 0x3210 };
 
    SecureBuffer<u16bit, 16> K;
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       {
       K[j] = load_be<u16bit>(key, j);
       K[j+8] = K[j] ^ RC[j];
       }
 
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       {
       EK[8*j  ] = rotate_left(K[(j+0) % 8    ], 2);
       EK[8*j+1] = rotate_left(K[(j+2) % 8 + 8], 1);

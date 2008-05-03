@@ -16,18 +16,18 @@ namespace Botan {
 class BOTAN_DLL Buffering_Filter : public Filter
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       virtual void end_msg();
       Buffering_Filter(u32bit, u32bit = 0);
       virtual ~Buffering_Filter() {}
    protected:
       virtual void initial_block(const byte[]) {}
       virtual void main_block(const byte[]) = 0;
-      virtual void final_block(const byte[], u32bit) = 0;
+      virtual void final_block(const byte[], length_type) = 0;
    private:
-      const u32bit INITIAL_BLOCK_SIZE, BLOCK_SIZE;
+      const length_type INITIAL_BLOCK_SIZE, BLOCK_SIZE;
       SecureVector<byte> initial, block;
-      u32bit initial_block_pos, block_pos;
+      length_type initial_block_pos, block_pos;
    };
 
 }

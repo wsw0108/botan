@@ -17,7 +17,7 @@ namespace Botan {
 class BOTAN_DLL OctetString
    {
    public:
-      u32bit length() const { return bits.size(); }
+      length_type length() const { return bits.size(); }
       SecureVector<byte> bits_of() const { return bits; }
 
       const byte* begin() const { return bits.begin(); }
@@ -29,14 +29,14 @@ class BOTAN_DLL OctetString
 
       void set_odd_parity();
 
-      void change(u32bit);
+      void change(length_type);
       void change(const std::string&);
-      void change(const byte[], u32bit);
+      void change(const byte[], length_type);
       void change(const MemoryRegion<byte>& in) { bits = in; }
 
-      OctetString(u32bit len) { change(len); }
+      OctetString(length_type len) { change(len); }
       OctetString(const std::string& str = "") { change(str); }
-      OctetString(const byte in[], u32bit len) { change(in, len); }
+      OctetString(const byte in[], length_type len) { change(in, len); }
       OctetString(const MemoryRegion<byte>& in) { change(in); }
    private:
       SecureVector<byte> bits;

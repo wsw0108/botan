@@ -16,11 +16,11 @@ namespace {
 /*************************************************
 * EAX MAC-based PRF                              *
 *************************************************/
-SecureVector<byte> eax_prf(byte tag, u32bit BLOCK_SIZE,
+SecureVector<byte> eax_prf(byte tag, length_type BLOCK_SIZE,
                            MessageAuthenticationCode* mac,
-                           const byte in[], u32bit length)
+                           const byte in[], length_type length)
    {
-   for(u32bit j = 0; j != BLOCK_SIZE - 1; ++j)
+   for(length_type j = 0; j != BLOCK_SIZE - 1; ++j)
       mac->update(0);
    mac->update(tag);
    mac->update(in, length);
@@ -33,7 +33,7 @@ SecureVector<byte> eax_prf(byte tag, u32bit BLOCK_SIZE,
 * EAX_Base Constructor                           *
 *************************************************/
 EAX_Base::EAX_Base(const std::string& cipher_name,
-                   u32bit tag_size) :
+                   length_type tag_size) :
    TAG_SIZE(tag_size ? tag_size / 8 : block_size_of(cipher_name)),
    BLOCK_SIZE(block_size_of(cipher_name))
    {
@@ -53,7 +53,7 @@ EAX_Base::EAX_Base(const std::string& cipher_name,
 /*************************************************
 * Check if a keylength is valid for EAX          *
 *************************************************/
-bool EAX_Base::valid_keylength(u32bit n) const
+bool EAX_Base::valid_keylength(length_type n) const
    {
    if(!cipher->valid_keylength(n))
       return false;
@@ -77,7 +77,7 @@ void EAX_Base::set_key(const SymmetricKey& key)
 *************************************************/
 void EAX_Base::start_msg()
    {
-   for(u32bit j = 0; j != BLOCK_SIZE - 1; ++j)
+   for(length_type j = 0; j != BLOCK_SIZE - 1; ++j)
       mac->update(0);
    mac->update(2);
    }
@@ -95,7 +95,7 @@ void EAX_Base::set_iv(const InitializationVector& iv)
 /*************************************************
 * Set the EAX header                             *
 *************************************************/
-void EAX_Base::set_header(const byte header[], u32bit length)
+void EAX_Base::set_header(const byte header[], length_type length)
    {
    header_mac = eax_prf(1, BLOCK_SIZE, mac, header, length);
    }
@@ -124,7 +124,7 @@ void EAX_Base::increment_counter()
 * EAX_Encryption Constructor                     *
 *************************************************/
 EAX_Encryption::EAX_Encryption(const std::string& cipher_name,
-                               u32bit tag_size) :
+                               length_type tag_size) :
    EAX_Base(cipher_name, tag_size)
    {
    }
@@ -135,7 +135,7 @@ EAX_Encryption::EAX_Encryption(const std::string& cipher_name,
 EAX_Encryption::EAX_Encryption(const std::string& cipher_name,
                                const SymmetricKey& key,
                                const InitializationVector& iv,
-                               u32bit tag_size) :
+                               length_type tag_size) :
    EAX_Base(cipher_name, tag_size)
    {
    set_key(key);
@@ -145,9 +145,9 @@ EAX_Encryption::EAX_Encryption(const std::string& cipher_name,
 /*************************************************
 * Encrypt in EAX mode                            *
 *************************************************/
-void EAX_Encryption::write(const byte input[], u32bit length)
+void EAX_Encryption::write(const byte input[], length_type length)
    {
-   u32bit copied = std::min(BLOCK_SIZE - position, length);
+   length_type copied = std::min(BLOCK_SIZE - position, length);
    xor_buf(buffer + position, input, copied);
    send(buffer + position, copied);
    mac->update(buffer + position, copied);
@@ -195,7 +195,7 @@ void EAX_Encryption::end_msg()
 * EAX_Decryption Constructor                     *
 *************************************************/
 EAX_Decryption::EAX_Decryption(const std::string& cipher_name,
-                               u32bit tag_size) :
+                               length_type tag_size) :
    EAX_Base(cipher_name, tag_size)
    {
    queue.create(2*TAG_SIZE + DEFAULT_BUFFERSIZE);
@@ -208,7 +208,7 @@ EAX_Decryption::EAX_Decryption(const std::string& cipher_name,
 EAX_Decryption::EAX_Decryption(const std::string& cipher_name,
                                const SymmetricKey& key,
                                const InitializationVector& iv,
-                               u32bit tag_size) :
+                               length_type tag_size) :
    EAX_Base(cipher_name, tag_size)
    {
    set_key(key);
@@ -220,11 +220,11 @@ EAX_Decryption::EAX_Decryption(const std::string& cipher_name,
 /*************************************************
 * Decrypt in EAX mode                            *
 *************************************************/
-void EAX_Decryption::write(const byte input[], u32bit length)
+void EAX_Decryption::write(const byte input[], length_type length)
    {
    while(length)
       {
-      const u32bit copied = std::min(length, queue.size() - queue_end);
+      const length_type copied = std::min(length, queue.size() - queue_end);
 
       queue.copy(queue_end, input, copied);
       input += copied;
@@ -234,7 +234,7 @@ void EAX_Decryption::write(const byte input[], u32bit length)
       SecureVector<byte> block_buf(cipher->BLOCK_SIZE);
       while((queue_end - queue_start) > TAG_SIZE)
          {
-         u32bit removed = (queue_end - queue_start) - TAG_SIZE;
+         length_type removed = (queue_end - queue_start) - TAG_SIZE;
          do_write(queue + queue_start, removed);
          queue_start += removed;
          }
@@ -254,11 +254,11 @@ void EAX_Decryption::write(const byte input[], u32bit length)
 /*************************************************
 * Decrypt in EAX mode                            *
 *************************************************/
-void EAX_Decryption::do_write(const byte input[], u32bit length)
+void EAX_Decryption::do_write(const byte input[], length_type length)
    {
    mac->update(input, length);
 
-   u32bit copied = std::min(BLOCK_SIZE - position, length);
+   length_type copied = std::min(BLOCK_SIZE - position, length);
    xor_buf(buffer + position, input, copied);
    send(buffer + position, copied);
    input += copied;
@@ -293,7 +293,7 @@ void EAX_Decryption::end_msg()
 
    SecureVector<byte> data_mac = mac->final();
 
-   for(u32bit j = 0; j != TAG_SIZE; ++j)
+   for(length_type j = 0; j != TAG_SIZE; ++j)
       if(queue[queue_start+j] != (data_mac[j] ^ nonce_mac[j] ^ header_mac[j]))
          throw Integrity_Failure(name() + ": Message authentication failure");
 

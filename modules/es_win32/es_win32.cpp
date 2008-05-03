@@ -14,7 +14,7 @@ namespace Botan {
 *************************************************/
 void Win32_EntropySource::do_slow_poll()
    {
-   const u32bit MAX_ITEMS = 256;
+   const length_type MAX_ITEMS = 256;
 
    do_fast_poll();
 
@@ -22,7 +22,7 @@ void Win32_EntropySource::do_slow_poll()
 
 #define TOOLHELP32_ITER(DATA_TYPE, FUNC_FIRST, FUNC_NEXT) \
    {                                                      \
-   u32bit items = 0;                                      \
+   length_type items = 0;                                      \
    DATA_TYPE info;                                        \
    info.dwSize = sizeof(DATA_TYPE);                       \
    if(FUNC_FIRST(snapshot, &info))                        \
@@ -41,12 +41,12 @@ void Win32_EntropySource::do_slow_poll()
 
 #undef TOOLHELP32_ITER
 
-   u32bit heap_lists_found = 0;
+   length_type heap_lists_found = 0;
    HEAPLIST32 heap_list;
    heap_list.dwSize = sizeof(HEAPLIST32);
 
-   const u32bit HEAP_LISTS_MAX = 32;
-   const u32bit HEAP_OBJS_PER_LIST = 128;
+   const length_type HEAP_LISTS_MAX = 32;
+   const length_type HEAP_OBJS_PER_LIST = 128;
    if(Heap32ListFirst(snapshot, &heap_list))
       {
       do
@@ -56,7 +56,7 @@ void Win32_EntropySource::do_slow_poll()
          if(heap_lists_found++ > HEAP_LISTS_MAX)
             break;
 
-         u32bit heap_objs_found = 0;
+         length_type heap_objs_found = 0;
          HEAPENTRY32 heap_entry;
          heap_entry.dwSize = sizeof(HEAPENTRY32);
          if(Heap32First(&heap_entry, heap_list.th32ProcessID,

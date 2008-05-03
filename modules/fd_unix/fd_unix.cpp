@@ -16,8 +16,8 @@ int operator<<(int fd, Pipe& pipe)
    SecureVector<byte> buffer(DEFAULT_BUFFERSIZE);
    while(pipe.remaining())
       {
-      u32bit got = pipe.read(buffer, buffer.size());
-      u32bit position = 0;
+      length_type got = pipe.read(buffer, buffer.size());
+      length_type position = 0;
       while(got)
          {
          ssize_t ret = write(fd, buffer + position, got);

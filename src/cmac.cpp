@@ -21,7 +21,7 @@ SecureVector<byte> poly_double(const MemoryRegion<byte>& in, byte polynomial)
    SecureVector<byte> out = in;
 
    byte carry = 0;
-   for(u32bit j = out.size(); j != 0; --j)
+   for(length_type j = out.size(); j != 0; --j)
       {
       byte temp = out[j-1];
       out[j-1] = (temp << 1) | carry;
@@ -39,7 +39,7 @@ SecureVector<byte> poly_double(const MemoryRegion<byte>& in, byte polynomial)
 /*************************************************
 * Update an CMAC Calculation                     *
 *************************************************/
-void CMAC::add_data(const byte input[], u32bit length)
+void CMAC::add_data(const byte input[], length_type length)
    {
    buffer.copy(position, input, length);
    if(position + length > OUTPUT_LENGTH)
@@ -71,14 +71,14 @@ void CMAC::final_result(byte mac[])
    else
       {
       buffer[position] = 0x80;
-      for(u32bit j = position+1; j != OUTPUT_LENGTH; ++j)
+      for(length_type j = position+1; j != OUTPUT_LENGTH; ++j)
          buffer[j] = 0;
       xor_buf(buffer, P, OUTPUT_LENGTH);
       }
    xor_buf(state, buffer, OUTPUT_LENGTH);
    e->encrypt(state);
 
-   for(u32bit j = 0; j != OUTPUT_LENGTH; ++j)
+   for(length_type j = 0; j != OUTPUT_LENGTH; ++j)
       mac[j] = state[j];
 
    state.clear();
@@ -89,7 +89,7 @@ void CMAC::final_result(byte mac[])
 /*************************************************
 * CMAC Key Schedule                              *
 *************************************************/
-void CMAC::key(const byte key[], u32bit length)
+void CMAC::key(const byte key[], length_type length)
    {
    clear();
    e->set_key(key, length);

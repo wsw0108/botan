@@ -22,13 +22,13 @@ class BOTAN_DLL ANSI_X919_MAC : public MessageAuthenticationCode
       ANSI_X919_MAC();
       ~ANSI_X919_MAC();
    private:
-      void add_data(const byte[], u32bit);
+      void add_data(const byte[], length_type);
       void final_result(byte[]);
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
       BlockCipher* e;
       BlockCipher* d;
       SecureBuffer<byte, 8> state;
-      u32bit position;
+      length_type position;
    };
 
 }

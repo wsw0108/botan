@@ -20,7 +20,7 @@ class BOTAN_DLL CTS_Encryption : public BlockCipherMode
       CTS_Encryption(const std::string&,
                      const SymmetricKey&, const InitializationVector&);
    private:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
       void encrypt(const byte[]);
    };
@@ -35,7 +35,7 @@ class BOTAN_DLL CTS_Decryption : public BlockCipherMode
       CTS_Decryption(const std::string&,
                      const SymmetricKey&, const InitializationVector&);
    private:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
       void decrypt(const byte[]);
       SecureVector<byte> temp;

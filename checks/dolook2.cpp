@@ -18,7 +18,7 @@ using namespace Botan;
 class S2K_Filter : public Filter
    {
    public:
-      void write(const byte in[], u32bit len)
+      void write(const byte in[], length_type len)
          { passphrase += std::string(reinterpret_cast<const char*>(in), len); }
       void end_msg()
          {
@@ -27,7 +27,7 @@ class S2K_Filter : public Filter
          SymmetricKey x = s2k->derive_key(outlen, passphrase);
          send(x.bits_of());
          }
-      S2K_Filter(S2K* algo, const SymmetricKey& s, u32bit o, u32bit i)
+      S2K_Filter(S2K* algo, const SymmetricKey& s, length_type o, length_type i)
          {
          s2k = algo;
          outlen = o;
@@ -39,14 +39,14 @@ class S2K_Filter : public Filter
       std::string passphrase;
       S2K* s2k;
       SecureVector<byte> salt;
-      u32bit outlen, iterations;
+      length_type outlen, iterations;
    };
 
 /* Not too useful generally; just dumps random bits for benchmarking */
 class RNG_Filter : public Filter
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       RNG_Filter(RandomNumberGenerator* r) : rng(r), buffer(1024)
          {
          global_state().randomize(buffer, buffer.size());
@@ -61,7 +61,7 @@ class RNG_Filter : public Filter
 class KDF_Filter : public Filter
    {
    public:
-      void write(const byte in[], u32bit len)
+      void write(const byte in[], length_type len)
          { secret.append(in, len); }
       void end_msg()
          {
@@ -70,7 +70,7 @@ class KDF_Filter : public Filter
                                           salt, salt.size());
          send(x.bits_of(), x.length());
          }
-      KDF_Filter(KDF* algo, const SymmetricKey& s, u32bit o)
+      KDF_Filter(KDF* algo, const SymmetricKey& s, length_type o)
          {
          kdf = algo;
          outlen = o;
@@ -81,7 +81,7 @@ class KDF_Filter : public Filter
       SecureVector<byte> secret;
       SecureVector<byte> salt;
       KDF* kdf;
-      u32bit outlen;
+      length_type outlen;
    };
 
 Filter* lookup_s2k(const std::string& algname,
@@ -100,11 +100,11 @@ Filter* lookup_s2k(const std::string& algname,
    return 0;
    }
 
-void RNG_Filter::write(const byte[], u32bit length)
+void RNG_Filter::write(const byte[], length_type length)
    {
    while(length)
       {
-      u32bit gen = std::min(buffer.size(), length);
+      length_type gen = std::min(buffer.size(), length);
       rng->randomize(buffer, gen);
       length -= gen;
       }

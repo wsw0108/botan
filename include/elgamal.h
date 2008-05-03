@@ -20,8 +20,8 @@ class BOTAN_DLL ElGamal_PublicKey : public PK_Encrypting_Key,
    public:
       std::string algo_name() const { return "ElGamal"; }
 
-      SecureVector<byte> encrypt(const byte[], u32bit) const;
-      u32bit max_input_bits() const;
+      SecureVector<byte> encrypt(const byte[], length_type) const;
+      length_type max_input_bits() const;
 
       DL_Group::Format group_format() const { return DL_Group::ANSI_X9_42; }
 
@@ -41,7 +41,7 @@ class BOTAN_DLL ElGamal_PrivateKey : public ElGamal_PublicKey,
                            public virtual DL_Scheme_PrivateKey
    {
    public:
-      SecureVector<byte> decrypt(const byte[], u32bit) const;
+      SecureVector<byte> decrypt(const byte[], length_type) const;
 
       bool check_key(bool) const;
 

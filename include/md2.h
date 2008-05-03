@@ -21,13 +21,13 @@ class BOTAN_DLL MD2 : public HashFunction
       HashFunction* clone() const { return new MD2; }
       MD2() : HashFunction(16, 16) { clear(); }
    private:
-      void add_data(const byte[], u32bit);
+      void add_data(const byte[], length_type);
       void hash(const byte[]);
       void final_result(byte[]);
 
       SecureBuffer<byte, 48> X;
       SecureBuffer<byte, 16> checksum, buffer;
-      u32bit position;
+      length_type position;
    };
 
 }

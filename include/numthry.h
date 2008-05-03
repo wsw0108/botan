@@ -37,7 +37,7 @@ BigInt BOTAN_DLL power_mod(const BigInt&, const BigInt&, const BigInt&);
 /*************************************************
 * Utility Functions                              *
 *************************************************/
-u32bit BOTAN_DLL low_zero_bits(const BigInt&);
+length_type BOTAN_DLL low_zero_bits(const BigInt&);
 
 /*************************************************
 * Primality Testing                              *
@@ -47,24 +47,24 @@ bool BOTAN_DLL is_prime(const BigInt&);
 bool BOTAN_DLL verify_prime(const BigInt&);
 
 s32bit BOTAN_DLL simple_primality_tests(const BigInt&);
-bool BOTAN_DLL passes_mr_tests(const BigInt&, u32bit = 1);
-bool BOTAN_DLL run_primality_tests(const BigInt&, u32bit = 1);
+bool BOTAN_DLL passes_mr_tests(const BigInt&, length_type = 1);
+bool BOTAN_DLL run_primality_tests(const BigInt&, length_type = 1);
 
 /*************************************************
 * Random Number Generation                       *
 *************************************************/
-BigInt BOTAN_DLL random_integer(u32bit);
+BigInt BOTAN_DLL random_integer(length_type);
 BigInt BOTAN_DLL random_integer(const BigInt&, const BigInt&);
-BigInt BOTAN_DLL random_prime(u32bit, const BigInt& = 1,
-                              u32bit = 1, u32bit = 2);
+BigInt BOTAN_DLL random_prime(length_type, const BigInt& = 1,
+                              length_type = 1, length_type = 2);
 
-BigInt BOTAN_DLL random_safe_prime(u32bit);
+BigInt BOTAN_DLL random_safe_prime(length_type);
 
 /*************************************************
 * Prime Numbers                                  *
 *************************************************/
-const u32bit PRIME_TABLE_SIZE = 6541;
-const u32bit PRIME_PRODUCTS_TABLE_SIZE = 256;
+const length_type PRIME_TABLE_SIZE = 6541;
+const length_type PRIME_PRODUCTS_TABLE_SIZE = 256;
 
 extern const u16bit BOTAN_DLL PRIMES[];
 extern const u64bit PRIME_PRODUCTS[];
@@ -79,7 +79,7 @@ class BOTAN_DLL MillerRabin_Test
       MillerRabin_Test(const BigInt&);
    private:
       BigInt n, r, n_minus_1;
-      u32bit s;
+      length_type s;
       Fixed_Exponent_Power_Mod pow_mod;
       Modular_Reducer reducer;
    };

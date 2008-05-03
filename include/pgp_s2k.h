@@ -20,8 +20,8 @@ class BOTAN_DLL OpenPGP_S2K : public S2K
       S2K* clone() const;
       OpenPGP_S2K(const std::string&);
    private:
-      OctetString derive(u32bit, const std::string&,
-                         const byte[], u32bit, u32bit) const;
+      OctetString derive(length_type, const std::string&,
+                         const byte[], length_type, length_type) const;
       const std::string hash_name;
    };
 

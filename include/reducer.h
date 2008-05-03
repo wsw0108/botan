@@ -26,7 +26,7 @@ class BOTAN_DLL Modular_Reducer
       Modular_Reducer(const BigInt&);
    private:
       BigInt modulus, modulus_2, mu;
-      u32bit mod_words, mod2_words, mu_words;
+      length_type mod_words, mod2_words, mu_words;
    };
 
 }

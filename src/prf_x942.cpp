@@ -30,9 +30,11 @@ MemoryVector<byte> encode_x942_int(u32bit n)
 /*************************************************
 * X9.42 PRF                                      *
 *************************************************/
-SecureVector<byte> X942_PRF::derive(u32bit key_len,
-                                    const byte secret[], u32bit secret_len,
-                                    const byte salt[], u32bit salt_len) const
+SecureVector<byte> X942_PRF::derive(length_type key_len,
+                                    const byte secret[],
+                                    length_type secret_len,
+                                    const byte salt[],
+                                    length_type salt_len) const
    {
    std::auto_ptr<HashFunction> hash(get_hash("SHA-1"));
    const OID kek_algo(key_wrap_oid);

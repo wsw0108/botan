@@ -22,7 +22,7 @@ class BOTAN_DLL CRC24 : public HashFunction
       CRC24() : HashFunction(3) { clear(); }
       ~CRC24() { clear(); }
    private:
-      void add_data(const byte[], u32bit);
+      void add_data(const byte[], length_type);
       void final_result(byte[]);
       u32bit crc;
    };

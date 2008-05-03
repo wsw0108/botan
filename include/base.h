@@ -14,7 +14,7 @@ namespace Botan {
 /*************************************************
 * Constants                                      *
 *************************************************/
-static const u32bit DEFAULT_BUFFERSIZE = BOTAN_DEFAULT_BUFFER_SIZE;
+static const length_type DEFAULT_BUFFERSIZE = BOTAN_DEFAULT_BUFFER_SIZE;
 
 /*************************************************
 * Symmetric Algorithm                            *
@@ -22,17 +22,20 @@ static const u32bit DEFAULT_BUFFERSIZE = BOTAN_DEFAULT_BUFFER_SIZE;
 class BOTAN_DLL SymmetricAlgorithm
    {
    public:
-      const u32bit MAXIMUM_KEYLENGTH, MINIMUM_KEYLENGTH, KEYLENGTH_MULTIPLE;
+      const length_type MAXIMUM_KEYLENGTH,
+                        MINIMUM_KEYLENGTH,
+                        KEYLENGTH_MULTIPLE;
 
       virtual std::string name() const = 0;
 
       void set_key(const SymmetricKey&) throw(Invalid_Key_Length);
-      void set_key(const byte[], u32bit) throw(Invalid_Key_Length);
-      bool valid_keylength(u32bit) const;
-      SymmetricAlgorithm(u32bit, u32bit, u32bit);
+      void set_key(const byte[], length_type) throw(Invalid_Key_Length);
+      bool valid_keylength(length_type) const;
+
+      SymmetricAlgorithm(length_type, length_type, length_type);
       virtual ~SymmetricAlgorithm() {}
    private:
-      virtual void key(const byte[], u32bit) = 0;
+      virtual void key(const byte[], length_type) = 0;
    };
 
 /*************************************************
@@ -41,7 +44,7 @@ class BOTAN_DLL SymmetricAlgorithm
 class BOTAN_DLL BlockCipher : public SymmetricAlgorithm
    {
    public:
-      const u32bit BLOCK_SIZE;
+      const length_type BLOCK_SIZE;
 
       void encrypt(const byte in[], byte out[]) const { enc(in, out); }
       void decrypt(const byte in[], byte out[]) const { dec(in, out); }
@@ -51,7 +54,7 @@ class BOTAN_DLL BlockCipher : public SymmetricAlgorithm
       virtual BlockCipher* clone() const = 0;
       virtual void clear() throw() {};
 
-      BlockCipher(u32bit, u32bit, u32bit = 0, u32bit = 1);
+      BlockCipher(length_type, length_type, length_type = 0, length_type = 1);
       virtual ~BlockCipher() {}
    private:
       virtual void enc(const byte[], byte[]) const = 0;
@@ -64,22 +67,27 @@ class BOTAN_DLL BlockCipher : public SymmetricAlgorithm
 class BOTAN_DLL StreamCipher : public SymmetricAlgorithm
    {
    public:
-      const u32bit IV_LENGTH;
-      void encrypt(const byte i[], byte o[], u32bit len) { cipher(i, o, len); }
-      void decrypt(const byte i[], byte o[], u32bit len) { cipher(i, o, len); }
-      void encrypt(byte in[], u32bit len) { cipher(in, in, len); }
-      void decrypt(byte in[], u32bit len) { cipher(in, in, len); }
+      const length_type IV_LENGTH;
 
-      virtual void resync(const byte[], u32bit);
-      virtual void seek(u32bit);
+      void encrypt(const byte in[], byte out[], length_type length)
+         { cipher(in, out, length); }
+      void decrypt(const byte in[], byte out[], length_type length)
+         { cipher(in, out, length); }
+
+      void encrypt(byte in[], length_type length) { cipher(in, in, length); }
+      void decrypt(byte in[], length_type length) { cipher(in, in, length); }
+
+      virtual void resync(const byte[], length_type);
+      virtual void seek(length_type);
 
       virtual StreamCipher* clone() const = 0;
       virtual void clear() throw() {};
 
-      StreamCipher(u32bit, u32bit = 0, u32bit = 1, u32bit = 0);
+      StreamCipher(length_type, length_type = 0,
+                   length_type = 1, length_type = 0);
       virtual ~StreamCipher() {}
    private:
-      virtual void cipher(const byte[], byte[], u32bit) = 0;
+      virtual void cipher(const byte[], byte[], length_type) = 0;
    };
 
 /*************************************************
@@ -88,20 +96,24 @@ class BOTAN_DLL StreamCipher : public SymmetricAlgorithm
 class BOTAN_DLL BufferedComputation
    {
    public:
-      const u32bit OUTPUT_LENGTH;
-      void update(const byte[], u32bit);
+      const length_type OUTPUT_LENGTH;
+
+      void update(const byte[], length_type);
       void update(const MemoryRegion<byte>&);
       void update(const std::string&);
       void update(byte);
+
       void final(byte out[]) { final_result(out); }
       SecureVector<byte> final();
-      SecureVector<byte> process(const byte[], u32bit);
+
+      SecureVector<byte> process(const byte[], length_type);
       SecureVector<byte> process(const MemoryRegion<byte>&);
       SecureVector<byte> process(const std::string&);
-      BufferedComputation(u32bit);
+
+      BufferedComputation(length_type);
       virtual ~BufferedComputation() {}
    private:
-      virtual void add_data(const byte[], u32bit) = 0;
+      virtual void add_data(const byte[], length_type) = 0;
       virtual void final_result(byte[]) = 0;
    };
 
@@ -111,13 +123,13 @@ class BOTAN_DLL BufferedComputation
 class BOTAN_DLL HashFunction : public BufferedComputation
    {
    public:
-      const u32bit HASH_BLOCK_SIZE;
+      const length_type HASH_BLOCK_SIZE;
 
       virtual HashFunction* clone() const = 0;
       virtual std::string name() const = 0;
       virtual void clear() throw() {};
 
-      HashFunction(u32bit, u32bit = 0);
+      HashFunction(length_type, length_type = 0);
       virtual ~HashFunction() {}
    };
 
@@ -128,13 +140,14 @@ class BOTAN_DLL MessageAuthenticationCode : public BufferedComputation,
                                   public SymmetricAlgorithm
    {
    public:
-      virtual bool verify_mac(const byte[], u32bit);
+      virtual bool verify_mac(const byte[], length_type);
 
       virtual MessageAuthenticationCode* clone() const = 0;
       virtual std::string name() const = 0;
       virtual void clear() throw() {};
 
-      MessageAuthenticationCode(u32bit, u32bit, u32bit = 0, u32bit = 1);
+      MessageAuthenticationCode(length_type, length_type,
+                                length_type = 0, length_type = 1);
       virtual ~MessageAuthenticationCode() {}
    };
 
@@ -144,8 +157,8 @@ class BOTAN_DLL MessageAuthenticationCode : public BufferedComputation,
 class BOTAN_DLL EntropySource
    {
    public:
-      virtual u32bit slow_poll(byte[], u32bit) = 0;
-      virtual u32bit fast_poll(byte[], u32bit);
+      virtual length_type slow_poll(byte[], length_type) = 0;
+      virtual length_type fast_poll(byte[], length_type);
       virtual ~EntropySource() {}
    };
 
@@ -155,16 +168,16 @@ class BOTAN_DLL EntropySource
 class BOTAN_DLL RandomNumberGenerator
    {
    public:
-      virtual void randomize(byte[], u32bit) throw(PRNG_Unseeded) = 0;
+      virtual void randomize(byte[], length_type) throw(PRNG_Unseeded) = 0;
       virtual bool is_seeded() const = 0;
       virtual void clear() throw() {};
 
-      void add_entropy(const byte[], u32bit);
-      u32bit add_entropy(EntropySource&, bool = true);
+      void add_entropy(const byte[], length_type);
+      length_type add_entropy(EntropySource&, bool = true);
 
       virtual ~RandomNumberGenerator() {}
    private:
-      virtual void add_randomness(const byte[], u32bit) = 0;
+      virtual void add_randomness(const byte[], length_type) = 0;
    };
 
 }

@@ -20,11 +20,11 @@ class BOTAN_DLL AES : public BlockCipher
       std::string name() const { return "AES"; }
       BlockCipher* clone() const { return new AES; }
       AES() : BlockCipher(16, 16, 32, 8) { ROUNDS = 14; }
-      AES(u32bit);
+      AES(length_type);
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
       static u32bit S(u32bit);
 
       static const byte SE[256];
@@ -33,7 +33,7 @@ class BOTAN_DLL AES : public BlockCipher
       static const u32bit TD[1024];
       SecureBuffer<u32bit, 52> EK, DK;
       SecureBuffer<byte, 32> ME, MD;
-      u32bit ROUNDS;
+      length_type ROUNDS;
    };
 
 /*************************************************

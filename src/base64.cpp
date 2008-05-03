@@ -12,7 +12,7 @@ namespace Botan {
 /*************************************************
 * Base64_Encoder Constructor                     *
 *************************************************/
-Base64_Encoder::Base64_Encoder(bool breaks, u32bit length, bool t_n) :
+Base64_Encoder::Base64_Encoder(bool breaks, length_type length, bool t_n) :
    line_length(breaks ? length : 0), trailing_newline(t_n)
    {
    in.create(48);
@@ -35,9 +35,9 @@ void Base64_Encoder::encode(const byte in[3], byte out[4])
 /*************************************************
 * Encode and send a block                        *
 *************************************************/
-void Base64_Encoder::encode_and_send(const byte block[], u32bit length)
+void Base64_Encoder::encode_and_send(const byte block[], length_type length)
    {
-   for(u32bit j = 0; j != length; j += 3)
+   for(length_type j = 0; j != length; j += 3)
       {
       encode(block + j, out);
       do_output(out, 4);
@@ -47,16 +47,18 @@ void Base64_Encoder::encode_and_send(const byte block[], u32bit length)
 /*************************************************
 * Handle the output                              *
 *************************************************/
-void Base64_Encoder::do_output(const byte input[], u32bit length)
+void Base64_Encoder::do_output(const byte input[], length_type length)
    {
    if(line_length == 0)
       send(input, length);
    else
       {
-      u32bit remaining = length, offset = 0;
+      length_type remaining = length, offset = 0;
       while(remaining)
          {
-         u32bit sent = std::min(line_length - counter, remaining);
+         const length_type sent = std::min<length_type>(line_length - counter,
+                                                        remaining);
+
          send(input + offset, sent);
          counter += sent;
          remaining -= sent;
@@ -73,7 +75,7 @@ void Base64_Encoder::do_output(const byte input[], u32bit length)
 /*************************************************
 * Convert some data into Base64                  *
 *************************************************/
-void Base64_Encoder::write(const byte input[], u32bit length)
+void Base64_Encoder::write(const byte input[], length_type length)
    {
    in.copy(position, input, length);
    if(position + length >= in.size())
@@ -98,7 +100,7 @@ void Base64_Encoder::write(const byte input[], u32bit length)
 *************************************************/
 void Base64_Encoder::end_msg()
    {
-   u32bit start_of_last_block = 3 * (position / 3),
+   length_type start_of_last_block = 3 * (position / 3),
           left_over = position % 3;
    encode_and_send(in, start_of_last_block);
 
@@ -108,7 +110,7 @@ void Base64_Encoder::end_msg()
 
       encode(remainder, out);
 
-      u32bit empty_bits = 8 * (3 - left_over), index = 4 - 1;
+      length_type empty_bits = 8 * (3 - left_over), index = 4 - 1;
       while(empty_bits >= 8)
          {
          out[index--] = '=';
@@ -155,9 +157,9 @@ void Base64_Decoder::decode(const byte in[4], byte out[3])
 /*************************************************
 * Decode and send a block                        *
 *************************************************/
-void Base64_Decoder::decode_and_send(const byte block[], u32bit length)
+void Base64_Decoder::decode_and_send(const byte block[], length_type length)
    {
-   for(u32bit j = 0; j != length; j += 4)
+   for(length_type j = 0; j != length; j += 4)
       {
       decode(block + j, out);
       send(out, 3);
@@ -184,9 +186,9 @@ void Base64_Decoder::handle_bad_char(byte c)
 /*************************************************
 * Convert some data from Base64                  *
 *************************************************/
-void Base64_Decoder::write(const byte input[], u32bit length)
+void Base64_Decoder::write(const byte input[], length_type length)
    {
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       {
       if(is_valid(input[j]))
          in[position++] = input[j];
@@ -208,7 +210,7 @@ void Base64_Decoder::end_msg()
    {
    if(position != 0)
       {
-      u32bit start_of_last_block = 4 * (position / 4),
+      length_type start_of_last_block = 4 * (position / 4),
              left_over = position % 4;
       decode_and_send(in, start_of_last_block);
 

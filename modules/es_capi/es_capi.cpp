@@ -14,7 +14,7 @@ namespace Botan {
 /*************************************************
 * Gather Entropy from Win32 CAPI                 *
 *************************************************/
-u32bit Win32_CAPI_EntropySource::slow_poll(byte output[], u32bit length)
+length_type Win32_CAPI_EntropySource::slow_poll(byte output[], length_type length)
    {
 
    class CSP_Handle
@@ -36,7 +36,7 @@ u32bit Win32_CAPI_EntropySource::slow_poll(byte output[], u32bit length)
                CryptReleaseContext(handle, 0);
             }
 
-         void gen_random(byte out[], u32bit n) const
+         void gen_random(byte out[], length_type n) const
             {
             if(is_valid())
                CryptGenRandom(handle, n, out);
@@ -54,7 +54,7 @@ u32bit Win32_CAPI_EntropySource::slow_poll(byte output[], u32bit length)
    if(length > 64)
       length = 64;
 
-   for(u32bit j = 0; j != prov_types.size(); ++j)
+   for(length_type j = 0; j != prov_types.size(); ++j)
       {
       CSP_Handle csp(prov_types[j]);
       if(!csp.is_valid())
@@ -73,7 +73,7 @@ Win32_CAPI_EntropySource::Win32_CAPI_EntropySource(const std::string& provs)
    {
    std::vector<std::string> capi_provs = split_on(provs, ':');
 
-   for(u32bit j = 0; j != capi_provs.size(); ++j)
+   for(length_type j = 0; j != capi_provs.size(); ++j)
       {
       if(capi_provs[j] == "RSA_FULL")  prov_types.push_back(PROV_RSA_FULL);
       if(capi_provs[j] == "INTEL_SEC") prov_types.push_back(PROV_INTEL_SEC);

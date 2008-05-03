@@ -30,7 +30,7 @@ void check_feedback(u32bit BLOCK_SIZE, u32bit FEEDBACK_SIZE, u32bit bits,
 * CFB Encryption Constructor                     *
 *************************************************/
 CFB_Encryption::CFB_Encryption(const std::string& cipher_name,
-                               u32bit fback_bits) :
+                               length_type fback_bits) :
    BlockCipherMode(cipher_name, "CFB", block_size_of(cipher_name), 1),
    FEEDBACK_SIZE(fback_bits ? fback_bits / 8: BLOCK_SIZE)
    {
@@ -43,7 +43,7 @@ CFB_Encryption::CFB_Encryption(const std::string& cipher_name,
 CFB_Encryption::CFB_Encryption(const std::string& cipher_name,
                                const SymmetricKey& key,
                                const InitializationVector& iv,
-                               u32bit fback_bits) :
+                               length_type fback_bits) :
    BlockCipherMode(cipher_name, "CFB", block_size_of(cipher_name), 1),
    FEEDBACK_SIZE(fback_bits ? fback_bits / 8: BLOCK_SIZE)
    {
@@ -55,11 +55,11 @@ CFB_Encryption::CFB_Encryption(const std::string& cipher_name,
 /*************************************************
 * Encrypt data in CFB mode                       *
 *************************************************/
-void CFB_Encryption::write(const byte input[], u32bit length)
+void CFB_Encryption::write(const byte input[], length_type length)
    {
    while(length)
       {
-      u32bit xored = std::min(FEEDBACK_SIZE - position, length);
+      length_type xored = std::min(FEEDBACK_SIZE - position, length);
       xor_buf(buffer + position, input, xored);
       send(buffer + position, xored);
       input += xored;
@@ -75,7 +75,7 @@ void CFB_Encryption::write(const byte input[], u32bit length)
 *************************************************/
 void CFB_Encryption::feedback()
    {
-   for(u32bit j = 0; j != BLOCK_SIZE - FEEDBACK_SIZE; ++j)
+   for(length_type j = 0; j != BLOCK_SIZE - FEEDBACK_SIZE; ++j)
       state[j] = state[j + FEEDBACK_SIZE];
    state.copy(BLOCK_SIZE - FEEDBACK_SIZE, buffer, FEEDBACK_SIZE);
    cipher->encrypt(state, buffer);
@@ -86,7 +86,7 @@ void CFB_Encryption::feedback()
 * CFB Decryption Constructor                     *
 *************************************************/
 CFB_Decryption::CFB_Decryption(const std::string& cipher_name,
-                               u32bit fback_bits) :
+                               length_type fback_bits) :
    BlockCipherMode(cipher_name, "CFB", block_size_of(cipher_name), 1),
    FEEDBACK_SIZE(fback_bits ? fback_bits / 8 : BLOCK_SIZE)
    {
@@ -99,7 +99,7 @@ CFB_Decryption::CFB_Decryption(const std::string& cipher_name,
 CFB_Decryption::CFB_Decryption(const std::string& cipher_name,
                                const SymmetricKey& key,
                                const InitializationVector& iv,
-                               u32bit fback_bits) :
+                               length_type fback_bits) :
    BlockCipherMode(cipher_name, "CFB", block_size_of(cipher_name), 1),
    FEEDBACK_SIZE(fback_bits ? fback_bits / 8 : BLOCK_SIZE)
    {
@@ -111,11 +111,11 @@ CFB_Decryption::CFB_Decryption(const std::string& cipher_name,
 /*************************************************
 * Decrypt data in CFB mode                       *
 *************************************************/
-void CFB_Decryption::write(const byte input[], u32bit length)
+void CFB_Decryption::write(const byte input[], length_type length)
    {
    while(length)
       {
-      u32bit xored = std::min(FEEDBACK_SIZE - position, length);
+      length_type xored = std::min(FEEDBACK_SIZE - position, length);
       xor_buf(buffer + position, input, xored);
       send(buffer + position, xored);
       buffer.copy(position, input, xored);
@@ -132,7 +132,7 @@ void CFB_Decryption::write(const byte input[], u32bit length)
 *************************************************/
 void CFB_Decryption::feedback()
    {
-   for(u32bit j = 0; j != BLOCK_SIZE - FEEDBACK_SIZE; ++j)
+   for(length_type j = 0; j != BLOCK_SIZE - FEEDBACK_SIZE; ++j)
       state[j] = state[j + FEEDBACK_SIZE];
    state.copy(BLOCK_SIZE - FEEDBACK_SIZE, buffer, FEEDBACK_SIZE);
    cipher->encrypt(state, buffer);

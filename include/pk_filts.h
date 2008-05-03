@@ -17,7 +17,7 @@ namespace Botan {
 class BOTAN_DLL PK_Encryptor_Filter : public Filter
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
       PK_Encryptor_Filter(PK_Encryptor* c) : cipher(c) {}
       ~PK_Encryptor_Filter() { delete cipher; }
@@ -32,7 +32,7 @@ class BOTAN_DLL PK_Encryptor_Filter : public Filter
 class BOTAN_DLL PK_Decryptor_Filter : public Filter
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
       PK_Decryptor_Filter(PK_Decryptor* c) : cipher(c) {}
       ~PK_Decryptor_Filter() { delete cipher; }
@@ -47,7 +47,7 @@ class BOTAN_DLL PK_Decryptor_Filter : public Filter
 class BOTAN_DLL PK_Signer_Filter : public Filter
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
       PK_Signer_Filter(PK_Signer* s) : signer(s) {}
       ~PK_Signer_Filter() { delete signer; }
@@ -61,14 +61,14 @@ class BOTAN_DLL PK_Signer_Filter : public Filter
 class BOTAN_DLL PK_Verifier_Filter : public Filter
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
 
-      void set_signature(const byte[], u32bit);
+      void set_signature(const byte[], length_type);
       void set_signature(const MemoryRegion<byte>&);
 
       PK_Verifier_Filter(PK_Verifier* v) : verifier(v) {}
-      PK_Verifier_Filter(PK_Verifier*, const byte[], u32bit);
+      PK_Verifier_Filter(PK_Verifier*, const byte[], length_type);
       PK_Verifier_Filter(PK_Verifier*, const MemoryRegion<byte>&);
       ~PK_Verifier_Filter() { delete verifier; }
    private:

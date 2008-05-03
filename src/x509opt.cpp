@@ -55,7 +55,7 @@ void X509_Cert_Options::add_ex_constraint(const std::string& oid_str)
 /*************************************************
 * Mark this certificate for CA usage             *
 *************************************************/
-void X509_Cert_Options::CA_key(u32bit limit)
+void X509_Cert_Options::CA_key(length_type limit)
    {
    is_CA = true;
    path_limit = limit;
@@ -78,13 +78,13 @@ void X509_Cert_Options::sanity_check() const
 * Initialize the certificate options             *
 *************************************************/
 X509_Cert_Options::X509_Cert_Options(const std::string& initial_opts,
-                                     u32bit expiration_time_in_seconds)
+                                     length_type expiration_time_in_seconds)
    {
    is_CA = false;
    path_limit = 0;
    constraints = NO_CONSTRAINTS;
 
-   const u32bit now = system_time();
+   const length_type now = system_time();
 
    start = X509_Time(now);
    end = X509_Time(now + expiration_time_in_seconds);

@@ -23,7 +23,7 @@ void Square::enc(const byte in[], byte out[]) const
         TE2[in[10] ^ ME[10]] ^ TE3[in[14] ^ ME[14]] ^ EK[2];
    B3 = TE0[in[ 3] ^ ME[ 3]] ^ TE1[in[ 7] ^ ME[ 7]] ^
         TE2[in[11] ^ ME[11]] ^ TE3[in[15] ^ ME[15]] ^ EK[3];
-   for(u32bit j = 1; j != 7; j += 2)
+   for(length_type j = 1; j != 7; j += 2)
       {
       T0 = TE0[get_byte(0, B0)] ^ TE1[get_byte(0, B1)] ^
            TE2[get_byte(0, B2)] ^ TE3[get_byte(0, B3)] ^ EK[4*j+0];
@@ -74,7 +74,7 @@ void Square::dec(const byte in[], byte out[]) const
         TD2[in[10] ^ MD[10]] ^ TD3[in[14] ^ MD[14]] ^ DK[2];
    B3 = TD0[in[ 3] ^ MD[ 3]] ^ TD1[in[ 7] ^ MD[ 7]] ^
         TD2[in[11] ^ MD[11]] ^ TD3[in[15] ^ MD[15]] ^ DK[3];
-   for(u32bit j = 1; j != 7; j += 2)
+   for(length_type j = 1; j != 7; j += 2)
       {
       T0 = TD0[get_byte(0, B0)] ^ TD1[get_byte(0, B1)] ^
            TD2[get_byte(0, B2)] ^ TD3[get_byte(0, B3)] ^ DK[4*j+0];
@@ -114,12 +114,14 @@ void Square::dec(const byte in[], byte out[]) const
 /*************************************************
 * Square Key Schedule                            *
 *************************************************/
-void Square::key(const byte key[], u32bit)
+void Square::key(const byte key[], length_type)
    {
    SecureBuffer<u32bit, 36> XEK, XDK;
-   for(u32bit j = 0; j != 4; ++j)
+
+   for(length_type j = 0; j != 4; ++j)
       XEK[j] = load_be<u32bit>(key, j);
-   for(u32bit j = 0; j != 8; ++j)
+
+   for(length_type j = 0; j != 8; ++j)
       {
       XEK[4*j+4] = XEK[4*j  ] ^ rotate_left(XEK[4*j+3], 8) ^ (0x01000000 << j);
       XEK[4*j+5] = XEK[4*j+1] ^ XEK[4*j+4];
@@ -128,14 +130,16 @@ void Square::key(const byte key[], u32bit)
       XDK.copy(28 - 4*j, XEK + 4*(j+1), 4);
       transform(XEK + 4*j);
       }
-   for(u32bit j = 0; j != 4; ++j)
-      for(u32bit k = 0; k != 4; ++k)
+
+   for(length_type j = 0; j != 4; ++j)
+      for(length_type k = 0; k != 4; ++k)
          {
          ME[4*j+k   ] = get_byte(k, XEK[j   ]);
          ME[4*j+k+16] = get_byte(k, XEK[j+32]);
          MD[4*j+k   ] = get_byte(k, XDK[j   ]);
          MD[4*j+k+16] = get_byte(k, XEK[j   ]);
          }
+
    EK.copy(XEK + 4, 28);
    DK.copy(XDK + 4, 28);
    }
@@ -151,14 +155,14 @@ void Square::transform(u32bit round_key[4])
       { 0x01, 0x03, 0x02, 0x01 },
       { 0x01, 0x01, 0x03, 0x02 } };
 
-   for(u32bit j = 0; j != 4; ++j)
+   for(length_type j = 0; j != 4; ++j)
       {
       SecureBuffer<byte, 4> A, B;
 
       store_be(round_key[j], A);
 
-      for(u32bit k = 0; k != 4; ++k)
-         for(u32bit l = 0; l != 4; ++l)
+      for(length_type k = 0; k != 4; ++k)
+         for(length_type l = 0; l != 4; ++l)
             {
             const byte a = A[l];
             const byte b = G[l][k];

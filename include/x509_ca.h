@@ -27,9 +27,9 @@ class BOTAN_DLL X509_CA
 
       X509_Certificate ca_certificate() const;
 
-      X509_CRL new_crl(u32bit = 0) const;
+      X509_CRL new_crl(length_type = 0) const;
       X509_CRL update_crl(const X509_CRL&, const std::vector<CRL_Entry>&,
-                          u32bit = 0) const;
+                          length_type = 0) const;
 
       static X509_Certificate make_cert(PK_Signer*, const AlgorithmIdentifier&,
                                         const MemoryRegion<byte>&,

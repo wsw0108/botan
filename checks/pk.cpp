@@ -46,14 +46,14 @@ class Fixed_Output_RNG : public RandomNumberGenerator
 
          throw Botan::Invalid_State("Fixed_Output_RNG: out of bits");
          }
-      void randomize(byte out[], u32bit len) throw()
+      void randomize(byte out[], length_type len) throw()
          {
-         for(u32bit j = 0; j != len; j++)
+         for(length_type j = 0; j != len; j++)
             out[j] = random();
          }
       std::string name() const { return "Fixed_Output_RNG"; }
       void clear() throw() {}
-      void add_randomness(const byte[], u32bit) throw() {}
+      void add_randomness(const byte[], length_type) throw() {}
       Fixed_Output_RNG(const SecureVector<byte>& x)
          {
          output = x;
@@ -61,7 +61,7 @@ class Fixed_Output_RNG : public RandomNumberGenerator
          }
    private:
       SecureVector<byte> output;
-      u32bit position;
+      length_type position;
    };
 
 void do_pk_keygen_tests();

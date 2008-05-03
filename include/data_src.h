@@ -17,14 +17,14 @@ namespace Botan {
 class BOTAN_DLL DataSource
    {
    public:
-      virtual u32bit read(byte[], u32bit) = 0;
-      virtual u32bit peek(byte[], u32bit, u32bit) const = 0;
+      virtual length_type read(byte[], length_type) = 0;
+      virtual length_type peek(byte[], length_type, length_type) const = 0;
       virtual bool end_of_data() const = 0;
       virtual std::string id() const { return ""; }
 
-      u32bit read_byte(byte&);
-      u32bit peek_byte(byte&) const;
-      u32bit discard_next(u32bit);
+      length_type read_byte(byte&);
+      length_type peek_byte(byte&) const;
+      length_type discard_next(length_type);
 
       DataSource() {}
       virtual ~DataSource() {}
@@ -39,16 +39,16 @@ class BOTAN_DLL DataSource
 class BOTAN_DLL DataSource_Memory : public DataSource
    {
    public:
-      u32bit read(byte[], u32bit);
-      u32bit peek(byte[], u32bit, u32bit) const;
+      length_type read(byte[], length_type);
+      length_type peek(byte[], length_type, length_type) const;
       bool end_of_data() const;
 
       DataSource_Memory(const std::string&);
-      DataSource_Memory(const byte[], u32bit);
+      DataSource_Memory(const byte[], length_type);
       DataSource_Memory(const MemoryRegion<byte>&);
    private:
       SecureVector<byte> source;
-      u32bit offset;
+      length_type offset;
    };
 
 /*************************************************
@@ -57,8 +57,8 @@ class BOTAN_DLL DataSource_Memory : public DataSource
 class BOTAN_DLL DataSource_Stream : public DataSource
    {
    public:
-      u32bit read(byte[], u32bit);
-      u32bit peek(byte[], u32bit, u32bit) const;
+      length_type read(byte[], length_type);
+      length_type peek(byte[], length_type, length_type) const;
       bool end_of_data() const;
       std::string id() const;
 
@@ -70,7 +70,7 @@ class BOTAN_DLL DataSource_Stream : public DataSource
       const bool owner;
 
       std::istream* source;
-      u32bit total_read;
+      length_type total_read;
    };
 
 }

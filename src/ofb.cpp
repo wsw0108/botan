@@ -32,9 +32,9 @@ OFB::OFB(const std::string& cipher_name, const SymmetricKey& key,
 /*************************************************
 * OFB Encryption/Decryption                      *
 *************************************************/
-void OFB::write(const byte input[], u32bit length)
+void OFB::write(const byte input[], length_type length)
    {
-   u32bit copied = std::min(BLOCK_SIZE - position, length);
+   length_type copied = std::min(BLOCK_SIZE - position, length);
    xor_buf(buffer, input, state + position, copied);
    send(buffer, copied);
    input += copied;

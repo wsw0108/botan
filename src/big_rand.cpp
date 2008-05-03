@@ -13,7 +13,7 @@ namespace Botan {
 /*************************************************
 * Construct a BigInt of a specific form          *
 *************************************************/
-BigInt::BigInt(NumberType type, u32bit bits)
+BigInt::BigInt(NumberType type, length_type bits)
    {
    set_sign(Positive);
    if(type == Random && bits)
@@ -27,7 +27,7 @@ BigInt::BigInt(NumberType type, u32bit bits)
 /*************************************************
 * Randomize this number                          *
 *************************************************/
-void BigInt::randomize(u32bit bitsize)
+void BigInt::randomize(length_type bitsize)
    {
    set_sign(Positive);
 
@@ -47,7 +47,7 @@ void BigInt::randomize(u32bit bitsize)
 /*************************************************
 * Generate a random integer                      *
 *************************************************/
-BigInt random_integer(u32bit bits)
+BigInt random_integer(length_type bits)
    {
    BigInt x;
    x.randomize(bits);
@@ -70,7 +70,7 @@ BigInt random_integer(const BigInt& min, const BigInt& max)
 /*************************************************
 * Generate a random safe prime                   *
 *************************************************/
-BigInt random_safe_prime(u32bit bits)
+BigInt random_safe_prime(length_type bits)
    {
    if(bits <= 64)
       throw Invalid_Argument("random_safe_prime: Can't make a prime of " +

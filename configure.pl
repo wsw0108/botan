@@ -903,15 +903,18 @@ sub find_mp_bits {
     my $seen_mp_module = undef;
 
     foreach my $modname (@modules_list) {
-        my %modinfo = %{ $MODULES{$modname} };
-        if($modinfo{'mp_bits'}) {
-            if(defined($seen_mp_module) and $modinfo{'mp_bits'} != $mp_bits) {
+        my $modinfo = $MODULES{$modname};
+
+        croak("Unknown module $modname") unless $modinfo;
+
+        if($$modinfo{'mp_bits'}) {
+            if(defined($seen_mp_module) and $$modinfo{'mp_bits'} != $mp_bits) {
                 croak('Inconsistent mp_bits requests from modules ',
                       $seen_mp_module, ' and ', $modname);
             }
 
             $seen_mp_module = $modname;
-            $mp_bits = $modinfo{'mp_bits'};
+            $mp_bits = $$modinfo{'mp_bits'};
         }
     }
     return $mp_bits;

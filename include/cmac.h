@@ -22,13 +22,13 @@ class BOTAN_DLL CMAC : public MessageAuthenticationCode
       CMAC(const std::string&);
       ~CMAC() { delete e; }
    private:
-      void add_data(const byte[], u32bit);
+      void add_data(const byte[], length_type);
       void final_result(byte[]);
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
 
       BlockCipher* e;
       SecureVector<byte> buffer, state, B, P;
-      u32bit position;
+      length_type position;
       byte polynomial;
    };
 

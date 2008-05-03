@@ -43,7 +43,7 @@ ASN1_Tag choose_encoding(const std::string& str)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00 };
 
-   for(u32bit j = 0; j != str.size(); ++j)
+   for(length_type j = 0; j != str.size(); ++j)
       if(!IS_PRINTABLE[static_cast<byte>(str[j])])
          {
          const std::string type = global_config().option("x509/ca/str_type");

@@ -14,7 +14,7 @@ namespace Botan {
 *************************************************/
 void LubyRackoff::enc(const byte in[], byte out[]) const
    {
-   const u32bit OUTPUT_LENGTH = hash->OUTPUT_LENGTH;
+   const length_type OUTPUT_LENGTH = hash->OUTPUT_LENGTH;
 
    SecureVector<byte> buffer(OUTPUT_LENGTH);
    hash->update(K1);
@@ -43,7 +43,7 @@ void LubyRackoff::enc(const byte in[], byte out[]) const
 *************************************************/
 void LubyRackoff::dec(const byte in[], byte out[]) const
    {
-   const u32bit OUTPUT_LENGTH = hash->OUTPUT_LENGTH;
+   const length_type OUTPUT_LENGTH = hash->OUTPUT_LENGTH;
 
    SecureVector<byte> buffer(OUTPUT_LENGTH);
    hash->update(K2);
@@ -70,7 +70,7 @@ void LubyRackoff::dec(const byte in[], byte out[]) const
 /*************************************************
 * Luby-Rackoff Key Schedule                      *
 *************************************************/
-void LubyRackoff::key(const byte key[], u32bit length)
+void LubyRackoff::key(const byte key[], length_type length)
    {
    K1.set(key, length / 2);
    K2.set(key + length / 2, length / 2);

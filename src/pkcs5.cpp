@@ -16,10 +16,10 @@ namespace Botan {
 /*************************************************
 * Return a PKCS#5 PBKDF1 derived key             *
 *************************************************/
-OctetString PKCS5_PBKDF1::derive(u32bit key_len,
+OctetString PKCS5_PBKDF1::derive(length_type key_len,
                                  const std::string& passphrase,
-                                 const byte salt[], u32bit salt_size,
-                                 u32bit iterations) const
+                                 const byte salt[], length_type salt_size,
+                                 length_type iterations) const
    {
    if(iterations == 0)
       throw Invalid_Argument("PKCS#5 PBKDF1: Invalid iteration count");
@@ -32,7 +32,7 @@ OctetString PKCS5_PBKDF1::derive(u32bit key_len,
    hash->update(salt, salt_size);
    SecureVector<byte> key = hash->final();
 
-   for(u32bit j = 1; j != iterations; ++j)
+   for(length_type j = 1; j != iterations; ++j)
       {
       hash->update(key);
       hash->final(key);
@@ -61,10 +61,10 @@ PKCS5_PBKDF1::PKCS5_PBKDF1(const std::string& h_name) : hash_name(h_name)
 /*************************************************
 * Return a PKCS#5 PBKDF2 derived key             *
 *************************************************/
-OctetString PKCS5_PBKDF2::derive(u32bit key_len,
+OctetString PKCS5_PBKDF2::derive(length_type key_len,
                                  const std::string& passphrase,
-                                 const byte salt[], u32bit salt_size,
-                                 u32bit iterations) const
+                                 const byte salt[], length_type salt_size,
+                                 length_type iterations) const
    {
    if(iterations == 0)
       throw Invalid_Argument("PKCS#5 PBKDF2: Invalid iteration count");
@@ -84,16 +84,16 @@ OctetString PKCS5_PBKDF2::derive(u32bit key_len,
    u32bit counter = 1;
    while(key_len)
       {
-      u32bit T_size = std::min(hmac.OUTPUT_LENGTH, key_len);
+      length_type T_size = std::min(hmac.OUTPUT_LENGTH, key_len);
       SecureVector<byte> U(hmac.OUTPUT_LENGTH);
 
       hmac.update(salt, salt_size);
-      for(u32bit j = 0; j != 4; ++j)
+      for(length_type j = 0; j != 4; ++j)
          hmac.update(get_byte(j, counter));
       hmac.final(U);
       xor_buf(T, U, T_size);
 
-      for(u32bit j = 1; j != iterations; ++j)
+      for(length_type j = 1; j != iterations; ++j)
          {
          hmac.update(U);
          hmac.final(U);

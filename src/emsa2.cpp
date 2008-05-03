@@ -12,7 +12,7 @@ namespace Botan {
 /*************************************************
 * EMSA2 Update Operation                         *
 *************************************************/
-void EMSA2::update(const byte input[], u32bit length)
+void EMSA2::update(const byte input[], length_type length)
    {
    hash->update(input, length);
    }
@@ -29,9 +29,9 @@ SecureVector<byte> EMSA2::raw_data()
 * EMSA2 Encode Operation                         *
 *************************************************/
 SecureVector<byte> EMSA2::encoding_of(const MemoryRegion<byte>& msg,
-                                      u32bit output_bits)
+                                      length_type output_bits)
    {
-   u32bit output_length = (output_bits + 1) / 8;
+   length_type output_length = (output_bits + 1) / 8;
 
    if(msg.size() != hash->OUTPUT_LENGTH)
       throw Encoding_Error("EMSA2::encoding_of: Bad input length");
@@ -39,7 +39,7 @@ SecureVector<byte> EMSA2::encoding_of(const MemoryRegion<byte>& msg,
       throw Encoding_Error("EMSA2::encoding_of: Output length is too small");
 
    bool empty = true;
-   for(u32bit j = 0; j != hash->OUTPUT_LENGTH; ++j)
+   for(length_type j = 0; j != hash->OUTPUT_LENGTH; ++j)
       if(empty_hash[j] != msg[j])
          empty = false;
 

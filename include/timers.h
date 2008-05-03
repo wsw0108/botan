@@ -17,7 +17,7 @@ class BOTAN_DLL Timer : public EntropySource
    {
    public:
       virtual u64bit clock() const;
-      u32bit slow_poll(byte[], u32bit);
+      length_type slow_poll(byte[], length_type);
 
       virtual ~Timer() {}
    protected:

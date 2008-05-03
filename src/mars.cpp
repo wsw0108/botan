@@ -18,16 +18,16 @@ u32bit gen_mask(u32bit input)
    {
    u32bit mask = 0;
 
-   for(u32bit j = 2; j != 31; ++j)
+   for(length_type j = 2; j != 31; ++j)
       {
       u32bit region = (input >> (j-1)) & 0x07;
 
       if(region == 0x00 || region == 0x07)
          {
-         u32bit low = (j < 9) ? 0 : (j - 9);
-         u32bit high = (j < 23) ? j : 23;
+         length_type low = (j < 9) ? 0 : (j - 9);
+         length_type high = (j < 23) ? j : 23;
 
-         for(u32bit k = low; k != high; ++k)
+         for(length_type k = low; k != high; ++k)
             {
             u32bit value = (input >> k) & 0x3FF;
 
@@ -124,7 +124,7 @@ void MARS::dec(const byte in[], byte out[]) const
 *************************************************/
 void MARS::forward_mix(u32bit& A, u32bit& B, u32bit& C, u32bit& D)
    {
-   for(u32bit j = 0; j != 2; ++j)
+   for(length_type j = 0; j != 2; ++j)
       {
       B ^= SBOX[get_byte(3, A)]; B += SBOX[get_byte(2, A) + 256];
       C += SBOX[get_byte(1, A)]; D ^= SBOX[get_byte(0, A) + 256];
@@ -149,7 +149,7 @@ void MARS::forward_mix(u32bit& A, u32bit& B, u32bit& C, u32bit& D)
 *************************************************/
 void MARS::reverse_mix(u32bit& A, u32bit& B, u32bit& C, u32bit& D)
    {
-   for(u32bit j = 0; j != 2; ++j)
+   for(length_type j = 0; j != 2; ++j)
       {
       B ^= SBOX[get_byte(3, A) + 256]; C -= SBOX[get_byte(0, A)];
       D -= SBOX[get_byte(1, A) + 256]; D ^= SBOX[get_byte(2, A)];
@@ -213,14 +213,14 @@ void MARS::decrypt_round(u32bit& A, u32bit& B, u32bit& C, u32bit& D,
 /*************************************************
 * MARS Key Schedule                              *
 *************************************************/
-void MARS::key(const byte key[], u32bit length)
+void MARS::key(const byte key[], length_type length)
    {
    SecureBuffer<u32bit, 15> T;
-   for(u32bit j = 0; j != length / 4; ++j)
+   for(length_type j = 0; j != length / 4; ++j)
       T[j] = load_le<u32bit>(key, j);
    T[length / 4] = length / 4;
 
-   for(u32bit j = 0; j != 4; ++j)
+   for(length_type j = 0; j != 4; ++j)
       {
       T[ 0] ^= rotate_left(T[ 8] ^ T[13], 3) ^ (j     );
       T[ 1] ^= rotate_left(T[ 9] ^ T[14], 3) ^ (j +  4);
@@ -238,7 +238,7 @@ void MARS::key(const byte key[], u32bit length)
       T[13] ^= rotate_left(T[ 6] ^ T[11], 3) ^ (j + 52);
       T[14] ^= rotate_left(T[ 7] ^ T[12], 3) ^ (j + 56);
 
-      for(u32bit k = 0; k != 4; ++k)
+      for(length_type k = 0; k != 4; ++k)
          {
          T[ 0] = rotate_left(T[ 0] + SBOX[T[14] % 512], 9);
          T[ 1] = rotate_left(T[ 1] + SBOX[T[ 0] % 512], 9);
@@ -263,7 +263,7 @@ void MARS::key(const byte key[], u32bit length)
       EK[10*j + 9] = T[ 6];
       }
 
-   for(u32bit j = 5; j != 37; j += 2)
+   for(length_type j = 5; j != 37; j += 2)
       {
       u32bit key3 = EK[j] & 3;
       EK[j] |= 3;

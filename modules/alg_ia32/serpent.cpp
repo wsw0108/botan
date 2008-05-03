@@ -10,9 +10,9 @@ namespace Botan {
 
 extern "C" {
 
-void serpent_encrypt(const byte[16], byte[16], const u32bit[132]);
-void serpent_decrypt(const byte[16], byte[16], const u32bit[132]);
-void serpent_key_schedule(u32bit[140]);
+void serpent_encrypt(const byte[16], byte[16], const length_type[132]);
+void serpent_decrypt(const byte[16], byte[16], const length_type[132]);
+void serpent_key_schedule(length_type[140]);
 
 }
 
@@ -35,12 +35,12 @@ void Serpent::dec(const byte in[], byte out[]) const
 /*************************************************
 * Serpent Key Schedule                           *
 *************************************************/
-void Serpent::key(const byte key[], u32bit length)
+void Serpent::key(const byte key[], length_type length)
    {
-   SecureBuffer<u32bit, 140> W;
-   for(u32bit j = 0; j != length / 4; ++j)
-      W[j] = make_u32bit(key[4*j+3], key[4*j+2], key[4*j+1], key[4*j]);
-   W[length / 4] |= u32bit(1) << ((length%4)*8);
+   SecureBuffer<length_type, 140> W;
+   for(length_type j = 0; j != length / 4; ++j)
+      W[j] = make_length_type(key[4*j+3], key[4*j+2], key[4*j+1], key[4*j]);
+   W[length / 4] |= length_type(1) << ((length%4)*8);
 
    serpent_key_schedule(W);
    round_key.copy(W + 8, 132);

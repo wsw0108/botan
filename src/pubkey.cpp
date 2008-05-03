@@ -17,7 +17,7 @@ namespace Botan {
 /*************************************************
 * Encrypt a message                              *
 *************************************************/
-SecureVector<byte> PK_Encryptor::encrypt(const byte in[], u32bit len) const
+SecureVector<byte> PK_Encryptor::encrypt(const byte in[], length_type len) const
    {
    return enc(in, len);
    }
@@ -33,7 +33,7 @@ SecureVector<byte> PK_Encryptor::encrypt(const MemoryRegion<byte>& in) const
 /*************************************************
 * Decrypt a message                              *
 *************************************************/
-SecureVector<byte> PK_Decryptor::decrypt(const byte in[], u32bit len) const
+SecureVector<byte> PK_Decryptor::decrypt(const byte in[], length_type len) const
    {
    return dec(in, len);
    }
@@ -59,7 +59,7 @@ PK_Encryptor_MR_with_EME::PK_Encryptor_MR_with_EME(const PK_Encrypting_Key& k,
 * Encrypt a message                              *
 *************************************************/
 SecureVector<byte> PK_Encryptor_MR_with_EME::enc(const byte msg[],
-                                                 u32bit length) const
+                                                 length_type length) const
    {
    SecureVector<byte> message;
    if(encoder) message = encoder->encode(msg, length, key.max_input_bits());
@@ -74,7 +74,7 @@ SecureVector<byte> PK_Encryptor_MR_with_EME::enc(const byte msg[],
 /*************************************************
 * Return the max size, in bytes, of a message    *
 *************************************************/
-u32bit PK_Encryptor_MR_with_EME::maximum_input_size() const
+length_type PK_Encryptor_MR_with_EME::maximum_input_size() const
    {
    if(!encoder)
       return (key.max_input_bits() / 8);
@@ -95,7 +95,7 @@ PK_Decryptor_MR_with_EME::PK_Decryptor_MR_with_EME(const PK_Decrypting_Key& k,
 * Decrypt a message                              *
 *************************************************/
 SecureVector<byte> PK_Decryptor_MR_with_EME::dec(const byte msg[],
-                                                 u32bit length) const
+                                                 length_type length) const
    {
    try {
       SecureVector<byte> decrypted = key.decrypt(msg, length);
@@ -137,7 +137,7 @@ void PK_Signer::set_output_format(Signature_Format format)
 /*************************************************
 * Sign a message                                 *
 *************************************************/
-SecureVector<byte> PK_Signer::sign_message(const byte msg[], u32bit length)
+SecureVector<byte> PK_Signer::sign_message(const byte msg[], length_type length)
    {
    update(msg, length);
    return signature();
@@ -154,7 +154,7 @@ SecureVector<byte> PK_Signer::sign_message(const MemoryRegion<byte>& msg)
 /*************************************************
 * Add more to the message to be signed           *
 *************************************************/
-void PK_Signer::update(const byte in[], u32bit length)
+void PK_Signer::update(const byte in[], length_type length)
    {
    emsa->update(in, length);
    }
@@ -191,10 +191,10 @@ SecureVector<byte> PK_Signer::signature()
       {
       if(plain_sig.size() % key.message_parts())
          throw Encoding_Error("PK_Signer: strange signature size found");
-      const u32bit SIZE_OF_PART = plain_sig.size() / key.message_parts();
+      const length_type SIZE_OF_PART = plain_sig.size() / key.message_parts();
 
       std::vector<BigInt> sig_parts(key.message_parts());
-      for(u32bit j = 0; j != sig_parts.size(); ++j)
+      for(length_type j = 0; j != sig_parts.size(); ++j)
          sig_parts[j].binary_decode(plain_sig + SIZE_OF_PART*j, SIZE_OF_PART);
 
       return DER_Encoder()
@@ -247,8 +247,8 @@ bool PK_Verifier::verify_message(const MemoryRegion<byte>& msg,
 /*************************************************
 * Verify a message                               *
 *************************************************/
-bool PK_Verifier::verify_message(const byte msg[], u32bit msg_length,
-                                 const byte sig[], u32bit sig_length)
+bool PK_Verifier::verify_message(const byte msg[], length_type msg_length,
+                                 const byte sig[], length_type sig_length)
    {
    update(msg, msg_length);
    return check_signature(sig, sig_length);
@@ -257,7 +257,7 @@ bool PK_Verifier::verify_message(const byte msg[], u32bit msg_length,
 /*************************************************
 * Append to the message                          *
 *************************************************/
-void PK_Verifier::update(const byte in[], u32bit length)
+void PK_Verifier::update(const byte in[], length_type length)
    {
    emsa->update(in, length);
    }
@@ -289,7 +289,7 @@ bool PK_Verifier::check_signature(const MemoryRegion<byte>& sig)
 /*************************************************
 * Check a signature                              *
 *************************************************/
-bool PK_Verifier::check_signature(const byte sig[], u32bit length)
+bool PK_Verifier::check_signature(const byte sig[], length_type length)
    {
    try {
       if(sig_format == IEEE_1363)
@@ -299,7 +299,7 @@ bool PK_Verifier::check_signature(const byte sig[], u32bit length)
          BER_Decoder decoder(sig, length);
          BER_Decoder ber_sig = decoder.start_cons(SEQUENCE);
 
-         u32bit count = 0;
+         length_type count = 0;
          SecureVector<byte> real_sig;
          while(ber_sig.more_items())
             {
@@ -336,7 +336,7 @@ PK_Verifier_with_MR::PK_Verifier_with_MR(const PK_Verifying_with_MR_Key& k,
 * Verify a signature                             *
 *************************************************/
 bool PK_Verifier_with_MR::validate_signature(const MemoryRegion<byte>& msg,
-                                             const byte sig[], u32bit sig_len)
+                                             const byte sig[], length_type sig_len)
    {
    SecureVector<byte> output_of_key = key.verify(sig, sig_len);
    return emsa->verify(output_of_key, msg, key.max_input_bits());
@@ -355,7 +355,7 @@ PK_Verifier_wo_MR::PK_Verifier_wo_MR(const PK_Verifying_wo_MR_Key& k,
 * Verify a signature                             *
 *************************************************/
 bool PK_Verifier_wo_MR::validate_signature(const MemoryRegion<byte>& msg,
-                                           const byte sig[], u32bit sig_len)
+                                           const byte sig[], length_type sig_len)
    {
    SecureVector<byte> encoded = emsa->encoding_of(msg, key.max_input_bits());
    return key.verify(encoded, encoded.size(), sig, sig_len);
@@ -373,8 +373,8 @@ PK_Key_Agreement::PK_Key_Agreement(const PK_Key_Agreement_Key& k,
 /*************************************************
 * Perform Key Agreement Operation                *
 *************************************************/
-SymmetricKey PK_Key_Agreement::derive_key(u32bit key_len,
-                                          const byte in[], u32bit in_len,
+SymmetricKey PK_Key_Agreement::derive_key(length_type key_len,
+                                          const byte in[], length_type in_len,
                                           const std::string& params) const
    {
    return derive_key(key_len, in, in_len,
@@ -385,9 +385,9 @@ SymmetricKey PK_Key_Agreement::derive_key(u32bit key_len,
 /*************************************************
 * Perform Key Agreement Operation                *
 *************************************************/
-SymmetricKey PK_Key_Agreement::derive_key(u32bit key_len, const byte in[],
-                                          u32bit in_len, const byte params[],
-                                          u32bit params_len) const
+SymmetricKey PK_Key_Agreement::derive_key(length_type key_len, const byte in[],
+                                          length_type in_len, const byte params[],
+                                          length_type params_len) const
    {
    std::auto_ptr<KDF> kdf((kdf_name == "Raw") ? 0 : get_kdf(kdf_name));
    OctetString z = key.derive_key(in, in_len);

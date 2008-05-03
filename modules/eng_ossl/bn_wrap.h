@@ -20,14 +20,14 @@ class OSSL_BN
       BIGNUM* value;
 
       BigInt to_bigint() const;
-      void encode(byte[], u32bit) const;
-      u32bit bytes() const;
+      void encode(byte[], length_type) const;
+      length_type bytes() const;
 
       OSSL_BN& operator=(const OSSL_BN&);
 
       OSSL_BN(const OSSL_BN&);
       OSSL_BN(const BigInt& = 0);
-      OSSL_BN(const byte[], u32bit);
+      OSSL_BN(const byte[], length_type);
       ~OSSL_BN();
    };
 

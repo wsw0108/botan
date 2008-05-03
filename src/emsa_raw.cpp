@@ -10,7 +10,7 @@ namespace Botan {
 /*************************************************
 * EMSA-Raw Encode Operation                      *
 *************************************************/
-void EMSA_Raw::update(const byte input[], u32bit length)
+void EMSA_Raw::update(const byte input[], length_type length)
    {
    message.append(input, length);
    }
@@ -29,7 +29,7 @@ SecureVector<byte> EMSA_Raw::raw_data()
 * EMSA-Raw Encode Operation                      *
 *************************************************/
 SecureVector<byte> EMSA_Raw::encoding_of(const MemoryRegion<byte>& msg,
-                                         u32bit)
+                                         length_type)
    {
    return msg;
    }

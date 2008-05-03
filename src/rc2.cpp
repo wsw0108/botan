@@ -19,7 +19,7 @@ void RC2::enc(const byte in[], byte out[]) const
    u16bit R2 = load_le<u16bit>(in, 2);
    u16bit R3 = load_le<u16bit>(in, 3);
 
-   for(u32bit j = 0; j != 16; ++j)
+   for(length_type j = 0; j != 16; ++j)
       {
       R0 += (R1 & ~R3) + (R2 & R3) + K[4*j];
       R0 = rotate_left(R0, 1);
@@ -55,7 +55,7 @@ void RC2::dec(const byte in[], byte out[]) const
    u16bit R2 = load_le<u16bit>(in, 2);
    u16bit R3 = load_le<u16bit>(in, 3);
 
-   for(u32bit j = 0; j != 16; ++j)
+   for(length_type j = 0; j != 16; ++j)
       {
       R3 = rotate_right(R3, 5);
       R3 -= (R0 & ~R2) + (R1 & R2) + K[63 - (4*j + 0)];
@@ -84,7 +84,7 @@ void RC2::dec(const byte in[], byte out[]) const
 /*************************************************
 * RC2 Key Schedule                               *
 *************************************************/
-void RC2::key(const byte key[], u32bit length)
+void RC2::key(const byte key[], length_type length)
    {
    static const byte TABLE[256] = {
       0xD9, 0x78, 0xF9, 0xC4, 0x19, 0xDD, 0xB5, 0xED, 0x28, 0xE9, 0xFD, 0x79,
@@ -113,20 +113,20 @@ void RC2::key(const byte key[], u32bit length)
    SecureBuffer<byte, 128> L;
    L.copy(key, length);
 
-   for(u32bit j = length; j != 128; ++j)
+   for(length_type j = length; j != 128; ++j)
       L[j] = TABLE[(L[j-1] + L[j-length]) % 256];
    L[128-length] = TABLE[L[128-length]];
    for(s32bit j = 127-length; j >= 0; --j)
       L[j] = TABLE[L[j+1] ^ L[j+length]];
 
-   for(u32bit j = 0; j != 64; ++j)
+   for(length_type j = 0; j != 64; ++j)
       K[j] = load_le<u16bit>(L, j);
    }
 
 /*************************************************
 * Return the code of the effective key bits      *
 *************************************************/
-byte RC2::EKB_code(u32bit ekb)
+byte RC2::EKB_code(length_type ekb)
    {
    const byte EKB[256] = {
       0xBD, 0x56, 0xEA, 0xF2, 0xA2, 0xF1, 0xAC, 0x2A, 0xB0, 0x93, 0xD1, 0x9C,

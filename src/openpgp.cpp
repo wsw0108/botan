@@ -14,13 +14,13 @@ namespace OpenPGP {
 /*************************************************
 * OpenPGP Base64 encoding                        *
 *************************************************/
-std::string encode(const byte input[], u32bit length,
+std::string encode(const byte input[], length_type length,
                    const std::string& label,
                    const std::map<std::string, std::string>& headers)
    {
    const std::string PGP_HEADER = "-----BEGIN PGP " + label + "-----\n";
    const std::string PGP_TRAILER = "-----END PGP " + label + "-----\n";
-   const u32bit PGP_WIDTH = 64;
+   const length_type PGP_WIDTH = 64;
 
    std::string pgp_encoded = PGP_HEADER;
 
@@ -54,7 +54,7 @@ std::string encode(const byte input[], u32bit length,
 /*************************************************
 * OpenPGP Base64 encoding                        *
 *************************************************/
-std::string encode(const byte input[], u32bit length,
+std::string encode(const byte input[], length_type length,
                    const std::string& type)
    {
    std::map<std::string, std::string> empty;
@@ -67,11 +67,11 @@ std::string encode(const byte input[], u32bit length,
 SecureVector<byte> decode(DataSource& source, std::string& label,
                           std::map<std::string, std::string>& headers)
    {
-   const u32bit RANDOM_CHAR_LIMIT = 5;
+   const length_type RANDOM_CHAR_LIMIT = 5;
 
    const std::string PGP_HEADER1 = "-----BEGIN PGP ";
    const std::string PGP_HEADER2 = "-----";
-   u32bit position = 0;
+   length_type position = 0;
 
    while(position != PGP_HEADER1.length())
       {
@@ -115,7 +115,7 @@ SecureVector<byte> decode(DataSource& source, std::string& label,
          }
 
       end_of_headers = true;
-      for(u32bit j = 0; j != this_header.length(); ++j)
+      for(length_type j = 0; j != this_header.length(); ++j)
          if(!Charset::is_space(this_header[j]))
             end_of_headers = false;
 

@@ -61,7 +61,7 @@ X509_Certificate::X509_Certificate(const std::string& in) :
 *************************************************/
 void X509_Certificate::force_decode()
    {
-   u32bit version;
+   length_type version;
    BigInt serial_bn;
    AlgorithmIdentifier sig_algo_inner;
    X509_DN dn_issuer, dn_subject;
@@ -136,7 +136,7 @@ void X509_Certificate::force_decode()
    if(is_CA_cert() &&
       !subject.has_value("X509v3.BasicConstraints.path_constraint"))
       {
-      u32bit limit = (x509_version() < 3) ? NO_CERT_PATH_LIMIT : 0;
+      length_type limit = (x509_version() < 3) ? NO_CERT_PATH_LIMIT : 0;
       subject.add("X509v3.BasicConstraints.path_constraint", limit);
       }
    }
@@ -144,7 +144,7 @@ void X509_Certificate::force_decode()
 /*************************************************
 * Return the X.509 version in use                *
 *************************************************/
-u32bit X509_Certificate::x509_version() const
+length_type X509_Certificate::x509_version() const
    {
    return (subject.get1_u32bit("X509.Certificate.version") + 1);
    }
@@ -207,7 +207,7 @@ bool X509_Certificate::is_CA_cert() const
 /*************************************************
 * Return the path length constraint              *
 *************************************************/
-u32bit X509_Certificate::path_limit() const
+length_type X509_Certificate::path_limit() const
    {
    return subject.get1_u32bit("X509v3.BasicConstraints.path_constraint", 0);
    }
@@ -335,7 +335,7 @@ AlternativeName create_alt_name(const Data_Store& info)
       public:
          bool operator()(const std::string& key, const std::string&) const
             {
-            for(u32bit j = 0; j != matches.size(); ++j)
+            for(length_type j = 0; j != matches.size(); ++j)
                if(key.compare(matches[j]) == 0)
                   return true;
             return false;

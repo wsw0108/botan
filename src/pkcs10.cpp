@@ -39,7 +39,7 @@ void PKCS10_Request::force_decode()
    {
    BER_Decoder cert_req_info(tbs_bits);
 
-   u32bit version;
+   length_type version;
    cert_req_info.decode(version);
    if(version != 0)
       throw Decoding_Error("Unknown version code in PKCS #10 request: " +
@@ -174,7 +174,7 @@ std::vector<OID> PKCS10_Request::ex_constraints() const
    std::vector<std::string> oids = info.get("X509v3.ExtendedKeyUsage");
 
    std::vector<OID> result;
-   for(u32bit j = 0; j != oids.size(); ++j)
+   for(length_type j = 0; j != oids.size(); ++j)
       result.push_back(OID(oids[j]));
    return result;
    }
@@ -190,7 +190,7 @@ bool PKCS10_Request::is_CA() const
 /*************************************************
 * Return the desired path limit (if any)         *
 *************************************************/
-u32bit PKCS10_Request::path_limit() const
+length_type PKCS10_Request::path_limit() const
    {
    return info.get1_u32bit("X509v3.BasicConstraints.path_constraint", 0);
    }

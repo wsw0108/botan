@@ -29,9 +29,9 @@ class BOTAN_DLL IF_Operation
 class BOTAN_DLL DSA_Operation
    {
    public:
-      virtual bool verify(const byte[], u32bit,
-                          const byte[], u32bit) const = 0;
-      virtual SecureVector<byte> sign(const byte[], u32bit,
+      virtual bool verify(const byte[], length_type,
+                          const byte[], length_type) const = 0;
+      virtual SecureVector<byte> sign(const byte[], length_type,
                                       const BigInt&) const = 0;
       virtual DSA_Operation* clone() const = 0;
       virtual ~DSA_Operation() {}
@@ -43,8 +43,8 @@ class BOTAN_DLL DSA_Operation
 class BOTAN_DLL NR_Operation
    {
    public:
-      virtual SecureVector<byte> verify(const byte[], u32bit) const = 0;
-      virtual SecureVector<byte> sign(const byte[], u32bit,
+      virtual SecureVector<byte> verify(const byte[], length_type) const = 0;
+      virtual SecureVector<byte> sign(const byte[], length_type,
                                       const BigInt&) const = 0;
       virtual NR_Operation* clone() const = 0;
       virtual ~NR_Operation() {}
@@ -56,7 +56,7 @@ class BOTAN_DLL NR_Operation
 class BOTAN_DLL ELG_Operation
    {
    public:
-      virtual SecureVector<byte> encrypt(const byte[], u32bit,
+      virtual SecureVector<byte> encrypt(const byte[], length_type,
                                          const BigInt&) const = 0;
       virtual BigInt decrypt(const BigInt&, const BigInt&) const = 0;
       virtual ELG_Operation* clone() const = 0;

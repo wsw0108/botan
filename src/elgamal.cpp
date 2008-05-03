@@ -33,7 +33,7 @@ void ElGamal_PublicKey::X509_load_hook()
 * ElGamal Encryption Function                    *
 *************************************************/
 SecureVector<byte> ElGamal_PublicKey::encrypt(const byte in[],
-                                              u32bit length) const
+                                              length_type length) const
    {
    BigInt k = random_integer(2 * dl_work_factor(group_p().bits()));
    return core.encrypt(in, length, k);
@@ -42,7 +42,7 @@ SecureVector<byte> ElGamal_PublicKey::encrypt(const byte in[],
 /*************************************************
 * Return the maximum input size in bits          *
 *************************************************/
-u32bit ElGamal_PublicKey::max_input_bits() const
+length_type ElGamal_PublicKey::max_input_bits() const
    {
    return (group_p().bits() - 1);
    }
@@ -91,7 +91,7 @@ void ElGamal_PrivateKey::PKCS8_load_hook(bool generated)
 * ElGamal Decryption Function                    *
 *************************************************/
 SecureVector<byte> ElGamal_PrivateKey::decrypt(const byte in[],
-                                               u32bit length) const
+                                               length_type length) const
    {
    return core.decrypt(in, length);
    }

@@ -11,7 +11,7 @@ namespace Botan {
 /*************************************************
 * Derive a key from a passphrase                 *
 *************************************************/
-OctetString S2K::derive_key(u32bit key_len,
+OctetString S2K::derive_key(length_type key_len,
                             const std::string& passphrase) const
    {
    return derive(key_len, passphrase, salt, salt.size(), iterations());
@@ -20,7 +20,7 @@ OctetString S2K::derive_key(u32bit key_len,
 /*************************************************
 * Set the number of iterations                   *
 *************************************************/
-void S2K::set_iterations(u32bit i)
+void S2K::set_iterations(length_type i)
    {
    iter = i;
    }
@@ -28,7 +28,7 @@ void S2K::set_iterations(u32bit i)
 /*************************************************
 * Change the salt                                *
 *************************************************/
-void S2K::change_salt(const byte new_salt[], u32bit length)
+void S2K::change_salt(const byte new_salt[], length_type length)
    {
    salt.set(new_salt, length);
    }
@@ -44,7 +44,7 @@ void S2K::change_salt(const MemoryRegion<byte>& new_salt)
 /*************************************************
 * Create a new random salt                       *
 *************************************************/
-void S2K::new_random_salt(u32bit length)
+void S2K::new_random_salt(length_type length)
    {
    salt.create(length);
    global_state().randomize(salt, length);

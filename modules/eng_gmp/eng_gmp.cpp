@@ -66,8 +66,8 @@ BigInt GMP_IF_Op::private_op(const BigInt& i_bn) const
 class GMP_DSA_Op : public DSA_Operation
    {
    public:
-      bool verify(const byte[], u32bit, const byte[], u32bit) const;
-      SecureVector<byte> sign(const byte[], u32bit, const BigInt&) const;
+      bool verify(const byte[], length_type, const byte[], length_type) const;
+      SecureVector<byte> sign(const byte[], length_type, const BigInt&) const;
 
       DSA_Operation* clone() const { return new GMP_DSA_Op(*this); }
 
@@ -80,10 +80,10 @@ class GMP_DSA_Op : public DSA_Operation
 /*************************************************
 * GMP DSA Verify Operation                       *
 *************************************************/
-bool GMP_DSA_Op::verify(const byte msg[], u32bit msg_len,
-                        const byte sig[], u32bit sig_len) const
+bool GMP_DSA_Op::verify(const byte msg[], length_type msg_len,
+                        const byte sig[], length_type sig_len) const
    {
-   const u32bit q_bytes = q.bytes();
+   const length_type q_bytes = q.bytes();
 
    if(sig_len != 2*q_bytes || msg_len > q_bytes)
       return false;
@@ -122,7 +122,7 @@ bool GMP_DSA_Op::verify(const byte msg[], u32bit msg_len,
 /*************************************************
 * GMP DSA Sign Operation                         *
 *************************************************/
-SecureVector<byte> GMP_DSA_Op::sign(const byte in[], u32bit length,
+SecureVector<byte> GMP_DSA_Op::sign(const byte in[], length_type length,
                                     const BigInt& k_bn) const
    {
    if(mpz_cmp_ui(x.value, 0) == 0)
@@ -146,7 +146,7 @@ SecureVector<byte> GMP_DSA_Op::sign(const byte in[], u32bit length,
    if(mpz_cmp_ui(r.value, 0) == 0 || mpz_cmp_ui(s.value, 0) == 0)
       throw Internal_Error("GMP_DSA_Op::sign: r or s was zero");
 
-   const u32bit q_bytes = q.bytes();
+   const length_type q_bytes = q.bytes();
 
    SecureVector<byte> output(2*q_bytes);
    r.encode(output, q_bytes);
@@ -160,8 +160,8 @@ SecureVector<byte> GMP_DSA_Op::sign(const byte in[], u32bit length,
 class GMP_NR_Op : public NR_Operation
    {
    public:
-      SecureVector<byte> verify(const byte[], u32bit) const;
-      SecureVector<byte> sign(const byte[], u32bit, const BigInt&) const;
+      SecureVector<byte> verify(const byte[], length_type) const;
+      SecureVector<byte> sign(const byte[], length_type, const BigInt&) const;
 
       NR_Operation* clone() const { return new GMP_NR_Op(*this); }
 
@@ -174,9 +174,9 @@ class GMP_NR_Op : public NR_Operation
 /*************************************************
 * GMP NR Verify Operation                        *
 *************************************************/
-SecureVector<byte> GMP_NR_Op::verify(const byte sig[], u32bit sig_len) const
+SecureVector<byte> GMP_NR_Op::verify(const byte sig[], length_type sig_len) const
    {
-   const u32bit q_bytes = q.bytes();
+   const length_type q_bytes = q.bytes();
 
    if(sig_len != 2*q_bytes)
       return false;
@@ -201,7 +201,7 @@ SecureVector<byte> GMP_NR_Op::verify(const byte sig[], u32bit sig_len) const
 /*************************************************
 * GMP NR Sign Operation                          *
 *************************************************/
-SecureVector<byte> GMP_NR_Op::sign(const byte in[], u32bit length,
+SecureVector<byte> GMP_NR_Op::sign(const byte in[], length_type length,
                                     const BigInt& k_bn) const
    {
    if(mpz_cmp_ui(x.value, 0) == 0)
@@ -224,7 +224,7 @@ SecureVector<byte> GMP_NR_Op::sign(const byte in[], u32bit length,
    if(mpz_cmp_ui(c.value, 0) == 0)
       throw Internal_Error("Default_NR_Op::sign: c was zero");
 
-   const u32bit q_bytes = q.bytes();
+   const length_type q_bytes = q.bytes();
    SecureVector<byte> output(2*q_bytes);
    c.encode(output, q_bytes);
    d.encode(output + q_bytes, q_bytes);
@@ -237,7 +237,7 @@ SecureVector<byte> GMP_NR_Op::sign(const byte in[], u32bit length,
 class GMP_ELG_Op : public ELG_Operation
    {
    public:
-      SecureVector<byte> encrypt(const byte[], u32bit, const BigInt&) const;
+      SecureVector<byte> encrypt(const byte[], length_type, const BigInt&) const;
       BigInt decrypt(const BigInt&, const BigInt&) const;
 
       ELG_Operation* clone() const { return new GMP_ELG_Op(*this); }
@@ -251,7 +251,7 @@ class GMP_ELG_Op : public ELG_Operation
 /*************************************************
 * GMP ElGamal Encrypt Operation                  *
 *************************************************/
-SecureVector<byte> GMP_ELG_Op::encrypt(const byte in[], u32bit length,
+SecureVector<byte> GMP_ELG_Op::encrypt(const byte in[], length_type length,
                                        const BigInt& k_bn) const
    {
    GMP_MPZ i(in, length);
@@ -266,7 +266,7 @@ SecureVector<byte> GMP_ELG_Op::encrypt(const byte in[], u32bit length,
    mpz_mul(b.value, b.value, i.value);
    mpz_mod(b.value, b.value, p.value);
 
-   const u32bit p_bytes = p.bytes();
+   const length_type p_bytes = p.bytes();
    SecureVector<byte> output(2*p_bytes);
    a.encode(output, p_bytes);
    b.encode(output + p_bytes, p_bytes);

@@ -30,7 +30,7 @@ GMP_MPZ::GMP_MPZ(const BigInt& in)
 /*************************************************
 * GMP_MPZ Constructor                            *
 *************************************************/
-GMP_MPZ::GMP_MPZ(const byte in[], u32bit length)
+GMP_MPZ::GMP_MPZ(const byte in[], length_type length)
    {
    mpz_init(value);
    mpz_import(value, length, 1, 1, 0, 0, in);
@@ -64,7 +64,7 @@ GMP_MPZ& GMP_MPZ::operator=(const GMP_MPZ& other)
 /*************************************************
 * Export the mpz_t as a bytestring               *
 *************************************************/
-void GMP_MPZ::encode(byte out[], u32bit length) const
+void GMP_MPZ::encode(byte out[], length_type length) const
    {
    size_t dummy = 0;
    mpz_export(out + (length - bytes()), &dummy, 1, 1, 0, 0, value);
@@ -73,7 +73,7 @@ void GMP_MPZ::encode(byte out[], u32bit length) const
 /*************************************************
 * Return the number of significant bytes         *
 *************************************************/
-u32bit GMP_MPZ::bytes() const
+length_type GMP_MPZ::bytes() const
    {
    return ((mpz_sizeinbase(value, 2) + 7) / 8);
    }

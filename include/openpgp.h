@@ -17,12 +17,13 @@ namespace OpenPGP {
 /*************************************************
 * OpenPGP Base64 encoding/decoding               *
 *************************************************/
-BOTAN_DLL std::string encode(const byte[], u32bit, const std::string&,
-                                  const std::map<std::string, std::string>&);
-BOTAN_DLL SecureVector<byte> decode(DataSource&, std::string&,
-                                         std::map<std::string, std::string>&);
+BOTAN_DLL std::string encode(const byte[], length_type, const std::string&,
+                             const std::map<std::string, std::string>&);
 
-BOTAN_DLL std::string encode(const byte[], u32bit, const std::string&);
+BOTAN_DLL SecureVector<byte> decode(DataSource&, std::string&,
+                                    std::map<std::string, std::string>&);
+
+BOTAN_DLL std::string encode(const byte[], length_type, const std::string&);
 BOTAN_DLL SecureVector<byte> decode(DataSource&, std::string&);
 
 }

@@ -14,14 +14,14 @@ namespace Botan {
 /*************************************************
 * Generate a buffer of random bytes              *
 *************************************************/
-void ANSI_X931_RNG::randomize(byte out[], u32bit length) throw(PRNG_Unseeded)
+void ANSI_X931_RNG::randomize(byte out[], length_type length) throw(PRNG_Unseeded)
    {
    if(!is_seeded())
       throw PRNG_Unseeded(name());
 
    while(length)
       {
-      const u32bit copied = std::min(length, R.size() - position);
+      const length_type copied = std::min(length, R.size() - position);
 
       copy_mem(out, R + position, copied);
       out += copied;
@@ -38,7 +38,7 @@ void ANSI_X931_RNG::randomize(byte out[], u32bit length) throw(PRNG_Unseeded)
 *************************************************/
 void ANSI_X931_RNG::update_buffer()
    {
-   const u32bit BLOCK_SIZE = cipher->BLOCK_SIZE;
+   const length_type BLOCK_SIZE = cipher->BLOCK_SIZE;
 
    SecureVector<byte> DT(BLOCK_SIZE);
 
@@ -57,7 +57,7 @@ void ANSI_X931_RNG::update_buffer()
 /*************************************************
 * Add entropy to internal state                  *
 *************************************************/
-void ANSI_X931_RNG::add_randomness(const byte data[], u32bit length)
+void ANSI_X931_RNG::add_randomness(const byte data[], length_type length)
    {
    prng->add_entropy(data, length);
 
@@ -113,7 +113,7 @@ ANSI_X931_RNG::ANSI_X931_RNG(const std::string& cipher_name,
    else
       cipher = get_block_cipher(cipher_name);
 
-   const u32bit BLOCK_SIZE = cipher->BLOCK_SIZE;
+   const length_type BLOCK_SIZE = cipher->BLOCK_SIZE;
 
    V.create(BLOCK_SIZE);
    R.create(BLOCK_SIZE);

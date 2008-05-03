@@ -23,7 +23,7 @@ class BOTAN_DLL Parallel : public HashFunction
       Parallel(const std::vector<std::string>&);
       ~Parallel();
    private:
-      void add_data(const byte[], u32bit);
+      void add_data(const byte[], length_type);
       void final_result(byte[]);
       std::vector<HashFunction*> hashes;
    };

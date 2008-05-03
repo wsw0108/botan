@@ -16,7 +16,7 @@ namespace {
 /*************************************************
 * Perform Memory Allocation                      *
 *************************************************/
-void* do_malloc(u32bit n, bool do_lock)
+void* do_malloc(length_type n, bool do_lock)
    {
    void* ptr = std::malloc(n);
 
@@ -33,7 +33,7 @@ void* do_malloc(u32bit n, bool do_lock)
 /*************************************************
 * Perform Memory Deallocation                    *
 *************************************************/
-void do_free(void* ptr, u32bit n, bool do_lock)
+void do_free(void* ptr, length_type n, bool do_lock)
    {
    if(!ptr)
       return;
@@ -50,7 +50,7 @@ void do_free(void* ptr, u32bit n, bool do_lock)
 /*************************************************
 * Malloc_Allocator's Allocation                  *
 *************************************************/
-void* Malloc_Allocator::allocate(u32bit n)
+void* Malloc_Allocator::allocate(length_type n)
    {
    return do_malloc(n, false);
    }
@@ -58,7 +58,7 @@ void* Malloc_Allocator::allocate(u32bit n)
 /*************************************************
 * Malloc_Allocator's Deallocation                *
 *************************************************/
-void Malloc_Allocator::deallocate(void* ptr, u32bit n)
+void Malloc_Allocator::deallocate(void* ptr, length_type n)
    {
    do_free(ptr, n, false);
    }
@@ -66,7 +66,7 @@ void Malloc_Allocator::deallocate(void* ptr, u32bit n)
 /*************************************************
 * Locking_Allocator's Allocation                 *
 *************************************************/
-void* Locking_Allocator::alloc_block(u32bit n)
+void* Locking_Allocator::alloc_block(length_type n)
    {
    return do_malloc(n, true);
    }
@@ -74,7 +74,7 @@ void* Locking_Allocator::alloc_block(u32bit n)
 /*************************************************
 * Locking_Allocator's Deallocation               *
 *************************************************/
-void Locking_Allocator::dealloc_block(void* ptr, u32bit n)
+void Locking_Allocator::dealloc_block(void* ptr, length_type n)
    {
    do_free(ptr, n, true);
    }

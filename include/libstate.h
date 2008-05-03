@@ -38,7 +38,7 @@ class BOTAN_DLL Library_State
             Engine_Iterator(const Library_State& l) : lib(l) { n = 0; }
          private:
             const Library_State& lib;
-            u32bit n;
+            length_type n;
          };
       friend class Engine_Iterator;
 
@@ -47,14 +47,14 @@ class BOTAN_DLL Library_State
       void set_default_allocator(const std::string&) const;
 
       bool rng_is_seeded() const { return rng->is_seeded(); }
-      void randomize(byte[], u32bit);
+      void randomize(byte[], length_type);
       byte random();
 
       void set_prng(RandomNumberGenerator*);
       void add_entropy_source(EntropySource*, bool = true);
-      void add_entropy(const byte[], u32bit);
+      void add_entropy(const byte[], length_type);
       void add_entropy(EntropySource&, bool);
-      u32bit seed_prng(bool, u32bit);
+      length_type seed_prng(bool, length_type);
 
       class Config& config() const;
 
@@ -63,7 +63,7 @@ class BOTAN_DLL Library_State
       Library_State(const Library_State&) {}
       Library_State& operator=(const Library_State&) { return (*this); }
 
-      class Engine* get_engine_n(u32bit) const;
+      class Engine* get_engine_n(length_type) const;
 
       class Mutex_Factory* mutex_factory;
       class Mutex* allocator_lock;

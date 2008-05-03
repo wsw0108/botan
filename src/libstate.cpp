@@ -134,7 +134,7 @@ void Library_State::set_prng(RandomNumberGenerator* new_rng)
 /*************************************************
 * Get bytes from the global PRNG                 *
 *************************************************/
-void Library_State::randomize(byte out[], u32bit length)
+void Library_State::randomize(byte out[], length_type length)
    {
    Mutex_Holder lock(rng_lock);
 
@@ -167,7 +167,7 @@ void Library_State::add_entropy_source(EntropySource* src, bool last_in_list)
 /*************************************************
 * Add some bytes of entropy to the global PRNG   *
 *************************************************/
-void Library_State::add_entropy(const byte in[], u32bit length)
+void Library_State::add_entropy(const byte in[], length_type length)
    {
    Mutex_Holder lock(rng_lock);
 
@@ -187,12 +187,12 @@ void Library_State::add_entropy(EntropySource& source, bool slow_poll)
 /*************************************************
 * Gather entropy for our PRNG object             *
 *************************************************/
-u32bit Library_State::seed_prng(bool slow_poll, u32bit bits_to_get)
+length_type Library_State::seed_prng(bool slow_poll, length_type bits_to_get)
    {
    Mutex_Holder lock(rng_lock);
 
-   u32bit bits = 0;
-   for(u32bit j = 0; j != entropy_sources.size(); ++j)
+   length_type bits = 0;
+   for(length_type j = 0; j != entropy_sources.size(); ++j)
       {
       bits += rng->add_entropy(*(entropy_sources[j]), slow_poll);
 
@@ -206,7 +206,7 @@ u32bit Library_State::seed_prng(bool slow_poll, u32bit bits_to_get)
 /*************************************************
 * Get an engine out of the list                  *
 *************************************************/
-Engine* Library_State::get_engine_n(u32bit n) const
+Engine* Library_State::get_engine_n(length_type n) const
    {
    Mutex_Holder lock(engine_lock);
 
@@ -259,24 +259,24 @@ void Library_State::initialize(const InitializerOptions& args,
    cached_default_allocator = 0;
 
    std::vector<Allocator*> mod_allocs = modules.allocators();
-   for(u32bit j = 0; j != mod_allocs.size(); ++j)
+   for(length_type j = 0; j != mod_allocs.size(); ++j)
       add_allocator(mod_allocs[j]);
 
    set_default_allocator(modules.default_allocator());
 
    std::vector<Engine*> mod_engines = modules.engines();
-   for(u32bit j = 0; j != mod_engines.size(); ++j)
+   for(length_type j = 0; j != mod_engines.size(); ++j)
       engines.push_back(mod_engines[j]);
 
    std::vector<EntropySource*> sources = modules.entropy_sources();
-   for(u32bit j = 0; j != sources.size(); ++j)
+   for(length_type j = 0; j != sources.size(); ++j)
       add_entropy_source(sources[j]);
 
    set_prng(new ANSI_X931_RNG);
 
    if(args.seed_rng())
       {
-      for(u32bit j = 0; j != 4; ++j)
+      for(length_type j = 0; j != 4; ++j)
          {
          seed_prng(true, 384);
          if(rng_is_seeded())
@@ -323,7 +323,7 @@ Library_State::~Library_State()
 
    cached_default_allocator = 0;
 
-   for(u32bit j = 0; j != allocators.size(); ++j)
+   for(length_type j = 0; j != allocators.size(); ++j)
       {
       allocators[j]->destroy();
       delete allocators[j];

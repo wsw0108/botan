@@ -83,7 +83,7 @@ void FTW_EntropySource::gather_from_dir(const std::string& dirname)
       }
    ::closedir(dir);
 
-   for(u32bit j = 0; j != subdirs.size(); j++)
+   for(length_type j = 0; j != subdirs.size(); j++)
       gather_from_dir(subdirs[j]);
    }
 

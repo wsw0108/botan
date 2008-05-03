@@ -73,8 +73,8 @@ BigInt Default_IF_Op::private_op(const BigInt& i) const
 class Default_DSA_Op : public DSA_Operation
    {
    public:
-      bool verify(const byte[], u32bit, const byte[], u32bit) const;
-      SecureVector<byte> sign(const byte[], u32bit, const BigInt&) const;
+      bool verify(const byte[], length_type, const byte[], length_type) const;
+      SecureVector<byte> sign(const byte[], length_type, const BigInt&) const;
 
       DSA_Operation* clone() const { return new Default_DSA_Op(*this); }
 
@@ -101,8 +101,8 @@ Default_DSA_Op::Default_DSA_Op(const DL_Group& grp, const BigInt& y1,
 /*************************************************
 * Default DSA Verify Operation                   *
 *************************************************/
-bool Default_DSA_Op::verify(const byte msg[], u32bit msg_len,
-                            const byte sig[], u32bit sig_len) const
+bool Default_DSA_Op::verify(const byte msg[], length_type msg_len,
+                            const byte sig[], length_type sig_len) const
    {
    const BigInt& q = group.get_q();
 
@@ -126,7 +126,7 @@ bool Default_DSA_Op::verify(const byte msg[], u32bit msg_len,
 /*************************************************
 * Default DSA Sign Operation                     *
 *************************************************/
-SecureVector<byte> Default_DSA_Op::sign(const byte in[], u32bit length,
+SecureVector<byte> Default_DSA_Op::sign(const byte in[], length_type length,
                                         const BigInt& k) const
    {
    if(x == 0)
@@ -153,8 +153,8 @@ SecureVector<byte> Default_DSA_Op::sign(const byte in[], u32bit length,
 class Default_NR_Op : public NR_Operation
    {
    public:
-      SecureVector<byte> verify(const byte[], u32bit) const;
-      SecureVector<byte> sign(const byte[], u32bit, const BigInt&) const;
+      SecureVector<byte> verify(const byte[], length_type) const;
+      SecureVector<byte> sign(const byte[], length_type, const BigInt&) const;
 
       NR_Operation* clone() const { return new Default_NR_Op(*this); }
 
@@ -181,7 +181,7 @@ Default_NR_Op::Default_NR_Op(const DL_Group& grp, const BigInt& y1,
 /*************************************************
 * Default NR Verify Operation                    *
 *************************************************/
-SecureVector<byte> Default_NR_Op::verify(const byte in[], u32bit length) const
+SecureVector<byte> Default_NR_Op::verify(const byte in[], length_type length) const
    {
    const BigInt& q = group.get_q();
 
@@ -201,7 +201,7 @@ SecureVector<byte> Default_NR_Op::verify(const byte in[], u32bit length) const
 /*************************************************
 * Default NR Sign Operation                      *
 *************************************************/
-SecureVector<byte> Default_NR_Op::sign(const byte in[], u32bit length,
+SecureVector<byte> Default_NR_Op::sign(const byte in[], length_type length,
                                        const BigInt& k) const
    {
    if(x == 0)
@@ -231,7 +231,7 @@ SecureVector<byte> Default_NR_Op::sign(const byte in[], u32bit length,
 class Default_ELG_Op : public ELG_Operation
    {
    public:
-      SecureVector<byte> encrypt(const byte[], u32bit, const BigInt&) const;
+      SecureVector<byte> encrypt(const byte[], length_type, const BigInt&) const;
       BigInt decrypt(const BigInt&, const BigInt&) const;
 
       ELG_Operation* clone() const { return new Default_ELG_Op(*this); }
@@ -261,7 +261,7 @@ Default_ELG_Op::Default_ELG_Op(const DL_Group& group, const BigInt& y,
 /*************************************************
 * Default ElGamal Encrypt Operation              *
 *************************************************/
-SecureVector<byte> Default_ELG_Op::encrypt(const byte in[], u32bit length,
+SecureVector<byte> Default_ELG_Op::encrypt(const byte in[], length_type length,
                                            const BigInt& k) const
    {
    BigInt m(in, length);

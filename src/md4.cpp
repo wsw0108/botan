@@ -45,7 +45,7 @@ inline void HH(u32bit& A, u32bit B, u32bit C, u32bit D, u32bit M, byte S)
 *************************************************/
 void MD4::hash(const byte input[])
    {
-   for(u32bit j = 0; j != 16; ++j)
+   for(length_type j = 0; j != 16; ++j)
       M[j] = load_le<u32bit>(input, j);
 
    u32bit A = digest[0], B = digest[1], C = digest[2], D = digest[3];
@@ -79,7 +79,7 @@ void MD4::hash(const byte input[])
 *************************************************/
 void MD4::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; j += 4)
+   for(length_type j = 0; j != OUTPUT_LENGTH; j += 4)
       store_le(digest[j/4], output + j);
    }
 

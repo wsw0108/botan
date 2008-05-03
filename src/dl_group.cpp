@@ -40,7 +40,7 @@ DL_Group::DL_Group(const std::string& type)
 /*************************************************
 * DL_Group Constructor                           *
 *************************************************/
-DL_Group::DL_Group(PrimeType type, u32bit pbits, u32bit qbits)
+DL_Group::DL_Group(PrimeType type, length_type pbits, length_type qbits)
    {
    if(pbits < 512)
       throw Invalid_Argument("DL_Group: prime size " + to_string(pbits) +
@@ -82,7 +82,8 @@ DL_Group::DL_Group(PrimeType type, u32bit pbits, u32bit qbits)
 /*************************************************
 * DL_Group Constructor                           *
 *************************************************/
-DL_Group::DL_Group(const MemoryRegion<byte>& seed, u32bit pbits, u32bit qbits)
+DL_Group::DL_Group(const MemoryRegion<byte>& seed,
+                   length_type pbits, length_type qbits)
    {
    if(!generate_dsa_primes(p, q, pbits, qbits, seed))
       throw Invalid_Argument("DL_Group: The seed/counter given does not "
@@ -311,7 +312,7 @@ BigInt DL_Group::make_dsa_generator(const BigInt& p, const BigInt& q)
    {
    BigInt g, e = (p - 1) / q;
 
-   for(u32bit j = 0; j != PRIME_TABLE_SIZE; ++j)
+   for(length_type j = 0; j != PRIME_TABLE_SIZE; ++j)
       {
       g = power_mod(PRIMES[j], e, p);
       if(g != 1)

@@ -19,13 +19,13 @@ class BOTAN_DLL RC5 : public BlockCipher
       void clear() throw() { S.clear(); }
       std::string name() const;
       BlockCipher* clone() const { return new RC5(ROUNDS); }
-      RC5(u32bit);
+      RC5(length_type);
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
       SecureVector<u32bit> S;
-      const u32bit ROUNDS;
+      const length_type ROUNDS;
    };
 
 }

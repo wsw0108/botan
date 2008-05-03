@@ -19,11 +19,11 @@ class BOTAN_DLL EMSA1 : public EMSA
       EMSA1(const std::string&);
       ~EMSA1() { delete hash; }
    private:
-      void update(const byte[], u32bit);
-      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, u32bit);
+      void update(const byte[], length_type);
+      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, length_type);
       SecureVector<byte> raw_data();
       bool verify(const MemoryRegion<byte>&, const MemoryRegion<byte>&,
-                  u32bit) throw();
+                  length_type) throw();
       HashFunction* hash;
    };
 
@@ -36,8 +36,8 @@ class BOTAN_DLL EMSA2 : public EMSA
       EMSA2(const std::string&);
       ~EMSA2() { delete hash; }
    private:
-      void update(const byte[], u32bit);
-      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, u32bit);
+      void update(const byte[], length_type);
+      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, length_type);
       SecureVector<byte> raw_data();
       SecureVector<byte> empty_hash;
       HashFunction* hash;
@@ -53,8 +53,8 @@ class BOTAN_DLL EMSA3 : public EMSA
       EMSA3(const std::string&);
       ~EMSA3() { delete hash; }
    private:
-      void update(const byte[], u32bit);
-      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, u32bit);
+      void update(const byte[], length_type);
+      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, length_type);
       SecureVector<byte> raw_data();
       HashFunction* hash;
       SecureVector<byte> hash_id;
@@ -67,15 +67,15 @@ class BOTAN_DLL EMSA4 : public EMSA
    {
    public:
       EMSA4(const std::string&, const std::string&);
-      EMSA4(const std::string&, const std::string&, u32bit);
+      EMSA4(const std::string&, const std::string&, length_type);
       ~EMSA4() { delete hash; delete mgf; }
    private:
-      void update(const byte[], u32bit);
-      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, u32bit);
+      void update(const byte[], length_type);
+      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, length_type);
       SecureVector<byte> raw_data();
       bool verify(const MemoryRegion<byte>&, const MemoryRegion<byte>&,
-                  u32bit) throw();
-      const u32bit SALT_SIZE;
+                  length_type) throw();
+      const length_type SALT_SIZE;
       HashFunction* hash;
       const MGF* mgf;
    };
@@ -86,8 +86,8 @@ class BOTAN_DLL EMSA4 : public EMSA
 class BOTAN_DLL EMSA_Raw : public EMSA
    {
    private:
-      void update(const byte[], u32bit);
-      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, u32bit);
+      void update(const byte[], length_type);
+      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, length_type);
       SecureVector<byte> raw_data();
       SecureVector<byte> message;
    };

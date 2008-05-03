@@ -13,9 +13,9 @@ namespace Botan {
 /*************************************************
 * Update an CBC-MAC Calculation                  *
 *************************************************/
-void CBC_MAC::add_data(const byte input[], u32bit length)
+void CBC_MAC::add_data(const byte input[], length_type length)
    {
-   u32bit xored = std::min(OUTPUT_LENGTH - position, length);
+   length_type xored = std::min<length_type>(OUTPUT_LENGTH - position, length);
    xor_buf(state + position, input, xored);
    position += xored;
 
@@ -53,7 +53,7 @@ void CBC_MAC::final_result(byte mac[])
 /*************************************************
 * CBC-MAC Key Schedule                           *
 *************************************************/
-void CBC_MAC::key(const byte key[], u32bit length)
+void CBC_MAC::key(const byte key[], length_type length)
    {
    e->set_key(key, length);
    }

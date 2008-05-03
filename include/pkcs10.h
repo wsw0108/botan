@@ -28,7 +28,7 @@ class BOTAN_DLL PKCS10_Request : public X509_Object
       std::vector<OID> ex_constraints() const;
 
       bool is_CA() const;
-      u32bit path_limit() const;
+      length_type path_limit() const;
 
       std::string challenge_password() const;
 

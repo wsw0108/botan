@@ -32,8 +32,8 @@ class BOTAN_DLL BigInt
       BigInt& operator/=(const BigInt&);
       BigInt& operator%=(const BigInt&);
       word    operator%=(word);
-      BigInt& operator<<=(u32bit);
-      BigInt& operator>>=(u32bit);
+      BigInt& operator<<=(length_type);
+      BigInt& operator>>=(length_type);
 
       BigInt& operator++() { return (*this += 1); }
       BigInt& operator--() { return (*this -= 1); }
@@ -49,14 +49,14 @@ class BOTAN_DLL BigInt
       bool is_nonzero() const { return (!is_zero()); }
       bool is_zero() const;
 
-      void set_bit(u32bit);
-      void clear_bit(u32bit);
-      void mask_bits(u32bit);
+      void set_bit(length_type);
+      void clear_bit(length_type);
+      void mask_bits(length_type);
 
-      bool get_bit(u32bit) const;
+      bool get_bit(length_type) const;
       u32bit get_substring(u32bit, u32bit) const;
-      byte byte_at(u32bit) const;
-      word word_at(u32bit n) const
+      byte byte_at(length_type) const;
+      word word_at(length_type n) const
          { return ((n < size()) ? reg[n] : 0); }
 
       u32bit to_u32bit() const;
@@ -69,31 +69,31 @@ class BOTAN_DLL BigInt
       void set_sign(Sign);
       BigInt abs() const;
 
-      u32bit size() const { return reg.size(); }
-      u32bit sig_words() const;
-      u32bit bytes() const;
-      u32bit bits() const;
+      length_type size() const { return reg.size(); }
+      length_type sig_words() const;
+      length_type bytes() const;
+      length_type bits() const;
 
       const word* data() const { return reg.begin(); }
       SecureVector<word>& get_reg() { return reg; }
-      void grow_reg(u32bit) const;
+      void grow_reg(length_type) const;
 
-      word& operator[](u32bit);
-      word operator[](u32bit) const;
+      word& operator[](length_type);
+      word operator[](length_type) const;
       void clear() { reg.clear(); }
 
-      void randomize(u32bit = 0);
+      void randomize(length_type = 0);
 
       void binary_encode(byte[]) const;
-      void binary_decode(const byte[], u32bit);
+      void binary_decode(const byte[], length_type);
       void binary_decode(const MemoryRegion<byte>&);
-      u32bit encoded_size(Base = Binary) const;
+      length_type encoded_size(Base = Binary) const;
 
       static SecureVector<byte> encode(const BigInt&, Base = Binary);
       static void encode(byte[], const BigInt&, Base = Binary);
-      static BigInt decode(const byte[], u32bit, Base = Binary);
+      static BigInt decode(const byte[], length_type, Base = Binary);
       static BigInt decode(const MemoryRegion<byte>&, Base = Binary);
-      static SecureVector<byte> encode_1363(const BigInt&, u32bit);
+      static SecureVector<byte> encode_1363(const BigInt&, length_type);
 
       void swap(BigInt&);
 
@@ -101,11 +101,11 @@ class BOTAN_DLL BigInt
       BigInt(u64bit);
       BigInt(const BigInt&);
       BigInt(const std::string&);
-      BigInt(const byte[], u32bit, Base = Binary);
-      BigInt(Sign, u32bit);
-      BigInt(NumberType, u32bit);
+      BigInt(const byte[], length_type, Base = Binary);
+      BigInt(Sign, length_type);
+      BigInt(NumberType, length_type);
    private:
-      void grow_to(u32bit) const;
+      void grow_to(length_type) const;
       SecureVector<word> reg;
       Sign signedness;
    };
@@ -119,8 +119,8 @@ BigInt BOTAN_DLL operator*(const BigInt&, const BigInt&);
 BigInt BOTAN_DLL operator/(const BigInt&, const BigInt&);
 BigInt BOTAN_DLL operator%(const BigInt&, const BigInt&);
 word   BOTAN_DLL operator%(const BigInt&, word);
-BigInt BOTAN_DLL operator<<(const BigInt&, u32bit);
-BigInt BOTAN_DLL operator>>(const BigInt&, u32bit);
+BigInt BOTAN_DLL operator<<(const BigInt&, length_type);
+BigInt BOTAN_DLL operator>>(const BigInt&, length_type);
 
 /*************************************************
 * Comparison Operators                           *

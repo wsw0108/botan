@@ -17,18 +17,18 @@ namespace Botan {
 class Bzip_Compression : public Filter
    {
    public:
-      void write(const byte input[], u32bit length);
+      void write(const byte input[], length_type length);
       void start_msg();
       void end_msg();
 
       void flush();
 
-      Bzip_Compression(u32bit = 9);
+      Bzip_Compression(length_type = 9);
       ~Bzip_Compression() { clear(); }
    private:
       void clear();
 
-      const u32bit level;
+      const length_type level;
       SecureVector<byte> buffer;
       class Bzip_Stream* bz;
    };
@@ -39,7 +39,7 @@ class Bzip_Compression : public Filter
 class Bzip_Decompression : public Filter
    {
    public:
-      void write(const byte input[], u32bit length);
+      void write(const byte input[], length_type length);
       void start_msg();
       void end_msg();
 

@@ -102,17 +102,17 @@ void CAST_128::dec(const byte in[], byte out[]) const
 /*************************************************
 * CAST-128 Key Schedule                          *
 *************************************************/
-void CAST_128::key(const byte key[], u32bit length)
+void CAST_128::key(const byte key[], length_type length)
    {
    clear();
    SecureBuffer<u32bit, 4> X;
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       X[j/4] = (X[j/4] << 8) + key[j];
 
    key_schedule(MK, X);
    key_schedule(RK, X);
 
-   for(u32bit j = 0; j != 16; ++j)
+   for(length_type j = 0; j != 16; ++j)
       RK[j] %= 32;
    }
 

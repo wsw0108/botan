@@ -23,7 +23,7 @@ void SHA_160::hash(const byte input[])
 *************************************************/
 void SHA_160::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; ++j)
+   for(length_type j = 0; j != OUTPUT_LENGTH; ++j)
       output[j] = get_byte(j % 4, digest[j/4]);
    }
 

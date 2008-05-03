@@ -21,9 +21,9 @@ class BOTAN_DLL Turing : public StreamCipher
       StreamCipher* clone() const { return new Turing; }
       Turing() : StreamCipher(4, 32, 4) { position = 0; }
    private:
-      void cipher(const byte[], byte[], u32bit);
-      void key(const byte[], u32bit);
-      void resync(const byte[], u32bit);
+      void cipher(const byte[], byte[], length_type);
+      void key(const byte[], length_type);
+      void resync(const byte[], length_type);
       void generate();
 
       static u32bit fixedS(u32bit);
@@ -38,7 +38,7 @@ class BOTAN_DLL Turing : public StreamCipher
       SecureBuffer<u32bit, 17> R;
       SecureVector<u32bit> K;
       SecureBuffer<byte, 340> buffer;
-      u32bit position;
+      length_type position;
    };
 
 }

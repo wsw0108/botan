@@ -16,7 +16,7 @@ void SAFER_SK::enc(const byte in[], byte out[]) const
    {
    byte A = in[0], B = in[1], C = in[2], D = in[3],
         E = in[4], F = in[5], G = in[6], H = in[7], X, Y;
-   for(u32bit j = 0; j != 16*ROUNDS; j += 16)
+   for(length_type j = 0; j != 16*ROUNDS; j += 16)
       {
       A = EXP[A ^ EK[j  ]]; B = LOG[B + EK[j+1]];
       C = LOG[C + EK[j+2]]; D = EXP[D ^ EK[j+3]];
@@ -65,20 +65,20 @@ void SAFER_SK::dec(const byte in[], byte out[]) const
 /*************************************************
 * SAFER-SK Key Schedule                          *
 *************************************************/
-void SAFER_SK::key(const byte key[], u32bit)
+void SAFER_SK::key(const byte key[], length_type)
    {
    SecureBuffer<byte, 18> KB;
 
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       {
       KB[ 8] ^= KB[j] = rotate_left(key[j], 5);
       KB[17] ^= KB[j+9] = EK[j] = key[j+8];
       }
-   for(u32bit j = 0; j != ROUNDS; ++j)
+   for(length_type j = 0; j != ROUNDS; ++j)
       {
-      for(u32bit k = 0; k != 18; ++k)
+      for(length_type k = 0; k != 18; ++k)
          KB[k] = rotate_left(KB[k], 6);
-      for(u32bit k = 0; k != 16; ++k)
+      for(length_type k = 0; k != 16; ++k)
          EK[16*j+k+8] = KB[KEY_INDEX[16*j+k]] + BIAS[16*j+k];
       }
    }
@@ -102,7 +102,7 @@ BlockCipher* SAFER_SK::clone() const
 /*************************************************
 * SAFER-SK Constructor                           *
 *************************************************/
-SAFER_SK::SAFER_SK(u32bit rounds) : BlockCipher(8, 16),
+SAFER_SK::SAFER_SK(length_type rounds) : BlockCipher(8, 16),
                                     EK(16 * rounds + 8), ROUNDS(rounds)
    {
    if(ROUNDS > 13 || ROUNDS == 0)

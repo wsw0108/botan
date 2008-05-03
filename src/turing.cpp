@@ -17,11 +17,11 @@ namespace {
 inline void PHT(MemoryRegion<u32bit>& buf)
    {
    u32bit sum = 0;
-   for(u32bit j = 0; j < buf.size() - 1; ++j)
+   for(length_type j = 0; j < buf.size() - 1; ++j)
       sum += buf[j];
    buf[buf.size()-1] += sum;
    sum = buf[buf.size()-1];
-   for(u32bit j = 0; j < buf.size() - 1; ++j)
+   for(length_type j = 0; j < buf.size() - 1; ++j)
       buf[j] += sum;
    }
 
@@ -83,7 +83,7 @@ inline u32bit mul(u32bit X)
 /*************************************************
 * Combine cipher stream with message             *
 *************************************************/
-void Turing::cipher(const byte in[], byte out[], u32bit length)
+void Turing::cipher(const byte in[], byte out[], length_type length)
    {
    while(length >= buffer.size() - position)
       {
@@ -102,7 +102,7 @@ void Turing::cipher(const byte in[], byte out[], u32bit length)
 *************************************************/
 void Turing::generate()
    {
-   for(u32bit j = 0; j != 17; ++j)
+   for(length_type j = 0; j != 17; ++j)
       {
       const u32bit idx_0 = OFFSETS[16*j];
       const u32bit idx_1 = OFFSETS[16*j+1];
@@ -156,7 +156,7 @@ void Turing::generate()
       C += R[idx_12];
       D += R[idx_5];
 
-      for(u32bit k = 0; k != 4; ++k)
+      for(length_type k = 0; k != 4; ++k)
          {
          buffer[20*j+k   ] = get_byte(k, A);
          buffer[20*j+k+ 4] = get_byte(k, B);
@@ -174,7 +174,7 @@ void Turing::generate()
 *************************************************/
 u32bit Turing::fixedS(u32bit W)
    {
-   for(u32bit j = 0; j != 4; ++j)
+   for(length_type j = 0; j != 4; ++j)
       {
       byte B = SBOX[get_byte(j, W)];
       W ^= rotate_left(Q_BOX[B], j*8);
@@ -190,11 +190,11 @@ u32bit Turing::fixedS(u32bit W)
 void Turing::gen_sbox(MemoryRegion<u32bit>& S, u32bit which,
                       const MemoryRegion<u32bit>& K)
    {
-   for(u32bit j = 0; j != 256; ++j)
+   for(length_type j = 0; j != 256; ++j)
       {
       u32bit W = 0, C = j;
 
-      for(u32bit k = 0; k < K.size(); ++k)
+      for(length_type k = 0; k < K.size(); ++k)
          {
          C = SBOX[get_byte(which, K[k]) ^ C];
          W ^= rotate_left(Q_BOX[C], k + 8*which);
@@ -206,13 +206,13 @@ void Turing::gen_sbox(MemoryRegion<u32bit>& S, u32bit which,
 /*************************************************
 * Turing Key Schedule                            *
 *************************************************/
-void Turing::key(const byte key[], u32bit length)
+void Turing::key(const byte key[], length_type length)
    {
    K.create(length / 4);
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       K[j/4] = (K[j/4] << 8) + key[j];
 
-   for(u32bit j = 0; j != K.size(); ++j)
+   for(length_type j = 0; j != K.size(); ++j)
       K[j] = fixedS(K[j]);
 
    PHT(K);
@@ -228,24 +228,24 @@ void Turing::key(const byte key[], u32bit length)
 /*************************************************
 * Resynchronization                              *
 *************************************************/
-void Turing::resync(const byte iv[], u32bit length)
+void Turing::resync(const byte iv[], length_type length)
    {
    if(length % 4 != 0 || length > 16)
       throw Invalid_IV_Length(name(), length);
 
    SecureVector<u32bit> IV(length / 4);
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       IV[j/4] = (IV[j/4] << 8) + iv[j];
 
-   for(u32bit j = 0; j != IV.size(); ++j)
+   for(length_type j = 0; j != IV.size(); ++j)
       R[j] = IV[j] = fixedS(IV[j]);
 
-   for(u32bit j = 0; j != K.size(); ++j)
+   for(length_type j = 0; j != K.size(); ++j)
       R[j+IV.size()] = K[j];
 
    R[K.size() + IV.size()] = (0x010203 << 8) | (K.size() << 4) | IV.size();
 
-   for(u32bit j = K.size() + IV.size() + 1; j != 17; ++j)
+   for(length_type j = K.size() + IV.size() + 1; j != 17; ++j)
       {
       const u32bit W = R[j-K.size()-IV.size()-1] + R[j-1];
       R[j] = S0[get_byte(0, W)] ^ S1[get_byte(1, W)] ^

@@ -44,7 +44,7 @@ class MemoryMapping_Failed : public Exception
 /*************************************************
 * Memory Map a File into Memory                  *
 *************************************************/
-void* MemoryMapping_Allocator::alloc_block(u32bit n)
+void* MemoryMapping_Allocator::alloc_block(length_type n)
    {
    class TemporaryFile
       {
@@ -99,7 +99,7 @@ void* MemoryMapping_Allocator::alloc_block(u32bit n)
 /*************************************************
 * Remove a Memory Mapping                        *
 *************************************************/
-void MemoryMapping_Allocator::dealloc_block(void* ptr, u32bit n)
+void MemoryMapping_Allocator::dealloc_block(void* ptr, length_type n)
    {
    if(ptr == 0)
       return;
@@ -107,7 +107,7 @@ void MemoryMapping_Allocator::dealloc_block(void* ptr, u32bit n)
    const byte PATTERNS[] = { 0x00, 0xFF, 0xAA, 0x55, 0x73, 0x8C, 0x5F, 0xA0,
                              0x6E, 0x91, 0x30, 0xCF, 0xD3, 0x2C, 0xAC, 0x00 };
 
-   for(u32bit j = 0; j != sizeof(PATTERNS); j++)
+   for(length_type j = 0; j != sizeof(PATTERNS); j++)
       {
       std::memset(ptr, PATTERNS[j], n);
 

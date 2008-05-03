@@ -11,8 +11,8 @@ namespace Botan {
 /*************************************************
 * Read data from a message                       *
 *************************************************/
-u32bit Output_Buffers::read(byte output[], u32bit length,
-                            Pipe::message_id msg)
+length_type Output_Buffers::read(byte output[], length_type length,
+                                 Pipe::message_id msg)
    {
    SecureQueue* q = get(msg);
    if(q)
@@ -23,9 +23,9 @@ u32bit Output_Buffers::read(byte output[], u32bit length,
 /*************************************************
 * Peek at data in a message                      *
 *************************************************/
-u32bit Output_Buffers::peek(byte output[], u32bit length,
-                            u32bit stream_offset,
-                            Pipe::message_id msg) const
+length_type Output_Buffers::peek(byte output[], length_type length,
+                                 length_type stream_offset,
+                                 Pipe::message_id msg) const
    {
    SecureQueue* q = get(msg);
    if(q)
@@ -36,7 +36,7 @@ u32bit Output_Buffers::peek(byte output[], u32bit length,
 /*************************************************
 * Check available bytes in a message             *
 *************************************************/
-u32bit Output_Buffers::remaining(Pipe::message_id msg) const
+length_type Output_Buffers::remaining(Pipe::message_id msg) const
    {
    SecureQueue* q = get(msg);
    if(q)
@@ -110,7 +110,7 @@ Output_Buffers::Output_Buffers()
 *************************************************/
 Output_Buffers::~Output_Buffers()
    {
-   for(u32bit j = 0; j != buffers.size(); ++j)
+   for(length_type j = 0; j != buffers.size(); ++j)
       delete buffers[j];
    }
 

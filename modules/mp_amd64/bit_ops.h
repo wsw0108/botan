@@ -13,12 +13,12 @@ namespace Botan {
 /*************************************************
 * Word Rotation Functions                        *
 *************************************************/
-template<typename T> inline T rotate_left(T input, u32bit rot)
+template<typename T> inline T rotate_left(T input, length_type rot)
    {
    return static_cast<T>((input << rot) | (input >> (8*sizeof(T)-rot)));;
    }
 
-template<typename T> inline T rotate_right(T input, u32bit rot)
+template<typename T> inline T rotate_right(T input, length_type rot)
    {
    return static_cast<T>((input >> rot) | (input << (8*sizeof(T)-rot)));
    }
@@ -46,7 +46,7 @@ inline u64bit reverse_bytes(u64bit input)
 /*************************************************
 * XOR Arrays                                     *
 *************************************************/
-inline void xor_buf(byte out[], const byte in[], u32bit length)
+inline void xor_buf(byte out[], const byte in[], length_type length)
    {
    while(length >= 8)
       {
@@ -54,7 +54,7 @@ inline void xor_buf(byte out[], const byte in[], u32bit length)
       in += 8; out += 8; length -= 8;
       }
 
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       out[j] ^= in[j];
    }
 
@@ -62,7 +62,7 @@ inline void xor_buf(byte out[], const byte in[], u32bit length)
 * XOR Arrays                                     *
 *************************************************/
 inline void xor_buf(byte out[], const byte in[],
-                    const byte in2[], u32bit length)
+                    const byte in2[], length_type length)
    {
    while(length >= 8)
       {
@@ -73,7 +73,7 @@ inline void xor_buf(byte out[], const byte in[],
       in += 8; in2 += 8; out += 8; length -= 8;
       }
 
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       out[j] = in[j] ^ in2[j];
    }
 
@@ -81,10 +81,10 @@ inline void xor_buf(byte out[], const byte in[],
 * Simple Bit Manipulation                        *
 *************************************************/
 bool power_of_2(u64bit);
-u32bit high_bit(u64bit);
-u32bit low_bit(u64bit);
-u32bit significant_bytes(u64bit);
-u32bit hamming_weight(u64bit);
+length_type high_bit(u64bit);
+length_type low_bit(u64bit);
+length_type significant_bytes(u64bit);
+length_type hamming_weight(u64bit);
 
 }
 

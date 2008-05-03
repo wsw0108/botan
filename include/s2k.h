@@ -20,23 +20,25 @@ class BOTAN_DLL S2K
       virtual std::string name() const = 0;
       virtual void clear() {}
 
-      OctetString derive_key(u32bit, const std::string&) const;
+      OctetString derive_key(length_type, const std::string&) const;
 
-      void set_iterations(u32bit);
-      void change_salt(const byte[], u32bit);
+      void set_iterations(length_type);
+      void change_salt(const byte[], length_type);
       void change_salt(const MemoryRegion<byte>&);
-      void new_random_salt(u32bit);
+      void new_random_salt(length_type);
 
-      u32bit iterations() const { return iter; }
+      length_type iterations() const { return iter; }
       SecureVector<byte> current_salt() const { return salt; }
 
       S2K() { iter = 0; }
       virtual ~S2K() {}
    private:
-      virtual OctetString derive(u32bit, const std::string&,
-                                 const byte[], u32bit, u32bit) const = 0;
+      virtual OctetString derive(length_type, const std::string&,
+                                 const byte[], length_type,
+                                 length_type) const = 0;
+
       SecureVector<byte> salt;
-      u32bit iter;
+      length_type iter;
    };
 
 }

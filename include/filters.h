@@ -21,11 +21,11 @@ namespace Botan {
 class BOTAN_DLL StreamCipher_Filter : public Keyed_Filter
    {
    public:
-      void seek(u32bit position) { cipher->seek(position); }
+      void seek(length_type position) { cipher->seek(position); }
       bool supports_resync() const { return (cipher->IV_LENGTH != 0); }
 
       void set_iv(const InitializationVector&);
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
 
       StreamCipher_Filter(const std::string&);
       StreamCipher_Filter(const std::string&, const SymmetricKey&);
@@ -41,13 +41,13 @@ class BOTAN_DLL StreamCipher_Filter : public Keyed_Filter
 class BOTAN_DLL Hash_Filter : public Filter
    {
    public:
-      void write(const byte input[], u32bit len) { hash->update(input, len); }
+      void write(const byte input[], length_type len) { hash->update(input, len); }
       void end_msg();
 
-      Hash_Filter(const std::string&, u32bit = 0);
+      Hash_Filter(const std::string&, length_type = 0);
       ~Hash_Filter() { delete hash; }
    private:
-      const u32bit OUTPUT_LENGTH;
+      const length_type OUTPUT_LENGTH;
       HashFunction* hash;
    };
 
@@ -57,14 +57,14 @@ class BOTAN_DLL Hash_Filter : public Filter
 class BOTAN_DLL MAC_Filter : public Keyed_Filter
    {
    public:
-      void write(const byte input[], u32bit len) { mac->update(input, len); }
+      void write(const byte input[], length_type len) { mac->update(input, len); }
       void end_msg();
 
-      MAC_Filter(const std::string&, u32bit = 0);
-      MAC_Filter(const std::string&, const SymmetricKey&, u32bit = 0);
+      MAC_Filter(const std::string&, length_type = 0);
+      MAC_Filter(const std::string&, const SymmetricKey&, length_type = 0);
       ~MAC_Filter() { delete mac; }
    private:
-      const u32bit OUTPUT_LENGTH;
+      const length_type OUTPUT_LENGTH;
       MessageAuthenticationCode* mac;
    };
 

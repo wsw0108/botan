@@ -18,9 +18,11 @@ namespace Botan {
 class BOTAN_DLL Output_Buffers
    {
    public:
-      u32bit read(byte[], u32bit, Pipe::message_id);
-      u32bit peek(byte[], u32bit, u32bit, Pipe::message_id) const;
-      u32bit remaining(Pipe::message_id) const;
+      length_type read(byte[], length_type, Pipe::message_id);
+      length_type peek(byte[], length_type, length_type,
+                       Pipe::message_id) const;
+
+      length_type remaining(Pipe::message_id) const;
 
       void add(class SecureQueue*);
       void retire();

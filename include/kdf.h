@@ -18,8 +18,8 @@ class BOTAN_DLL KDF1 : public KDF
    public:
       KDF1(const std::string&);
    private:
-      SecureVector<byte> derive(u32bit, const byte[], u32bit,
-                                const byte[], u32bit) const;
+      SecureVector<byte> derive(length_type, const byte[], length_type,
+                                const byte[], length_type) const;
 
       const std::string hash_name;
    };
@@ -33,8 +33,8 @@ class BOTAN_DLL KDF2 : public KDF
 
       KDF2(const std::string&);
    private:
-      SecureVector<byte> derive(u32bit, const byte[], u32bit,
-                                const byte[], u32bit) const;
+      SecureVector<byte> derive(length_type, const byte[], length_type,
+                                const byte[], length_type) const;
       const std::string hash_name;
    };
 
@@ -46,8 +46,8 @@ class BOTAN_DLL X942_PRF : public KDF
    public:
       X942_PRF(const std::string&);
    private:
-      SecureVector<byte> derive(u32bit, const byte[], u32bit,
-                                const byte[], u32bit) const;
+      SecureVector<byte> derive(length_type, const byte[], length_type,
+                                const byte[], length_type) const;
 
       std::string key_wrap_oid;
    };

@@ -1,4 +1,4 @@
-/*************************************************
+/***r**********************************************
 * Buffered EntropySource Header File             *
 * (C) 1999-2007 Jack Lloyd                       *
 *************************************************/
@@ -16,20 +16,20 @@ namespace Botan {
 class BOTAN_DLL Buffered_EntropySource : public EntropySource
    {
    public:
-      u32bit slow_poll(byte[], u32bit);
-      u32bit fast_poll(byte[], u32bit);
+      length_type slow_poll(byte[], length_type);
+      length_type fast_poll(byte[], length_type);
    protected:
       Buffered_EntropySource();
-      u32bit copy_out(byte[], u32bit, u32bit);
+      length_type copy_out(byte[], length_type, length_type);
 
-      void add_bytes(const void*, u32bit);
+      void add_bytes(const void*, length_type);
       void add_bytes(u64bit);
 
       virtual void do_slow_poll() = 0;
       virtual void do_fast_poll();
    private:
       SecureVector<byte> buffer;
-      u32bit write_pos, read_pos;
+      length_type write_pos, read_pos;
       bool done_slow_poll;
    };
 

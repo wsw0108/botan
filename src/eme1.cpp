@@ -14,8 +14,8 @@ namespace Botan {
 /*************************************************
 * EME1 Pad Operation                             *
 *************************************************/
-SecureVector<byte> EME1::pad(const byte in[], u32bit in_length,
-                             u32bit key_length) const
+SecureVector<byte> EME1::pad(const byte in[], length_type in_length,
+                             length_type key_length) const
    {
    key_length /= 8;
 
@@ -40,8 +40,8 @@ SecureVector<byte> EME1::pad(const byte in[], u32bit in_length,
 /*************************************************
 * EME1 Unpad Operation                           *
 *************************************************/
-SecureVector<byte> EME1::unpad(const byte in[], u32bit in_length,
-                               u32bit key_length) const
+SecureVector<byte> EME1::unpad(const byte in[], length_type in_length,
+                               length_type key_length) const
    {
    key_length /= 8;
    if(in_length > key_length)
@@ -53,11 +53,11 @@ SecureVector<byte> EME1::unpad(const byte in[], u32bit in_length,
    mgf->mask(tmp + HASH_LENGTH, tmp.size() - HASH_LENGTH, tmp, HASH_LENGTH);
    mgf->mask(tmp, HASH_LENGTH, tmp + HASH_LENGTH, tmp.size() - HASH_LENGTH);
 
-   for(u32bit j = 0; j != Phash.size(); ++j)
+   for(length_type j = 0; j != Phash.size(); ++j)
       if(tmp[j+HASH_LENGTH] != Phash[j])
          throw Decoding_Error("Invalid EME1 encoding");
 
-   for(u32bit j = HASH_LENGTH + Phash.size(); j != tmp.size(); ++j)
+   for(length_type j = HASH_LENGTH + Phash.size(); j != tmp.size(); ++j)
       {
       if(tmp[j] && tmp[j] != 0x01)
          throw Decoding_Error("Invalid EME1 encoding");
@@ -73,7 +73,7 @@ SecureVector<byte> EME1::unpad(const byte in[], u32bit in_length,
 /*************************************************
 * Return the max input size for a given key size *
 *************************************************/
-u32bit EME1::maximum_input_size(u32bit keybits) const
+length_type EME1::maximum_input_size(length_type keybits) const
    {
    if(keybits / 8 > 2*HASH_LENGTH + 1)
       return ((keybits / 8) - 2*HASH_LENGTH - 1);

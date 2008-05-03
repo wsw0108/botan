@@ -11,9 +11,9 @@ namespace Botan {
 /*************************************************
 * Adler32 Checksum                               *
 *************************************************/
-void Adler32::hash(const byte input[], u32bit length)
+void Adler32::hash(const byte input[], length_type length)
    {
-   u32bit S1x = S1, S2x = S2;
+   length_type S1x = S1, S2x = S2;
    while(length >= 16)
       {
       S1x += input[ 0]; S2x += S1x;
@@ -35,7 +35,7 @@ void Adler32::hash(const byte input[], u32bit length)
       input += 16;
       length -= 16;
       }
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       {
       S1x += input[j]; S2x += S1x;
       }
@@ -48,9 +48,9 @@ void Adler32::hash(const byte input[], u32bit length)
 /*************************************************
 * Update an Adler32 Checksum                     *
 *************************************************/
-void Adler32::add_data(const byte input[], u32bit length)
+void Adler32::add_data(const byte input[], length_type length)
    {
-   const u32bit PROCESS_AMOUNT = 5552;
+   const length_type PROCESS_AMOUNT = 5552;
    while(length >= PROCESS_AMOUNT)
       {
       hash(input, PROCESS_AMOUNT);

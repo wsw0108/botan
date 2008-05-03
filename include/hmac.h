@@ -22,9 +22,9 @@ class BOTAN_DLL HMAC : public MessageAuthenticationCode
       HMAC(const std::string&);
       ~HMAC() { delete hash; }
    private:
-      void add_data(const byte[], u32bit);
+      void add_data(const byte[], length_type);
       void final_result(byte[]);
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
       HashFunction* hash;
       SecureVector<byte> i_key, o_key;
    };

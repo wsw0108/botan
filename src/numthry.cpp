@@ -54,7 +54,7 @@ u32bit miller_rabin_test_iterations(u32bit bits, bool verify)
       {    0,  0,  0 }
    };
 
-   for(u32bit j = 0; tests[j].bits; ++j)
+   for(length_type j = 0; tests[j].bits; ++j)
       {
       if(bits <= tests[j].bits)
          if(verify)
@@ -70,11 +70,11 @@ u32bit miller_rabin_test_iterations(u32bit bits, bool verify)
 /*************************************************
 * Return the number of 0 bits at the end of n    *
 *************************************************/
-u32bit low_zero_bits(const BigInt& n)
+length_type low_zero_bits(const BigInt& n)
    {
    if(n.is_zero()) return 0;
 
-   u32bit bits = 0, max_bits = n.bits();
+   length_type bits = 0, max_bits = n.bits();
    while((n.get_bit(bits) == 0) && bits < max_bits)
       ++bits;
    return bits;
@@ -91,7 +91,7 @@ BigInt gcd(const BigInt& a, const BigInt& b)
    BigInt x = a, y = b;
    x.set_sign(BigInt::Positive);
    y.set_sign(BigInt::Positive);
-   u32bit shift = std::min(low_zero_bits(x), low_zero_bits(y));
+   length_type shift = std::min(low_zero_bits(x), low_zero_bits(y));
 
    x >>= shift;
    y >>= shift;
@@ -133,9 +133,9 @@ BigInt inverse_mod(const BigInt& n, const BigInt& mod)
 
    while(u.is_nonzero())
       {
-      u32bit zero_bits = low_zero_bits(u);
+      length_type zero_bits = low_zero_bits(u);
       u >>= zero_bits;
-      for(u32bit j = 0; j != zero_bits; ++j)
+      for(length_type j = 0; j != zero_bits; ++j)
          {
          if(A.is_odd() || B.is_odd())
             { A += y; B -= x; }
@@ -144,7 +144,7 @@ BigInt inverse_mod(const BigInt& n, const BigInt& mod)
 
       zero_bits = low_zero_bits(v);
       v >>= zero_bits;
-      for(u32bit j = 0; j != zero_bits; ++j)
+      for(length_type j = 0; j != zero_bits; ++j)
          {
          if(C.is_odd() || D.is_odd())
             { C += y; D -= x; }
@@ -190,7 +190,7 @@ s32bit simple_primality_tests(const BigInt& n)
    if(n <= PRIMES[PRIME_TABLE_SIZE-1])
       {
       const word num = n.word_at(0);
-      for(u32bit j = 0; PRIMES[j]; ++j)
+      for(length_type j = 0; PRIMES[j]; ++j)
          {
          if(num == PRIMES[j]) return PRIME;
          if(num <  PRIMES[j]) return NOT_PRIME;
@@ -198,8 +198,8 @@ s32bit simple_primality_tests(const BigInt& n)
       return NOT_PRIME;
       }
 
-   u32bit check_first = std::min(n.bits() / 32, PRIME_PRODUCTS_TABLE_SIZE);
-   for(u32bit j = 0; j != check_first; ++j)
+   length_type check_first = std::min(n.bits() / 32, PRIME_PRODUCTS_TABLE_SIZE);
+   for(length_type j = 0; j != check_first; ++j)
       if(gcd(n, PRIME_PRODUCTS[j]) != 1)
          return NOT_PRIME;
 
@@ -233,7 +233,7 @@ bool verify_prime(const BigInt& n)
 /*************************************************
 * Verify primality                               *
 *************************************************/
-bool run_primality_tests(const BigInt& n, u32bit level)
+bool run_primality_tests(const BigInt& n, length_type level)
    {
    s32bit simple_tests = simple_primality_tests(n);
    if(simple_tests) return (simple_tests == 1) ? true : false;
@@ -243,9 +243,9 @@ bool run_primality_tests(const BigInt& n, u32bit level)
 /*************************************************
 * Test for primaility using Miller-Rabin         *
 *************************************************/
-bool passes_mr_tests(const BigInt& n, u32bit level)
+bool passes_mr_tests(const BigInt& n, length_type level)
    {
-   const u32bit PREF_NONCE_BITS = 40;
+   const length_type PREF_NONCE_BITS = 40;
 
    if(level > 2)
       level = 2;
@@ -258,14 +258,14 @@ bool passes_mr_tests(const BigInt& n, u32bit level)
    if(level == 0)
       return true;
 
-   const u32bit NONCE_BITS = std::min(n.bits() - 1, PREF_NONCE_BITS);
+   const length_type NONCE_BITS = std::min(n.bits() - 1, PREF_NONCE_BITS);
 
    const bool verify = (level == 2);
 
-   u32bit tests = miller_rabin_test_iterations(n.bits(), verify);
+   length_type tests = miller_rabin_test_iterations(n.bits(), verify);
 
    BigInt nonce;
-   for(u32bit j = 0; j != tests; ++j)
+   for(length_type j = 0; j != tests; ++j)
       {
       if(verify) nonce = random_integer(NONCE_BITS);
       else       nonce = PRIMES[j];
@@ -288,7 +288,7 @@ bool MillerRabin_Test::passes_test(const BigInt& a)
    if(y == 1 || y == n_minus_1)
       return true;
 
-   for(u32bit j = 1; j != s; ++j)
+   for(length_type j = 1; j != s; ++j)
       {
       y = reducer.square(y);
 

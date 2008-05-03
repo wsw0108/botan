@@ -8,7 +8,7 @@
 
 namespace Botan {
 
-extern "C" void md5_core(u32bit[4], const byte[64], u32bit[16]);
+extern "C" void md5_core(length_type[4], const byte[64], length_type[16]);
 
 /*************************************************
 * MD5 Compression Function                       *
@@ -23,7 +23,7 @@ void MD5::hash(const byte input[])
 *************************************************/
 void MD5::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; ++j)
+   for(length_type j = 0; j != OUTPUT_LENGTH; ++j)
       output[j] = get_byte(3 - (j % 4), digest[j/4]);
    }
 

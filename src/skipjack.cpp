@@ -61,7 +61,7 @@ void Skipjack::dec(const byte in[], byte out[]) const
 /*************************************************
 * Skipjack Stepping Rule 'A'                     *
 *************************************************/
-void Skipjack::step_A(u16bit& W1, u16bit& W4, u32bit round) const
+void Skipjack::step_A(u16bit& W1, u16bit& W4, length_type round) const
    {
    byte G1 = get_byte(0, W1), G2 = get_byte(1, W1), G3;
    G3 = FTABLE[(4 * round - 4) % 10][G2] ^ G1;
@@ -75,7 +75,7 @@ void Skipjack::step_A(u16bit& W1, u16bit& W4, u32bit round) const
 /*************************************************
 * Skipjack Stepping Rule 'B'                     *
 *************************************************/
-void Skipjack::step_B(u16bit& W1, u16bit& W2, u32bit round) const
+void Skipjack::step_B(u16bit& W1, u16bit& W2, length_type round) const
    {
    W2 ^= W1 ^ round;
    byte G1 = get_byte(0, W1), G2 = get_byte(1, W1), G3;
@@ -89,7 +89,7 @@ void Skipjack::step_B(u16bit& W1, u16bit& W2, u32bit round) const
 /*************************************************
 * Skipjack Invserse Stepping Rule 'A'            *
 *************************************************/
-void Skipjack::step_Ai(u16bit& W1, u16bit& W2, u32bit round) const
+void Skipjack::step_Ai(u16bit& W1, u16bit& W2, length_type round) const
    {
    W1 ^= W2 ^ round;
    byte G1 = get_byte(1, W2), G2 = get_byte(0, W2), G3;
@@ -103,7 +103,7 @@ void Skipjack::step_Ai(u16bit& W1, u16bit& W2, u32bit round) const
 /*************************************************
 * Skipjack Invserse Stepping Rule 'B'            *
 *************************************************/
-void Skipjack::step_Bi(u16bit& W2, u16bit& W3, u32bit round) const
+void Skipjack::step_Bi(u16bit& W2, u16bit& W3, length_type round) const
    {
    byte G1 = get_byte(1, W2), G2 = get_byte(0, W2), G3;
    G3 = FTABLE[(4 * round - 1) % 10][G2] ^ G1;
@@ -117,7 +117,7 @@ void Skipjack::step_Bi(u16bit& W2, u16bit& W3, u32bit round) const
 /*************************************************
 * Skipjack Key Schedule                          *
 *************************************************/
-void Skipjack::key(const byte key[], u32bit)
+void Skipjack::key(const byte key[], length_type)
    {
    static const byte F[256] = {
       0xA3, 0xD7, 0x09, 0x83, 0xF8, 0x48, 0xF6, 0xF4, 0xB3, 0x21, 0x15, 0x78,
@@ -143,8 +143,8 @@ void Skipjack::key(const byte key[], u32bit)
       0x5E, 0x6C, 0xA9, 0x13, 0x57, 0x25, 0xB5, 0xE3, 0xBD, 0xA8, 0x3A, 0x01,
       0x05, 0x59, 0x2A, 0x46 };
 
-   for(u32bit j = 0; j != 10; ++j)
-      for(u32bit k = 0; k != 256; ++k)
+   for(length_type j = 0; j != 10; ++j)
+      for(length_type k = 0; k != 256; ++k)
          FTABLE[j][k] = F[k ^ key[9-j]];
    }
 
@@ -153,7 +153,7 @@ void Skipjack::key(const byte key[], u32bit)
 *************************************************/
 void Skipjack::clear() throw()
    {
-   for(u32bit j = 0; j != 10; ++j)
+   for(length_type j = 0; j != 10; ++j)
       FTABLE[j].clear();
    }
 

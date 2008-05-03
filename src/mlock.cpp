@@ -10,14 +10,14 @@ namespace Botan {
 /*************************************************
 * Lock an area of memory into RAM                *
 *************************************************/
-void lock_mem(void*, u32bit)
+void lock_mem(void*, length_type)
    {
    }
 
 /*************************************************
 * Unlock a previously locked region of memory    *
 *************************************************/
-void unlock_mem(void*, u32bit)
+void unlock_mem(void*, length_type)
    {
    }
 

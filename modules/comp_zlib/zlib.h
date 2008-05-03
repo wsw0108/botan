@@ -17,17 +17,17 @@ namespace Botan {
 class Zlib_Compression : public Filter
    {
    public:
-      void write(const byte input[], u32bit length);
+      void write(const byte input[], length_type length);
       void start_msg();
       void end_msg();
 
       void flush();
 
-      Zlib_Compression(u32bit = 6);
+      Zlib_Compression(length_type = 6);
       ~Zlib_Compression() { clear(); }
    private:
       void clear();
-      const u32bit level;
+      const length_type level;
       SecureVector<byte> buffer;
       class Zlib_Stream* zlib;
    };
@@ -38,7 +38,7 @@ class Zlib_Compression : public Filter
 class Zlib_Decompression : public Filter
    {
    public:
-      void write(const byte input[], u32bit length);
+      void write(const byte input[], length_type length);
       void start_msg();
       void end_msg();
 

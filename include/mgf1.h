@@ -16,7 +16,7 @@ namespace Botan {
 class BOTAN_DLL MGF1 : public MGF
    {
    public:
-      void mask(const byte[], u32bit, byte[], u32bit) const;
+      void mask(const byte[], length_type, byte[], length_type) const;
       MGF1(const std::string&);
    private:
       const std::string hash_name;

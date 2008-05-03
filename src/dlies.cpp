@@ -16,7 +16,7 @@ namespace Botan {
 *************************************************/
 DLIES_Encryptor::DLIES_Encryptor(const PK_Key_Agreement_Key& k,
                                  const std::string& kdf,
-                                 const std::string& mac, u32bit mk_len) :
+                                 const std::string& mac, length_type mk_len) :
    key(k), kdf_algo(kdf), mac_algo(mac), MAC_KEYLEN(mk_len)
    {
    }
@@ -24,7 +24,7 @@ DLIES_Encryptor::DLIES_Encryptor(const PK_Key_Agreement_Key& k,
 /*************************************************
 * DLIES Encryption                               *
 *************************************************/
-SecureVector<byte> DLIES_Encryptor::enc(const byte in[], u32bit length) const
+SecureVector<byte> DLIES_Encryptor::enc(const byte in[], length_type length) const
    {
    if(length > maximum_input_size())
       throw Invalid_Argument("DLIES: Plaintext too large");
@@ -42,7 +42,7 @@ SecureVector<byte> DLIES_Encryptor::enc(const byte in[], u32bit length) const
 
    SecureVector<byte> vz(v, key.derive_key(other_key, other_key.size()));
 
-   const u32bit K_LENGTH = length + MAC_KEYLEN;
+   const length_type K_LENGTH = length + MAC_KEYLEN;
    OctetString K = kdf->derive_key(K_LENGTH, vz, vz.size());
    if(K.length() != K_LENGTH)
       throw Encoding_Error("DLIES: KDF did not provide sufficient output");
@@ -52,7 +52,7 @@ SecureVector<byte> DLIES_Encryptor::enc(const byte in[], u32bit length) const
    mac->set_key(K.begin(), MAC_KEYLEN);
 
    mac->update(C, length);
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       mac->update(0);
 
    mac->final(C + length);
@@ -71,7 +71,7 @@ void DLIES_Encryptor::set_other_key(const MemoryRegion<byte>& ok)
 /*************************************************
 * Return the max size, in bytes, of a message    *
 *************************************************/
-u32bit DLIES_Encryptor::maximum_input_size() const
+length_type DLIES_Encryptor::maximum_input_size() const
    {
    return 32;
    }
@@ -81,7 +81,7 @@ u32bit DLIES_Encryptor::maximum_input_size() const
 *************************************************/
 DLIES_Decryptor::DLIES_Decryptor(const PK_Key_Agreement_Key& k,
                                  const std::string& kdf,
-                                 const std::string& mac, u32bit mk_len) :
+                                 const std::string& mac, length_type mk_len) :
    key(k), kdf_algo(kdf), mac_algo(mac),
    MAC_KEYLEN(mk_len), PUBLIC_LEN(key.public_value().size())
    {
@@ -90,7 +90,7 @@ DLIES_Decryptor::DLIES_Decryptor(const PK_Key_Agreement_Key& k,
 /*************************************************
 * DLIES Decryption                               *
 *************************************************/
-SecureVector<byte> DLIES_Decryptor::dec(const byte msg[], u32bit length) const
+SecureVector<byte> DLIES_Decryptor::dec(const byte msg[], length_type length) const
    {
    std::auto_ptr<MessageAuthenticationCode> mac(get_mac(mac_algo));
 
@@ -99,7 +99,7 @@ SecureVector<byte> DLIES_Decryptor::dec(const byte msg[], u32bit length) const
 
    std::auto_ptr<KDF> kdf(get_kdf(kdf_algo));
 
-   const u32bit CIPHER_LEN = length - PUBLIC_LEN - mac->OUTPUT_LENGTH;
+   const length_type CIPHER_LEN = length - PUBLIC_LEN - mac->OUTPUT_LENGTH;
 
    SecureVector<byte> v(msg, PUBLIC_LEN);
    SecureVector<byte> C(msg + PUBLIC_LEN, CIPHER_LEN);
@@ -107,14 +107,14 @@ SecureVector<byte> DLIES_Decryptor::dec(const byte msg[], u32bit length) const
 
    SecureVector<byte> vz(v, key.derive_key(v, v.size()));
 
-   const u32bit K_LENGTH = C.size() + MAC_KEYLEN;
+   const length_type K_LENGTH = C.size() + MAC_KEYLEN;
    OctetString K = kdf->derive_key(K_LENGTH, vz, vz.size());
    if(K.length() != K_LENGTH)
       throw Encoding_Error("DLIES: KDF did not provide sufficient output");
 
    mac->set_key(K.begin(), MAC_KEYLEN);
    mac->update(C);
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       mac->update(0);
    SecureVector<byte> T2 = mac->final();
    if(T != T2)

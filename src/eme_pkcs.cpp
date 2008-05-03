@@ -11,8 +11,8 @@ namespace Botan {
 /*************************************************
 * PKCS1 Pad Operation                            *
 *************************************************/
-SecureVector<byte> EME_PKCS1v15::pad(const byte in[], u32bit inlen,
-                                     u32bit olen) const
+SecureVector<byte> EME_PKCS1v15::pad(const byte in[], length_type inlen,
+                                     length_type olen) const
    {
    olen /= 8;
 
@@ -24,7 +24,7 @@ SecureVector<byte> EME_PKCS1v15::pad(const byte in[], u32bit inlen,
    SecureVector<byte> out(olen);
 
    out[0] = 0x02;
-   for(u32bit j = 1; j != olen - inlen - 1; ++j)
+   for(length_type j = 1; j != olen - inlen - 1; ++j)
       while(out[j] == 0)
          out[j] = global_state().random();
    out.copy(olen - inlen, in, inlen);
@@ -35,14 +35,14 @@ SecureVector<byte> EME_PKCS1v15::pad(const byte in[], u32bit inlen,
 /*************************************************
 * PKCS1 Unpad Operation                          *
 *************************************************/
-SecureVector<byte> EME_PKCS1v15::unpad(const byte in[], u32bit inlen,
-                                       u32bit key_len) const
+SecureVector<byte> EME_PKCS1v15::unpad(const byte in[], length_type inlen,
+                                       length_type key_len) const
    {
    if(inlen != key_len / 8 || inlen < 10 || in[0] != 0x02)
       throw Decoding_Error("PKCS1::unpad");
 
-   u32bit seperator = 0;
-   for(u32bit j = 0; j != inlen; ++j)
+   length_type seperator = 0;
+   for(length_type j = 0; j != inlen; ++j)
       if(in[j] == 0)
          {
          seperator = j;
@@ -57,7 +57,7 @@ SecureVector<byte> EME_PKCS1v15::unpad(const byte in[], u32bit inlen,
 /*************************************************
 * Return the max input size for a given key size *
 *************************************************/
-u32bit EME_PKCS1v15::maximum_input_size(u32bit keybits) const
+length_type EME_PKCS1v15::maximum_input_size(length_type keybits) const
    {
    if(keybits / 8 > 10)
       return ((keybits / 8) - 10);

@@ -111,15 +111,15 @@ class BOTAN_DLL X509_Store
             bool operator<(const CRL_Data&) const;
          };
 
-      u32bit find_cert(const X509_DN&, const MemoryRegion<byte>&) const;
+      length_type find_cert(const X509_DN&, const MemoryRegion<byte>&) const;
       X509_Code check_sig(const Cert_Info&, const Cert_Info&) const;
       void recompute_revoked_info() const;
 
       void do_add_certs(DataSource&, bool);
       X509_Code construct_cert_chain(const X509_Certificate&,
-                                     std::vector<u32bit>&, bool = false);
+                                     std::vector<length_type>&, bool = false);
 
-      u32bit find_parent_of(const X509_Certificate&);
+      length_type find_parent_of(const X509_Certificate&);
       bool is_revoked(const X509_Certificate&) const;
 
       static const u32bit NO_CERT_FOUND = 0xFFFFFFFF;

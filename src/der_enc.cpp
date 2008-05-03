@@ -29,11 +29,11 @@ SecureVector<byte> encode_tag(ASN1_Tag type_tag, ASN1_Tag class_tag)
       encoded_tag.append(static_cast<byte>(type_tag | class_tag));
    else
       {
-      u32bit blocks = high_bit(type_tag) + 6;
+      length_type blocks = high_bit(type_tag) + 6;
       blocks = (blocks - (blocks % 7)) / 7;
 
       encoded_tag.append(class_tag | 0x1F);
-      for(u32bit k = 0; k != blocks - 1; ++k)
+      for(length_type k = 0; k != blocks - 1; ++k)
          encoded_tag.append(0x80 | ((type_tag >> 7*(blocks-k-1)) & 0x7F));
       encoded_tag.append(type_tag & 0x7F);
       }
@@ -44,16 +44,16 @@ SecureVector<byte> encode_tag(ASN1_Tag type_tag, ASN1_Tag class_tag)
 /*************************************************
 * DER encode an ASN.1 length field               *
 *************************************************/
-SecureVector<byte> encode_length(u32bit length)
+SecureVector<byte> encode_length(length_type length)
    {
    SecureVector<byte> encoded_length;
    if(length <= 127)
       encoded_length.append(static_cast<byte>(length));
    else
       {
-      const u32bit top_byte = significant_bytes(length);
+      const length_type top_byte = significant_bytes(length);
       encoded_length.append(static_cast<byte>(0x80 | top_byte));
-      for(u32bit j = 4-top_byte; j != 4; ++j)
+      for(length_type j = 4-top_byte; j != 4; ++j)
          encoded_length.append(get_byte(j, length));
       }
    return encoded_length;
@@ -73,7 +73,7 @@ SecureVector<byte> DER_Encoder::DER_Sequence::get_contents()
    if(type_tag == SET)
       {
       std::sort(set_contents.begin(), set_contents.end());
-      for(u32bit j = 0; j != set_contents.size(); ++j)
+      for(length_type j = 0; j != set_contents.size(); ++j)
          contents.append(set_contents[j]);
       set_contents.clear();
       }
@@ -91,7 +91,7 @@ SecureVector<byte> DER_Encoder::DER_Sequence::get_contents()
 /*************************************************
 * Add an encoded value to the SEQUENCE/SET       *
 *************************************************/
-void DER_Encoder::DER_Sequence::add_bytes(const byte data[], u32bit length)
+void DER_Encoder::DER_Sequence::add_bytes(const byte data[], length_type length)
    {
    if(type_tag == SET)
       set_contents.push_back(SecureVector<byte>(data, length));
@@ -185,7 +185,7 @@ DER_Encoder& DER_Encoder::raw_bytes(const MemoryRegion<byte>& val)
 /*************************************************
 * Write raw bytes into the stream                *
 *************************************************/
-DER_Encoder& DER_Encoder::raw_bytes(const byte bytes[], u32bit length)
+DER_Encoder& DER_Encoder::raw_bytes(const byte bytes[], length_type length)
    {
    if(subsequences.size())
       subsequences[subsequences.size()-1].add_bytes(bytes, length);
@@ -214,7 +214,7 @@ DER_Encoder& DER_Encoder::encode(bool is_true)
 /*************************************************
 * DER encode a small INTEGER                     *
 *************************************************/
-DER_Encoder& DER_Encoder::encode(u32bit n)
+DER_Encoder& DER_Encoder::encode(length_type n)
    {
    return encode(BigInt(n), INTEGER, UNIVERSAL);
    }
@@ -240,7 +240,7 @@ DER_Encoder& DER_Encoder::encode(const MemoryRegion<byte>& bytes,
 /*************************************************
 * Encode this object                             *
 *************************************************/
-DER_Encoder& DER_Encoder::encode(const byte bytes[], u32bit length,
+DER_Encoder& DER_Encoder::encode(const byte bytes[], length_type length,
                                  ASN1_Tag real_type)
    {
    return encode(bytes, length, real_type, real_type, UNIVERSAL);
@@ -259,7 +259,7 @@ DER_Encoder& DER_Encoder::encode(bool is_true,
 /*************************************************
 * DER encode a small INTEGER                     *
 *************************************************/
-DER_Encoder& DER_Encoder::encode(u32bit n,
+DER_Encoder& DER_Encoder::encode(length_type n,
                                  ASN1_Tag type_tag, ASN1_Tag class_tag)
    {
    return encode(BigInt(n), type_tag, class_tag);
@@ -279,9 +279,9 @@ DER_Encoder& DER_Encoder::encode(const BigInt& n,
    BigInt::encode(contents.begin() + extra_zero, n);
    if(n < 0)
       {
-      for(u32bit j = 0; j != contents.size(); ++j)
+      for(length_type j = 0; j != contents.size(); ++j)
          contents[j] = ~contents[j];
-      for(u32bit j = contents.size(); j > 0; --j)
+      for(length_type j = contents.size(); j > 0; --j)
          if(++contents[j-1])
             break;
       }
@@ -303,7 +303,7 @@ DER_Encoder& DER_Encoder::encode(const MemoryRegion<byte>& bytes,
 /*************************************************
 * DER encode an OCTET STRING or BIT STRING       *
 *************************************************/
-DER_Encoder& DER_Encoder::encode(const byte bytes[], u32bit length,
+DER_Encoder& DER_Encoder::encode(const byte bytes[], length_type length,
                                  ASN1_Tag real_type,
                                  ASN1_Tag type_tag, ASN1_Tag class_tag)
    {
@@ -344,7 +344,7 @@ DER_Encoder& DER_Encoder::encode(const ASN1_Object& obj)
 * Write the encoding of the byte(s)              *
 *************************************************/
 DER_Encoder& DER_Encoder::add_object(ASN1_Tag type_tag, ASN1_Tag class_tag,
-                                     const byte rep[], u32bit length)
+                                     const byte rep[], length_type length)
    {
    SecureVector<byte> encoded_tag = encode_tag(type_tag, class_tag);
    SecureVector<byte> encoded_length = encode_length(length);
@@ -364,7 +364,7 @@ DER_Encoder& DER_Encoder::add_object(ASN1_Tag type_tag, ASN1_Tag class_tag,
                                      const MemoryRegion<byte>& rep_buf)
    {
    const byte* rep = rep_buf.begin();
-   const u32bit rep_len = rep_buf.size();
+   const length_type rep_len = rep_buf.size();
    return add_object(type_tag, class_tag, rep, rep_len);
    }
 
@@ -375,7 +375,7 @@ DER_Encoder& DER_Encoder::add_object(ASN1_Tag type_tag, ASN1_Tag class_tag,
                                      const std::string& rep_str)
    {
    const byte* rep = reinterpret_cast<const byte*>(rep_str.data());
-   const u32bit rep_len = rep_str.size();
+   const length_type rep_len = rep_str.size();
    return add_object(type_tag, class_tag, rep, rep_len);
    }
 

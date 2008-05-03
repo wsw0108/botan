@@ -34,7 +34,7 @@ u32bit to_u32bit(const std::string& number)
 /*************************************************
 * Convert an integer into a string               *
 *************************************************/
-std::string to_string(u64bit n, u32bit min_len)
+std::string to_string(u64bit n, length_type min_len)
    {
    std::string lenstr;
    if(n)
@@ -96,7 +96,7 @@ std::vector<std::string> parse_algorithm_name(const std::string& namex)
 
    std::string name = namex, substring;
    std::vector<std::string> elems;
-   u32bit level = 0;
+   length_type level = 0;
 
    elems.push_back(name.substr(0, name.find('(')));
    name = name.substr(name.find('('));

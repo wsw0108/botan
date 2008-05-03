@@ -33,15 +33,16 @@ class BOTAN_DLL DL_Group
 
       DL_Group();
       DL_Group(const std::string&);
-      DL_Group(PrimeType, u32bit, u32bit = 0);
-      DL_Group(const MemoryRegion<byte>&, u32bit = 1024, u32bit = 0);
+      DL_Group(PrimeType, length_type, length_type = 0);
+      DL_Group(const MemoryRegion<byte>&, length_type = 1024, length_type = 0);
       DL_Group(const BigInt&, const BigInt&);
       DL_Group(const BigInt&, const BigInt&, const BigInt&);
    private:
       static BigInt make_dsa_generator(const BigInt&, const BigInt&);
       static SecureVector<byte> generate_dsa_primes(BigInt&, BigInt&,
-                                                    u32bit, u32bit);
-      static bool generate_dsa_primes(BigInt&, BigInt&, u32bit, u32bit,
+                                                    length_type, length_type);
+      static bool generate_dsa_primes(BigInt&, BigInt&,
+                                      length_type, length_type,
                                       const MemoryRegion<byte>&);
 
       void init_check() const;
