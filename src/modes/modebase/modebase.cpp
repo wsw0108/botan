@@ -13,8 +13,9 @@ namespace Botan {
 *************************************************/
 BlockCipherMode::BlockCipherMode(const std::string& cipher_name,
                                  const std::string& cipher_mode_name,
-                                 u32bit iv_size, u32bit iv_meth,
-                                 u32bit buf_mult) :
+                                 length_type iv_size,
+                                 length_type iv_meth,
+                                 length_type buf_mult) :
    BLOCK_SIZE(block_size_of(cipher_name)), BUFFER_SIZE(buf_mult * BLOCK_SIZE),
    IV_METHOD(iv_meth), mode_name(cipher_mode_name)
    {

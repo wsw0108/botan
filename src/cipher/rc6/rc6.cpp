@@ -22,7 +22,7 @@ void RC6::enc(const byte in[], byte out[]) const
 
    B += S[0]; D += S[1];
 
-   for(u32bit j = 0; j != 20; j += 4)
+   for(length_type j = 0; j != 20; j += 4)
       {
       u32bit T1, T2;
 
@@ -64,7 +64,7 @@ void RC6::dec(const byte in[], byte out[]) const
 
    C -= S[43]; A -= S[42];
 
-   for(u32bit j = 0; j != 20; j += 4)
+   for(length_type j = 0; j != 20; j += 4)
       {
       u32bit T1, T2;
 
@@ -97,18 +97,20 @@ void RC6::dec(const byte in[], byte out[]) const
 /*************************************************
 * RC6 Key Schedule                               *
 *************************************************/
-void RC6::key(const byte key[], u32bit length)
+void RC6::key(const byte key[], length_type length)
    {
-   const u32bit WORD_KEYLENGTH = (((length - 1) / 4) + 1),
-                MIX_ROUNDS     = 3*std::max(WORD_KEYLENGTH, S.size());
+   const length_type WORD_KEYLENGTH = (((length - 1) / 4) + 1),
+                     MIX_ROUNDS     = 3*std::max(WORD_KEYLENGTH, S.size());
    S[0] = 0xB7E15163;
-   for(u32bit j = 1; j != S.size(); ++j)
+   for(length_type j = 1; j != S.size(); ++j)
       S[j] = S[j-1] + 0x9E3779B9;
 
    SecureBuffer<u32bit, 8> K;
    for(s32bit j = length-1; j >= 0; --j)
       K[j/4] = (K[j/4] << 8) + key[j];
-   for(u32bit j = 0, A = 0, B = 0; j != MIX_ROUNDS; ++j)
+
+   u32bit A = 0, B = 0;
+   for(length_type j = 0; j != MIX_ROUNDS; ++j)
       {
       A = rotate_left(S[j % S.size()] + A + B, 3);
       B = rotate_left(K[j % WORD_KEYLENGTH] + A + B, (A + B) % 32);

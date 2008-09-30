@@ -23,13 +23,13 @@ class EVP_BlockCipher : public BlockCipher
       BlockCipher* clone() const;
       EVP_BlockCipher(const EVP_CIPHER*, const std::string&);
       EVP_BlockCipher(const EVP_CIPHER*, const std::string&,
-                      u32bit, u32bit, u32bit);
+                      length_type, length_type, length_type);
 
       ~EVP_BlockCipher();
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
       std::string cipher_name;
       mutable EVP_CIPHER_CTX encrypt, decrypt;
    };
@@ -60,8 +60,8 @@ EVP_BlockCipher::EVP_BlockCipher(const EVP_CIPHER* algo,
 *************************************************/
 EVP_BlockCipher::EVP_BlockCipher(const EVP_CIPHER* algo,
                                  const std::string& algo_name,
-                                 u32bit key_min, u32bit key_max,
-                                 u32bit key_mod) :
+                                 length_type key_min, length_type key_max,
+                                 length_type key_mod) :
    BlockCipher(EVP_CIPHER_block_size(algo), key_min, key_max, key_mod),
    cipher_name(algo_name)
    {
@@ -108,7 +108,7 @@ void EVP_BlockCipher::dec(const byte in[], byte out[]) const
 /*************************************************
 * Set the key                                    *
 *************************************************/
-void EVP_BlockCipher::key(const byte key[], u32bit length)
+void EVP_BlockCipher::key(const byte key[], length_type length)
    {
    SecureVector<byte> full_key(key, length);
 

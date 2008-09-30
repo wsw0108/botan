@@ -85,13 +85,13 @@ BOTAN_DLL bool have_mac(const std::string&);
 /*************************************************
 * Query information about an algorithm           *
 *************************************************/
-BOTAN_DLL u32bit block_size_of(const std::string&);
-BOTAN_DLL u32bit output_length_of(const std::string&);
+BOTAN_DLL length_type block_size_of(const std::string&);
+BOTAN_DLL length_type output_length_of(const std::string&);
 
-BOTAN_DLL bool valid_keylength_for(u32bit, const std::string&);
-BOTAN_DLL u32bit min_keylength_of(const std::string&);
-BOTAN_DLL u32bit max_keylength_of(const std::string&);
-BOTAN_DLL u32bit keylength_multiple_of(const std::string&);
+BOTAN_DLL bool valid_keylength_for(length_type, const std::string&);
+BOTAN_DLL length_type min_keylength_of(const std::string&);
+BOTAN_DLL length_type max_keylength_of(const std::string&);
+BOTAN_DLL length_type keylength_multiple_of(const std::string&);
 
 }
 

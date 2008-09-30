@@ -36,7 +36,7 @@ Unix_EntropySource::Unix_EntropySource(const std::vector<std::string>& path) :
 /*************************************************
 * Add sources to the list                        *
 *************************************************/
-void Unix_EntropySource::add_sources(const Unix_Program srcs[], u32bit count)
+void Unix_EntropySource::add_sources(const Unix_Program srcs[], length_type count)
    {
    sources.insert(sources.end(), srcs, srcs + count);
    std::sort(sources.begin(), sources.end(), Unix_Program_Cmp);
@@ -49,7 +49,7 @@ void Unix_EntropySource::do_fast_poll()
    {
    const char* STAT_TARGETS[] = { "/", "/tmp", ".", "..", 0 };
 
-   for(u32bit j = 0; STAT_TARGETS[j]; j++)
+   for(length_type j = 0; STAT_TARGETS[j]; j++)
       {
       struct stat statbuf;
       clear_mem(&statbuf, 1);
@@ -83,20 +83,20 @@ void Unix_EntropySource::do_fast_poll()
 *************************************************/
 void Unix_EntropySource::do_slow_poll()
    {
-   const u32bit TRY_TO_GET = 16 * 1024;
-   const u32bit MINIMAL_WORKING = 32;
+   const length_type TRY_TO_GET = 16 * 1024;
+   const length_type MINIMAL_WORKING = 32;
 
-   u32bit got = 0;
-   for(u32bit j = 0; j != sources.size(); j++)
+   length_type got = 0;
+   for(length_type j = 0; j != sources.size(); j++)
       {
       DataSource_Command pipe(sources[j].name_and_args, PATH);
       SecureVector<byte> buffer(DEFAULT_BUFFERSIZE);
 
-      u32bit got_from_src = 0;
+      length_type got_from_src = 0;
 
       while(!pipe.end_of_data())
          {
-         u32bit this_loop = pipe.read(buffer, buffer.size());
+         length_type this_loop = pipe.read(buffer, buffer.size());
          add_bytes(buffer, this_loop);
          got_from_src += this_loop;
          }

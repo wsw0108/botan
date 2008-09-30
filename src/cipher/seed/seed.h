@@ -23,7 +23,7 @@ class BOTAN_DLL SEED : public BlockCipher
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
 
       class G_FUNC
          {

@@ -18,7 +18,7 @@ class Device_EntropySource : public EntropySource
    {
    public:
       Device_EntropySource(const std::vector<std::string>& fs) : fsnames(fs) {}
-      u32bit slow_poll(byte[], u32bit);
+      length_type slow_poll(byte[], length_type);
    private:
       std::vector<std::string> fsnames;
    };

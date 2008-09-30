@@ -90,7 +90,7 @@ PKCS8_Encoder* IF_Scheme_PrivateKey::pkcs8_encoder() const
             {
             return DER_Encoder()
                .start_cons(SEQUENCE)
-                  .encode(static_cast<u32bit>(0))
+                  .encode(static_cast<length_type>(0))
                   .encode(key->n)
                   .encode(key->e)
                   .encode(key->d)
@@ -123,7 +123,7 @@ PKCS8_Decoder* IF_Scheme_PrivateKey::pkcs8_decoder(RandomNumberGenerator& rng)
 
          void key_bits(const MemoryRegion<byte>& bits)
             {
-            u32bit version;
+            length_type version;
 
             BER_Decoder(bits)
                .start_cons(SEQUENCE)

@@ -22,7 +22,7 @@ Buffered_EntropySource::Buffered_EntropySource() : buffer(256)
 /*************************************************
 * Fast Poll                                      *
 *************************************************/
-u32bit Buffered_EntropySource::fast_poll(byte out[], u32bit length)
+length_type Buffered_EntropySource::fast_poll(byte out[], length_type length)
    {
    if(!done_slow_poll) { do_slow_poll(); done_slow_poll = true; }
 
@@ -33,7 +33,7 @@ u32bit Buffered_EntropySource::fast_poll(byte out[], u32bit length)
 /*************************************************
 * Slow Poll                                      *
 *************************************************/
-u32bit Buffered_EntropySource::slow_poll(byte out[], u32bit length)
+length_type Buffered_EntropySource::slow_poll(byte out[], length_type length)
    {
    do_slow_poll();
    done_slow_poll = true;
@@ -51,13 +51,14 @@ void Buffered_EntropySource::do_fast_poll()
 /*************************************************
 * Add entropy to the internal buffer             *
 *************************************************/
-void Buffered_EntropySource::add_bytes(const void* entropy_ptr, u32bit length)
+void Buffered_EntropySource::add_bytes(const void* entropy_ptr, length_type length)
    {
    const byte* bytes = static_cast<const byte*>(entropy_ptr);
 
    while(length)
       {
-      u32bit copied = std::min(length, buffer.size() - write_pos);
+      length_type copied = std::min<length_type>(length,
+                                                 buffer.size() - write_pos);
       xor_buf(buffer + write_pos, bytes, copied);
       bytes += copied;
       length -= copied;
@@ -76,11 +77,14 @@ void Buffered_EntropySource::add_bytes(u64bit entropy)
 /*************************************************
 * Take entropy from the internal buffer          *
 *************************************************/
-u32bit Buffered_EntropySource::copy_out(byte out[], u32bit length,
-                                        u32bit max_read)
+length_type Buffered_EntropySource::copy_out(byte out[],
+                                             length_type length,
+                                             length_type max_read)
    {
-   length = std::min(length, max_read);
-   u32bit copied = std::min(length, buffer.size() - read_pos);
+   length = std::min<length_type>(length, max_read);
+   length_type copied = std::min<length_type>(length,
+                                              buffer.size() - read_pos);
+
    xor_buf(out, buffer + read_pos, copied);
    read_pos = (read_pos + copied) % buffer.size();
    return copied;

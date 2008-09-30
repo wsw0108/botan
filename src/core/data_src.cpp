@@ -13,7 +13,7 @@ namespace Botan {
 /*************************************************
 * Read a single byte from the DataSource         *
 *************************************************/
-u32bit DataSource::read_byte(byte& out)
+length_type DataSource::read_byte(byte& out)
    {
    return read(&out, 1);
    }
@@ -21,7 +21,7 @@ u32bit DataSource::read_byte(byte& out)
 /*************************************************
 * Peek a single byte from the DataSource         *
 *************************************************/
-u32bit DataSource::peek_byte(byte& out) const
+length_type DataSource::peek_byte(byte& out) const
    {
    return peek(&out, 1, 0);
    }
@@ -29,11 +29,11 @@ u32bit DataSource::peek_byte(byte& out) const
 /*************************************************
 * Discard the next N bytes of the data           *
 *************************************************/
-u32bit DataSource::discard_next(u32bit n)
+length_type DataSource::discard_next(length_type n)
    {
-   u32bit discarded = 0;
+   length_type discarded = 0;
    byte dummy;
-   for(u32bit j = 0; j != n; ++j)
+   for(length_type j = 0; j != n; ++j)
       discarded = read_byte(dummy);
    return discarded;
    }
@@ -41,9 +41,9 @@ u32bit DataSource::discard_next(u32bit n)
 /*************************************************
 * Read from a memory buffer                      *
 *************************************************/
-u32bit DataSource_Memory::read(byte out[], u32bit length)
+length_type DataSource_Memory::read(byte out[], length_type length)
    {
-   u32bit got = std::min(source.size() - offset, length);
+   length_type got = std::min<length_type>(source.size() - offset, length);
    copy_mem(out, source + offset, got);
    offset += got;
    return got;
@@ -52,13 +52,13 @@ u32bit DataSource_Memory::read(byte out[], u32bit length)
 /*************************************************
 * Peek into a memory buffer                      *
 *************************************************/
-u32bit DataSource_Memory::peek(byte out[], u32bit length,
-                               u32bit peek_offset) const
+length_type DataSource_Memory::peek(byte out[], length_type length,
+                               length_type peek_offset) const
    {
-   const u32bit bytes_left = source.size() - offset;
+   const length_type bytes_left = source.size() - offset;
    if(peek_offset >= bytes_left) return 0;
 
-   u32bit got = std::min(bytes_left - peek_offset, length);
+   length_type got = std::min(bytes_left - peek_offset, length);
    copy_mem(out, source + offset + peek_offset, got);
    return got;
    }
@@ -74,7 +74,7 @@ bool DataSource_Memory::end_of_data() const
 /*************************************************
 * DataSource_Memory Constructor                  *
 *************************************************/
-DataSource_Memory::DataSource_Memory(const byte in[], u32bit length)
+DataSource_Memory::DataSource_Memory(const byte in[], length_type length)
    {
    source.set(in, length);
    offset = 0;
@@ -101,13 +101,13 @@ DataSource_Memory::DataSource_Memory(const std::string& in)
 /*************************************************
 * Read from a stream                             *
 *************************************************/
-u32bit DataSource_Stream::read(byte out[], u32bit length)
+length_type DataSource_Stream::read(byte out[], length_type length)
    {
    source->read(reinterpret_cast<char*>(out), length);
    if(source->bad())
       throw Stream_IO_Error("DataSource_Stream::read: Source failure");
 
-   u32bit got = source->gcount();
+   length_type got = source->gcount();
    total_read += got;
    return got;
    }
@@ -115,12 +115,13 @@ u32bit DataSource_Stream::read(byte out[], u32bit length)
 /*************************************************
 * Peek into a stream                             *
 *************************************************/
-u32bit DataSource_Stream::peek(byte out[], u32bit length, u32bit offset) const
+length_type DataSource_Stream::peek(byte out[], length_type length,
+                                    length_type offset) const
    {
    if(end_of_data())
       throw Invalid_State("DataSource_Stream: Cannot peek when out of data");
 
-   u32bit got = 0;
+   length_type got = 0;
 
    if(offset)
       {

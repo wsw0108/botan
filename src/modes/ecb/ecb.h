@@ -21,7 +21,7 @@ class BOTAN_DLL ECB : public BlockCipherMode
       std::string name() const;
       const BlockCipherModePaddingMethod* padder;
    private:
-      bool valid_iv_size(u32bit) const;
+      bool valid_iv_size(length_type) const;
    };
 
 /*************************************************
@@ -34,7 +34,7 @@ class BOTAN_DLL ECB_Encryption : public ECB
       ECB_Encryption(const std::string&, const std::string&,
                      const SymmetricKey&);
    private:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
    };
 
@@ -48,7 +48,7 @@ class BOTAN_DLL ECB_Decryption : public ECB
       ECB_Decryption(const std::string&, const std::string&,
                      const SymmetricKey&);
    private:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
    };
 

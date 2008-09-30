@@ -19,18 +19,18 @@ class BOTAN_DLL SAFER_SK : public BlockCipher
       void clear() throw() { EK.clear(); }
       std::string name() const;
       BlockCipher* clone() const;
-      SAFER_SK(u32bit);
+      SAFER_SK(length_type);
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
 
       static const byte EXP[256];
       static const byte LOG[512];
       static const byte BIAS[208];
       static const byte KEY_INDEX[208];
       SecureVector<byte> EK;
-      const u32bit ROUNDS;
+      const length_type ROUNDS;
    };
 
 }

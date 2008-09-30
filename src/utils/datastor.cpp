@@ -138,7 +138,7 @@ void Data_Store::add(const std::string& key, const std::string& val)
 /*************************************************
 * Insert a single key and value                  *
 *************************************************/
-void Data_Store::add(const std::string& key, u32bit val)
+void Data_Store::add(const std::string& key, length_type val)
    {
    add(key, to_string(val));
    }

@@ -19,7 +19,7 @@ ECB::ECB(const std::string& cipher_name, const std::string& padding_name) :
 /*************************************************
 * Verify the IV is not set                       *
 *************************************************/
-bool ECB::valid_iv_size(u32bit iv_size) const
+bool ECB::valid_iv_size(length_type iv_size) const
    {
    if(iv_size == 0)
       return true;
@@ -57,7 +57,7 @@ ECB_Encryption::ECB_Encryption(const std::string& cipher_name,
 /*************************************************
 * Encrypt in ECB mode                            *
 *************************************************/
-void ECB_Encryption::write(const byte input[], u32bit length)
+void ECB_Encryption::write(const byte input[], length_type length)
    {
    buffer.copy(position, input, length);
    if(position + length >= BLOCK_SIZE)
@@ -114,7 +114,7 @@ ECB_Decryption::ECB_Decryption(const std::string& cipher_name,
 /*************************************************
 * Decrypt in ECB mode                            *
 *************************************************/
-void ECB_Decryption::write(const byte input[], u32bit length)
+void ECB_Decryption::write(const byte input[], length_type length)
    {
    buffer.copy(position, input, length);
    if(position + length > BLOCK_SIZE)

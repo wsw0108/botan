@@ -22,7 +22,7 @@ namespace Botan {
 /*************************************************
 * Gather Entropy from EGD                        *
 *************************************************/
-u32bit EGD_EntropySource::do_poll(byte output[], u32bit length,
+length_type EGD_EntropySource::do_poll(byte output[], length_type length,
                                   const std::string& path) const
    {
    if(length > 128)
@@ -62,11 +62,11 @@ u32bit EGD_EntropySource::do_poll(byte output[], u32bit length,
 /*************************************************
 * Gather Entropy from EGD                        *
 *************************************************/
-u32bit EGD_EntropySource::slow_poll(byte output[], u32bit length)
+length_type EGD_EntropySource::slow_poll(byte output[], length_type length)
    {
-   for(u32bit j = 0; j != paths.size(); j++)
+   for(length_type j = 0; j != paths.size(); j++)
       {
-      u32bit got = do_poll(output, length, paths[j]);
+      length_type got = do_poll(output, length, paths[j]);
       if(got)
          return got;
       }

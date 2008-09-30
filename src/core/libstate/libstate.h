@@ -36,7 +36,7 @@ class BOTAN_DLL Library_State
             Engine_Iterator(const Library_State& l) : lib(l) { n = 0; }
          private:
             const Library_State& lib;
-            u32bit n;
+            length_type n;
          };
       friend class Engine_Iterator;
 
@@ -62,7 +62,7 @@ class BOTAN_DLL Library_State
       Library_State(const Library_State&) {}
       Library_State& operator=(const Library_State&) { return (*this); }
 
-      class Engine* get_engine_n(u32bit) const;
+      class Engine* get_engine_n(length_type) const;
 
       class Mutex_Factory* mutex_factory;
 

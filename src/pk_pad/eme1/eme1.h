@@ -17,7 +17,7 @@ namespace Botan {
 class BOTAN_DLL EME1 : public EME
    {
    public:
-      u32bit maximum_input_size(u32bit) const;
+      length_type maximum_input_size(length_type) const;
 
       /**
        EME1 constructor. Hash will be deleted by ~EME1 (when mgf is deleted)
@@ -28,11 +28,11 @@ class BOTAN_DLL EME1 : public EME
 
       ~EME1() { delete mgf; }
    private:
-      SecureVector<byte> pad(const byte[], u32bit, u32bit,
+      SecureVector<byte> pad(const byte[], length_type, length_type,
                              RandomNumberGenerator&) const;
-      SecureVector<byte> unpad(const byte[], u32bit, u32bit) const;
+      SecureVector<byte> unpad(const byte[], length_type, length_type) const;
 
-      const u32bit HASH_LENGTH;
+      const length_type HASH_LENGTH;
       SecureVector<byte> Phash;
       MGF* mgf;
    };

@@ -16,7 +16,7 @@ namespace Botan {
 class BOTAN_DLL RC2 : public BlockCipher
    {
    public:
-      static byte EKB_code(u32bit);
+      static byte EKB_code(length_type);
 
       void clear() throw() { K.clear(); }
       std::string name() const { return "RC2"; }
@@ -25,7 +25,7 @@ class BOTAN_DLL RC2 : public BlockCipher
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
 
       SecureBuffer<u16bit, 64> K;
    };

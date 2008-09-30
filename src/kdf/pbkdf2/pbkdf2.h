@@ -23,8 +23,8 @@ class BOTAN_DLL PKCS5_PBKDF2 : public S2K
       PKCS5_PBKDF2(MessageAuthenticationCode* m);
       ~PKCS5_PBKDF2();
    private:
-      OctetString derive(u32bit, const std::string&,
-                          const byte[], u32bit, u32bit) const;
+      OctetString derive(length_type, const std::string&,
+                          const byte[], length_type, length_type) const;
 
       MessageAuthenticationCode* mac;
    };

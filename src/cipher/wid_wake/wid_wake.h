@@ -21,17 +21,17 @@ class BOTAN_DLL WiderWake_41_BE : public StreamCipher
       StreamCipher* clone() const { return new WiderWake_41_BE; }
       WiderWake_41_BE() : StreamCipher(16, 16, 1, 8) {}
    private:
-      void cipher(const byte[], byte[], u32bit);
-      void key(const byte[], u32bit);
-      void resync(const byte[], u32bit);
+      void cipher(const byte[], byte[], length_type);
+      void key(const byte[], length_type);
+      void resync(const byte[], length_type);
 
-      void generate(u32bit);
+      void generate(length_type);
 
       SecureBuffer<byte, DEFAULT_BUFFERSIZE> buffer;
       SecureBuffer<u32bit, 256> T;
       SecureBuffer<u32bit, 5> state;
       SecureBuffer<u32bit, 4> t_key;
-      u32bit position;
+      length_type position;
    };
 
 }

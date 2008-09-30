@@ -49,7 +49,7 @@ SecureVector<byte> emsa2_encoding(const MemoryRegion<byte>& msg,
 /*************************************************
 * EMSA2 Update Operation                         *
 *************************************************/
-void EMSA2::update(const byte input[], u32bit length)
+void EMSA2::update(const byte input[], length_type length)
    {
    hash->update(input, length);
    }

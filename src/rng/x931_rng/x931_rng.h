@@ -17,7 +17,7 @@ namespace Botan {
 class BOTAN_DLL ANSI_X931_RNG : public RandomNumberGenerator
    {
    public:
-      void randomize(byte[], u32bit);
+      void randomize(byte[], length_type);
       bool is_seeded() const;
       void clear() throw();
       std::string name() const;
@@ -29,12 +29,13 @@ class BOTAN_DLL ANSI_X931_RNG : public RandomNumberGenerator
       ANSI_X931_RNG(BlockCipher*, RandomNumberGenerator*);
       ~ANSI_X931_RNG();
    private:
+      void add_randomness(const byte[], length_type);
       void update_buffer();
 
       BlockCipher* cipher;
       RandomNumberGenerator* prng;
       SecureVector<byte> V, R;
-      u32bit position;
+      length_type position;
    };
 
 }

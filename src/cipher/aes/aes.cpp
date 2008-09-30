@@ -27,7 +27,7 @@ void AES::enc(const byte in[], byte out[]) const
         TE2[in[ 2] ^ ME[ 2]] ^ TE3[in[ 7] ^ ME[ 7]] ^ EK[2];
    B3 = TE0[in[12] ^ ME[12]] ^ TE1[in[ 1] ^ ME[ 1]] ^
         TE2[in[ 6] ^ ME[ 6]] ^ TE3[in[11] ^ ME[11]] ^ EK[3];
-   for(u32bit j = 1; j != ROUNDS - 1; j += 2)
+   for(length_type j = 1; j != ROUNDS - 1; j += 2)
       {
       T0 = TE0[get_byte(0, B0)] ^ TE1[get_byte(1, B1)] ^
            TE2[get_byte(2, B2)] ^ TE3[get_byte(3, B3)] ^ EK[4*j+0];
@@ -83,7 +83,7 @@ void AES::dec(const byte in[], byte out[]) const
         TD2[in[ 2] ^ MD[ 2]] ^ TD3[in[15] ^ MD[15]] ^ DK[2];
    B3 = TD0[in[12] ^ MD[12]] ^ TD1[in[ 9] ^ MD[ 9]] ^
         TD2[in[ 6] ^ MD[ 6]] ^ TD3[in[ 3] ^ MD[ 3]] ^ DK[3];
-   for(u32bit j = 1; j != ROUNDS - 1; j += 2)
+   for(length_type j = 1; j != ROUNDS - 1; j += 2)
       {
       T0 = TD0[get_byte(0, B0)] ^ TD1[get_byte(1, B3)] ^
            TD2[get_byte(2, B2)] ^ TD3[get_byte(3, B1)] ^ DK[4*j+0];
@@ -123,7 +123,7 @@ void AES::dec(const byte in[], byte out[]) const
 /*************************************************
 * AES Key Schedule                               *
 *************************************************/
-void AES::key(const byte key[], u32bit length)
+void AES::key(const byte key[], length_type length)
    {
    static const u32bit RC[10] = {
       0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000,
@@ -132,14 +132,14 @@ void AES::key(const byte key[], u32bit length)
 
    SecureBuffer<u32bit, 64> XEK, XDK;
 
-   const u32bit X = length / 4;
-   for(u32bit j = 0; j != X; ++j)
+   const length_type X = length / 4;
+   for(length_type j = 0; j != X; ++j)
       XEK[j] = load_be<u32bit>(key, j);
 
-   for(u32bit j = X; j < 4*(ROUNDS+1); j += X)
+   for(length_type j = X; j < 4*(ROUNDS+1); j += X)
       {
       XEK[j] = XEK[j-X] ^ S(rotate_left(XEK[j-1], 8)) ^ RC[(j-X)/X];
-      for(u32bit k = 1; k != X; ++k)
+      for(length_type k = 1; k != X; ++k)
          {
          if(X == 8 && k == 4)
             XEK[j+k] = XEK[j+k-X] ^ S(XEK[j+k-1]);
@@ -148,7 +148,7 @@ void AES::key(const byte key[], u32bit length)
          }
       }
 
-   for(u32bit j = 0; j != 4*(ROUNDS+1); j += 4)
+   for(length_type j = 0; j != 4*(ROUNDS+1); j += 4)
       {
       XDK[j  ] = XEK[4*ROUNDS-j  ];
       XDK[j+1] = XEK[4*ROUNDS-j+1];
@@ -156,14 +156,14 @@ void AES::key(const byte key[], u32bit length)
       XDK[j+3] = XEK[4*ROUNDS-j+3];
       }
 
-   for(u32bit j = 4; j != length + 24; ++j)
+   for(length_type j = 4; j != length + 24; ++j)
       XDK[j] = TD[SE[get_byte(0, XDK[j])] +   0] ^
                TD[SE[get_byte(1, XDK[j])] + 256] ^
                TD[SE[get_byte(2, XDK[j])] + 512] ^
                TD[SE[get_byte(3, XDK[j])] + 768];
 
-   for(u32bit j = 0; j != 4; ++j)
-      for(u32bit k = 0; k != 4; ++k)
+   for(length_type j = 0; j != 4; ++j)
+      for(length_type k = 0; k != 4; ++k)
          {
          ME[4*j+k   ] = get_byte(k, XEK[j]);
          ME[4*j+k+16] = get_byte(k, XEK[j+4*ROUNDS]);
@@ -187,7 +187,7 @@ u32bit AES::S(u32bit input)
 /*************************************************
 * AES Constructor                                *
 *************************************************/
-AES::AES(u32bit key_size) : BlockCipher(16, key_size)
+AES::AES(length_type key_size) : BlockCipher(16, key_size)
    {
    if(key_size != 16 && key_size != 24 && key_size != 32)
       throw Invalid_Key_Length(name(), key_size);

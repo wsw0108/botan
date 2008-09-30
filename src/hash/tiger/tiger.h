@@ -19,7 +19,7 @@ class BOTAN_DLL Tiger : public MDx_HashFunction
       void clear() throw();
       std::string name() const;
       HashFunction* clone() const { return new Tiger(OUTPUT_LENGTH); }
-      Tiger(u32bit = 24, u32bit = 3);
+      Tiger(length_type = 24, length_type = 3);
    private:
       void hash(const byte[]);
       void copy_out(byte[]);
@@ -34,7 +34,7 @@ class BOTAN_DLL Tiger : public MDx_HashFunction
 
       SecureBuffer<u64bit, 8> X;
       SecureBuffer<u64bit, 3> digest;
-      const u32bit PASS;
+      const length_type PASS;
    };
 
 }

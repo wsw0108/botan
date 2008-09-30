@@ -16,7 +16,7 @@ using Botan::u64bit;
 /* Discard output to reduce overhead */
 struct BitBucket : public Botan::Filter
    {
-   void write(const byte[], u32bit) {}
+      void write(const byte[], Botan::length_type) {}
    };
 
 Botan::Filter* lookup(const std::string&,

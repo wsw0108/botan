@@ -80,7 +80,7 @@ void X509_Time::set_to(const std::string& time_str)
    std::vector<std::string> params;
    std::string current;
 
-   for(u32bit j = 0; j != time_str.size(); ++j)
+   for(length_type j = 0; j != time_str.size(); ++j)
       {
       if(Charset::is_digit(time_str[j]))
          current += time_str[j];
@@ -127,17 +127,17 @@ void X509_Time::set_to(const std::string& t_spec, ASN1_Tag tag)
    if(t_spec[t_spec.size()-1] != 'Z')
       throw Invalid_Argument("Invalid time encoding: " + t_spec);
 
-   const u32bit YEAR_SIZE = (tag == UTC_TIME) ? 2 : 4;
+   const length_type YEAR_SIZE = (tag == UTC_TIME) ? 2 : 4;
 
    std::vector<std::string> params;
    std::string current;
 
-   for(u32bit j = 0; j != YEAR_SIZE; ++j)
+   for(length_type j = 0; j != YEAR_SIZE; ++j)
       current += t_spec[j];
    params.push_back(current);
    current.clear();
 
-   for(u32bit j = YEAR_SIZE; j != t_spec.size() - 1; ++j)
+   for(length_type j = YEAR_SIZE; j != t_spec.size() - 1; ++j)
       {
       current += t_spec[j];
       if(current.size() == 2)
@@ -203,7 +203,7 @@ std::string X509_Time::as_string() const
       if(year < 1950 || year >= 2050)
          throw Encoding_Error("X509_Time: The time " + readable_string() +
                               " cannot be encoded as a UTCTime");
-      u32bit asn1year = (year >= 2000) ? (year - 2000) : (year - 1900);
+      length_type asn1year = (year >= 2000) ? (year - 2000) : (year - 1900);
       asn1rep = to_string(asn1year, 2);
       }
    asn1rep += to_string(month, 2) + to_string(day, 2);

@@ -21,7 +21,7 @@ OSSL_BN::OSSL_BN(const BigInt& in)
 /*************************************************
 * OSSL_BN Constructor                            *
 *************************************************/
-OSSL_BN::OSSL_BN(const byte in[], u32bit length)
+OSSL_BN::OSSL_BN(const byte in[], length_type length)
    {
    value = BN_new();
    BN_bin2bn(in, length, value);
@@ -55,7 +55,7 @@ OSSL_BN& OSSL_BN::operator=(const OSSL_BN& other)
 /*************************************************
 * Export the BIGNUM as a bytestring              *
 *************************************************/
-void OSSL_BN::encode(byte out[], u32bit length) const
+void OSSL_BN::encode(byte out[], length_type length) const
    {
    BN_bn2bin(value, out + (length - bytes()));
    }
@@ -63,7 +63,7 @@ void OSSL_BN::encode(byte out[], u32bit length) const
 /*************************************************
 * Return the number of significant bytes         *
 *************************************************/
-u32bit OSSL_BN::bytes() const
+length_type OSSL_BN::bytes() const
    {
    return BN_num_bytes(value);
    }

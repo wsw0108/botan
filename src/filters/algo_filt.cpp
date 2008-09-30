@@ -40,11 +40,11 @@ void StreamCipher_Filter::set_iv(const InitializationVector& iv)
 /*************************************************
 * Write data into a StreamCipher_Filter          *
 *************************************************/
-void StreamCipher_Filter::write(const byte input[], u32bit length)
+void StreamCipher_Filter::write(const byte input[], length_type length)
    {
    while(length)
       {
-      u32bit copied = std::min(length, buffer.size());
+      length_type copied = std::min(length, buffer.size());
       cipher->encrypt(input, buffer, copied);
       send(buffer, copied);
       input += copied;
@@ -55,7 +55,7 @@ void StreamCipher_Filter::write(const byte input[], u32bit length)
 /*************************************************
 * Hash_Filter Constructor                        *
 *************************************************/
-Hash_Filter::Hash_Filter(const std::string& hash_name, u32bit len) :
+Hash_Filter::Hash_Filter(const std::string& hash_name, length_type len) :
    OUTPUT_LENGTH(len)
    {
    hash = get_hash(hash_name);
@@ -76,7 +76,7 @@ void Hash_Filter::end_msg()
 /*************************************************
 * MAC_Filter Constructor                         *
 *************************************************/
-MAC_Filter::MAC_Filter(const std::string& mac_name, u32bit len) :
+MAC_Filter::MAC_Filter(const std::string& mac_name, length_type len) :
    OUTPUT_LENGTH(len)
    {
    base_ptr = mac = get_mac(mac_name);
@@ -86,7 +86,7 @@ MAC_Filter::MAC_Filter(const std::string& mac_name, u32bit len) :
 * MAC_Filter Constructor                         *
 *************************************************/
 MAC_Filter::MAC_Filter(const std::string& mac_name, const SymmetricKey& key,
-                       u32bit len) : OUTPUT_LENGTH(len)
+                       length_type len) : OUTPUT_LENGTH(len)
    {
    base_ptr = mac = get_mac(mac_name);
    mac->set_key(key);

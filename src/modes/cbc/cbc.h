@@ -22,7 +22,7 @@ class BOTAN_DLL CBC_Encryption : public BlockCipherMode
                      const SymmetricKey&, const InitializationVector&);
    private:
       std::string name() const;
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
       const BlockCipherModePaddingMethod* padder;
    };
@@ -38,7 +38,7 @@ class BOTAN_DLL CBC_Decryption : public BlockCipherMode
                      const SymmetricKey&, const InitializationVector&);
    private:
       std::string name() const;
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
       const BlockCipherModePaddingMethod* padder;
       SecureVector<byte> temp;

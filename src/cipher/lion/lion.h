@@ -25,9 +25,9 @@ class BOTAN_DLL Lion : public BlockCipher
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
 
-      const u32bit LEFT_SIZE, RIGHT_SIZE;
+      const length_type LEFT_SIZE, RIGHT_SIZE;
 
       HashFunction* hash;
       StreamCipher* cipher;

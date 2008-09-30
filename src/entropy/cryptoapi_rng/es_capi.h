@@ -17,7 +17,7 @@ namespace Botan {
 class Win32_CAPI_EntropySource : public EntropySource
    {
    public:
-      u32bit slow_poll(byte[], u32bit);
+      length_type slow_poll(byte[], length_type);
       Win32_CAPI_EntropySource(const std::string& = "");
    private:
       std::vector<u64bit> prov_types;

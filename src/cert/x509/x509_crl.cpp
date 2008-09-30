@@ -37,7 +37,7 @@ void X509_CRL::force_decode()
    {
    BER_Decoder tbs_crl(tbs_bits);
 
-   u32bit version;
+   length_type version;
    tbs_crl.decode_optional(version, INTEGER, UNIVERSAL);
 
    if(version != 0 && version != 1)
@@ -121,7 +121,7 @@ MemoryVector<byte> X509_CRL::authority_key_id() const
 /*************************************************
 * Return the CRL number of this CRL              *
 *************************************************/
-u32bit X509_CRL::crl_number() const
+length_type X509_CRL::crl_number() const
    {
    return info.get1_u32bit("X509v3.CRLNumber");
    }

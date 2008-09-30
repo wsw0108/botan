@@ -43,7 +43,7 @@ BigInt RW_PublicKey::public_op(const BigInt& i) const
 /*************************************************
 * Rabin-Williams Verification Function           *
 *************************************************/
-SecureVector<byte> RW_PublicKey::verify(const byte in[], u32bit len) const
+SecureVector<byte> RW_PublicKey::verify(const byte in[], length_type len) const
    {
    BigInt i(in, len);
    return BigInt::encode(public_op(i));
@@ -95,7 +95,7 @@ RW_PrivateKey::RW_PrivateKey(RandomNumberGenerator& rng,
 /*************************************************
 * Rabin-Williams Signature Operation             *
 *************************************************/
-SecureVector<byte> RW_PrivateKey::sign(const byte in[], u32bit len,
+SecureVector<byte> RW_PrivateKey::sign(const byte in[], length_type len,
                                        RandomNumberGenerator&) const
    {
    BigInt i(in, len);

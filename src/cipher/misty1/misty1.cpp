@@ -35,7 +35,7 @@ void MISTY1::enc(const byte in[], byte out[]) const
    u16bit B2 = load_be<u16bit>(in, 2);
    u16bit B3 = load_be<u16bit>(in, 3);
 
-   for(u32bit j = 0; j != 12; j += 3)
+   for(length_type j = 0; j != 12; j += 3)
       {
       const u16bit* RK = EK + 8 * j;
 
@@ -44,7 +44,7 @@ void MISTY1::enc(const byte in[], byte out[]) const
       B3 ^= B2 & RK[2];
       B2 ^= B3 | RK[3];
 
-      u32bit T0, T1;
+      length_type T0, T1;
 
       T0  = FI(B0 ^ RK[ 4], RK[ 5], RK[ 6]) ^ B1;
       T1  = FI(B1 ^ RK[ 7], RK[ 8], RK[ 9]) ^ T0;
@@ -79,7 +79,7 @@ void MISTY1::dec(const byte in[], byte out[]) const
    u16bit B2 = load_be<u16bit>(in, 0);
    u16bit B3 = load_be<u16bit>(in, 1);
 
-   for(u32bit j = 0; j != 12; j += 3)
+   for(length_type j = 0; j != 12; j += 3)
       {
       const u16bit* RK = DK + 8 * j;
 
@@ -88,7 +88,7 @@ void MISTY1::dec(const byte in[], byte out[]) const
       B0 ^= B1 | RK[2];
       B1 ^= B0 & RK[3];
 
-      u32bit T0, T1;
+      length_type T0, T1;
 
       T0  = FI(B2 ^ RK[ 4], RK[ 5], RK[ 6]) ^ B3;
       T1  = FI(B3 ^ RK[ 7], RK[ 8], RK[ 9]) ^ T0;
@@ -116,19 +116,19 @@ void MISTY1::dec(const byte in[], byte out[]) const
 /*************************************************
 * MISTY1 Key Schedule                            *
 *************************************************/
-void MISTY1::key(const byte key[], u32bit length)
+void MISTY1::key(const byte key[], length_type length)
    {
    SecureBuffer<u16bit, 32> KS;
-   for(u32bit j = 0; j != length / 2; ++j)
+   for(length_type j = 0; j != length / 2; ++j)
       KS[j] = load_be<u16bit>(key, j);
 
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       {
       KS[j+ 8] = FI(KS[j], KS[(j+1) % 8] >> 9, KS[(j+1) % 8] & 0x1FF);
       KS[j+16] = KS[j+8] >> 9;
       KS[j+24] = KS[j+8] & 0x1FF;
       }
-   for(u32bit j = 0; j != 100; ++j)
+   for(length_type j = 0; j != 100; ++j)
       {
       EK[j] = KS[EK_ORDER[j]];
       DK[j] = KS[DK_ORDER[j]];
@@ -138,7 +138,7 @@ void MISTY1::key(const byte key[], u32bit length)
 /*************************************************
 * MISTY1 Constructor                             *
 *************************************************/
-MISTY1::MISTY1(u32bit rounds) : BlockCipher(8, 16)
+MISTY1::MISTY1(length_type rounds) : BlockCipher(8, 16)
    {
    if(rounds != 8)
       throw Invalid_Argument("MISTY1: Invalid number of rounds: "

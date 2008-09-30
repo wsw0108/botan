@@ -11,8 +11,9 @@ namespace Botan {
 /*************************************************
 * SymmetricAlgorithm Constructor                 *
 *************************************************/
-SymmetricAlgorithm::SymmetricAlgorithm(u32bit key_min, u32bit key_max,
-                                       u32bit key_mod) :
+SymmetricAlgorithm::SymmetricAlgorithm(length_type key_min,
+                                       length_type key_max,
+                                       length_type key_mod) :
    MAXIMUM_KEYLENGTH(key_max ? key_max : key_min),
    MINIMUM_KEYLENGTH(key_min),
    KEYLENGTH_MULTIPLE(key_mod)
@@ -22,7 +23,7 @@ SymmetricAlgorithm::SymmetricAlgorithm(u32bit key_min, u32bit key_max,
 /*************************************************
 * Query if the keylength is valid                *
 *************************************************/
-bool SymmetricAlgorithm::valid_keylength(u32bit length) const
+bool SymmetricAlgorithm::valid_keylength(length_type length) const
    {
    return ((length >= MINIMUM_KEYLENGTH) &&
            (length <= MAXIMUM_KEYLENGTH) &&
@@ -41,7 +42,7 @@ void SymmetricAlgorithm::set_key(const SymmetricKey& algo_key)
 /*************************************************
 * Set the key                                    *
 *************************************************/
-void SymmetricAlgorithm::set_key(const byte algo_key[], u32bit length)
+void SymmetricAlgorithm::set_key(const byte algo_key[], length_type length)
    throw(Invalid_Key_Length)
    {
    if(!valid_keylength(length))
@@ -52,8 +53,9 @@ void SymmetricAlgorithm::set_key(const byte algo_key[], u32bit length)
 /*************************************************
 * BlockCipher Constructor                        *
 *************************************************/
-BlockCipher::BlockCipher(u32bit block, u32bit key_min, u32bit key_max,
-                         u32bit key_mod) :
+BlockCipher::BlockCipher(length_type block, length_type key_min,
+                         length_type key_max,
+                         length_type key_mod) :
    SymmetricAlgorithm(key_min, key_max, key_mod),
    BLOCK_SIZE(block)
    {
@@ -62,8 +64,8 @@ BlockCipher::BlockCipher(u32bit block, u32bit key_min, u32bit key_max,
 /*************************************************
 * StreamCipher Constructor                       *
 *************************************************/
-StreamCipher::StreamCipher(u32bit key_min, u32bit key_max, u32bit key_mod,
-                           u32bit iv_len) :
+StreamCipher::StreamCipher(length_type key_min, length_type key_max,
+                           length_type key_mod, length_type iv_len) :
    SymmetricAlgorithm(key_min, key_max, key_mod), IV_LENGTH(iv_len)
    {
    }
@@ -71,14 +73,15 @@ StreamCipher::StreamCipher(u32bit key_min, u32bit key_max, u32bit key_mod,
 /*************************************************
 * BufferedComputation Constructor                *
 *************************************************/
-BufferedComputation::BufferedComputation(u32bit olen) : OUTPUT_LENGTH(olen)
+BufferedComputation::BufferedComputation(length_type olen) :
+   OUTPUT_LENGTH(olen)
    {
    }
 
 /*************************************************
 * HashFunction Constructor                       *
 *************************************************/
-HashFunction::HashFunction(u32bit hlen, u32bit blen) :
+HashFunction::HashFunction(length_type hlen, length_type blen) :
    BufferedComputation(hlen), HASH_BLOCK_SIZE(blen)
    {
    }
@@ -86,10 +89,10 @@ HashFunction::HashFunction(u32bit hlen, u32bit blen) :
 /*************************************************
 * MessageAuthenticationCode Constructor          *
 *************************************************/
-MessageAuthenticationCode::MessageAuthenticationCode(u32bit mlen,
-                                                     u32bit key_min,
-                                                     u32bit key_max,
-                                                     u32bit key_mod) :
+MessageAuthenticationCode::MessageAuthenticationCode(length_type mlen,
+                                                     length_type key_min,
+                                                     length_type key_max,
+                                                     length_type key_mod) :
    BufferedComputation(mlen),
    SymmetricAlgorithm(key_min, key_max, key_mod)
    {
@@ -98,12 +101,13 @@ MessageAuthenticationCode::MessageAuthenticationCode(u32bit mlen,
 /*************************************************
 * Default MAC verification operation             *
 *************************************************/
-bool MessageAuthenticationCode::verify_mac(const byte mac[], u32bit length)
+bool MessageAuthenticationCode::verify_mac(const byte mac[],
+                                           length_type length)
    {
    SecureVector<byte> our_mac = final();
    if(our_mac.size() != length)
       return false;
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       if(mac[j] != our_mac[j])
          return false;
    return true;
@@ -112,7 +116,7 @@ bool MessageAuthenticationCode::verify_mac(const byte mac[], u32bit length)
 /*************************************************
 * Default StreamCipher Resync Operation          *
 *************************************************/
-void StreamCipher::resync(const byte[], u32bit length)
+void StreamCipher::resync(const byte[], length_type length)
    {
    if(length)
       throw Exception("The stream cipher " + name() +
@@ -122,7 +126,7 @@ void StreamCipher::resync(const byte[], u32bit length)
 /*************************************************
 * Default StreamCipher Seek Operation            *
 *************************************************/
-void StreamCipher::seek(u32bit)
+void StreamCipher::seek(length_type)
    {
    throw Exception("The stream cipher " + name() + " does not support seek()");
    }
@@ -130,7 +134,7 @@ void StreamCipher::seek(u32bit)
 /*************************************************
 * Hashing/MACing                                 *
 *************************************************/
-void BufferedComputation::update(const byte in[], u32bit n)
+void BufferedComputation::update(const byte in[], length_type n)
    {
    add_data(in, n);
    }
@@ -172,7 +176,8 @@ SecureVector<byte> BufferedComputation::final()
 /*************************************************
 * Hashing/MACing                                 *
 *************************************************/
-SecureVector<byte> BufferedComputation::process(const byte in[], u32bit len)
+SecureVector<byte> BufferedComputation::process(const byte in[],
+                                                length_type len)
    {
    update(in, len);
    return final();

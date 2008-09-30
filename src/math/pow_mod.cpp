@@ -103,8 +103,8 @@ Power_Mod::Usage_Hints choose_base_hints(const BigInt& b, const BigInt& n)
       return Power_Mod::Usage_Hints(Power_Mod::BASE_IS_2 |
                                     Power_Mod::BASE_IS_SMALL);
 
-   const u32bit b_bits = b.bits();
-   const u32bit n_bits = n.bits();
+   const length_type b_bits = b.bits();
+   const length_type n_bits = n.bits();
 
    if(b_bits < n_bits / 32)
       return Power_Mod::BASE_IS_SMALL;
@@ -119,8 +119,8 @@ Power_Mod::Usage_Hints choose_base_hints(const BigInt& b, const BigInt& n)
 *************************************************/
 Power_Mod::Usage_Hints choose_exp_hints(const BigInt& e, const BigInt& n)
    {
-   const u32bit e_bits = e.bits();
-   const u32bit n_bits = n.bits();
+   const length_type e_bits = e.bits();
+   const length_type n_bits = n.bits();
 
    if(e_bits < n_bits / 32)
       return Power_Mod::BASE_IS_SMALL;

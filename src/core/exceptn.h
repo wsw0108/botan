@@ -40,7 +40,7 @@ struct BOTAN_DLL Invalid_Argument : public Exception
 *************************************************/
 struct BOTAN_DLL Invalid_Key_Length : public Invalid_Argument
    {
-   Invalid_Key_Length(const std::string&, u32bit);
+   Invalid_Key_Length(const std::string&, length_type);
    };
 
 /*************************************************
@@ -56,7 +56,7 @@ struct BOTAN_DLL Invalid_Block_Size : public Invalid_Argument
 *************************************************/
 struct BOTAN_DLL Invalid_IV_Length : public Invalid_Argument
    {
-   Invalid_IV_Length(const std::string&, u32bit);
+   Invalid_IV_Length(const std::string&, length_type);
    };
 
 /*************************************************
@@ -160,7 +160,7 @@ struct BOTAN_DLL Config_Error : public Format_Error
    {
    Config_Error(const std::string& err) :
       Format_Error("Config error: " + err) {}
-   Config_Error(const std::string&, u32bit);
+   Config_Error(const std::string&, length_type);
    };
 
 /*************************************************

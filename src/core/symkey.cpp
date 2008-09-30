@@ -16,7 +16,7 @@ namespace Botan {
 * Create an OctetString from RNG output          *
 *************************************************/
 OctetString::OctetString(RandomNumberGenerator& rng,
-                         u32bit length)
+                         length_type length)
    {
    bits.create(length);
    rng.randomize(bits, length);
@@ -28,21 +28,21 @@ OctetString::OctetString(RandomNumberGenerator& rng,
 void OctetString::change(const std::string& hex_string)
    {
    SecureVector<byte> hex;
-   for(u32bit j = 0; j != hex_string.length(); ++j)
+   for(length_type j = 0; j != hex_string.length(); ++j)
       if(Hex_Decoder::is_valid(hex_string[j]))
          hex.append(hex_string[j]);
 
    if(hex.size() % 2 != 0)
       throw Invalid_Argument("OctetString: hex string must encode full bytes");
    bits.create(hex.size() / 2);
-   for(u32bit j = 0; j != bits.size(); ++j)
+   for(length_type j = 0; j != bits.size(); ++j)
       bits[j] = Hex_Decoder::decode(hex.begin() + 2*j);
    }
 
 /*************************************************
 * Create an OctetString from a byte string       *
 *************************************************/
-void OctetString::change(const byte in[], u32bit n)
+void OctetString::change(const byte in[], length_type n)
    {
    bits.create(n);
    bits.copy(in, n);
@@ -77,7 +77,7 @@ void OctetString::set_odd_parity()
       0xF1, 0xF1, 0xF2, 0xF2, 0xF4, 0xF4, 0xF7, 0xF7, 0xF8, 0xF8, 0xFB, 0xFB,
       0xFD, 0xFD, 0xFE, 0xFE };
 
-   for(u32bit j = 0; j != bits.size(); ++j)
+   for(length_type j = 0; j != bits.size(); ++j)
       bits[j] = ODD_PARITY[bits[j]];
    }
 

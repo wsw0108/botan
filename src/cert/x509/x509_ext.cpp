@@ -50,11 +50,11 @@ Extensions::Extensions(const Extensions& extensions) : ASN1_Object()
 *************************************************/
 Extensions& Extensions::operator=(const Extensions& other)
    {
-   for(u32bit j = 0; j != extensions.size(); ++j)
+   for(length_type j = 0; j != extensions.size(); ++j)
       delete extensions[j];
    extensions.clear();
 
-   for(u32bit j = 0; j != other.extensions.size(); ++j)
+   for(length_type j = 0; j != other.extensions.size(); ++j)
       extensions.push_back(other.extensions[j]->copy());
 
    return (*this);
@@ -73,7 +73,7 @@ OID Certificate_Extension::oid_of() const
 *************************************************/
 void Extensions::encode_into(DER_Encoder& to_object) const
    {
-   for(u32bit j = 0; j != extensions.size(); ++j)
+   for(length_type j = 0; j != extensions.size(); ++j)
       {
       const Certificate_Extension* ext = extensions[j];
 
@@ -109,7 +109,7 @@ void Extensions::encode_into(DER_Encoder& to_object) const
 *************************************************/
 void Extensions::decode_from(BER_Decoder& from_source)
    {
-   for(u32bit j = 0; j != extensions.size(); ++j)
+   for(length_type j = 0; j != extensions.size(); ++j)
       delete extensions[j];
    extensions.clear();
 
@@ -151,7 +151,7 @@ void Extensions::decode_from(BER_Decoder& from_source)
 void Extensions::contents_to(Data_Store& subject_info,
                              Data_Store& issuer_info) const
    {
-   for(u32bit j = 0; j != extensions.size(); ++j)
+   for(length_type j = 0; j != extensions.size(); ++j)
       extensions[j]->contents_to(subject_info, issuer_info);
    }
 
@@ -160,7 +160,7 @@ void Extensions::contents_to(Data_Store& subject_info,
 *************************************************/
 Extensions::~Extensions()
    {
-   for(u32bit j = 0; j != extensions.size(); ++j)
+   for(length_type j = 0; j != extensions.size(); ++j)
       delete extensions[j];
    }
 
@@ -169,7 +169,7 @@ namespace Cert_Extension {
 /*************************************************
 * Checked accessor for the path_limit member     *
 *************************************************/
-u32bit Basic_Constraints::get_path_limit() const
+length_type Basic_Constraints::get_path_limit() const
    {
    if(!is_ca)
       throw Invalid_State("Basic_Constraints::get_path_limit: Not a CA");
@@ -225,7 +225,7 @@ MemoryVector<byte> Key_Usage::encode_inner() const
    if(constraints == NO_CONSTRAINTS)
       throw Encoding_Error("Cannot encode zero usage constraints");
 
-   const u32bit unused_bits = low_bit(constraints) - 1;
+   const length_type unused_bits = low_bit(constraints) - 1;
 
    SecureVector<byte> der;
    der.append(BIT_STRING);
@@ -260,7 +260,7 @@ void Key_Usage::decode_inner(const MemoryRegion<byte>& in)
    obj.value[obj.value.size()-1] &= (0xFF << obj.value[0]);
 
    u16bit usage = 0;
-   for(u32bit j = 1; j != obj.value.size(); ++j)
+   for(length_type j = 1; j != obj.value.size(); ++j)
       usage = (obj.value[j] << 8) | usage;
 
    constraints = Key_Constraints(usage);
@@ -432,7 +432,7 @@ void Extended_Key_Usage::decode_inner(const MemoryRegion<byte>& in)
 *************************************************/
 void Extended_Key_Usage::contents_to(Data_Store& subject, Data_Store&) const
    {
-   for(u32bit j = 0; j != oids.size(); ++j)
+   for(length_type j = 0; j != oids.size(); ++j)
       subject.add("X509v3.ExtendedKeyUsage", oids[j].as_string());
    }
 
@@ -498,14 +498,14 @@ void Certificate_Policies::decode_inner(const MemoryRegion<byte>& in)
 *************************************************/
 void Certificate_Policies::contents_to(Data_Store& info, Data_Store&) const
    {
-   for(u32bit j = 0; j != oids.size(); ++j)
+   for(length_type j = 0; j != oids.size(); ++j)
       info.add("X509v3.ExtendedKeyUsage", oids[j].as_string());
    }
 
 /*************************************************
 * Checked accessor for the crl_number member     *
 *************************************************/
-u32bit CRL_Number::get_crl_number() const
+length_type CRL_Number::get_crl_number() const
    {
    if(!has_value)
       throw Invalid_State("CRL_Number::get_crl_number: Not set");
@@ -552,7 +552,7 @@ void CRL_Number::contents_to(Data_Store& info, Data_Store&) const
 MemoryVector<byte> CRL_ReasonCode::encode_inner() const
    {
    return DER_Encoder()
-      .encode(static_cast<u32bit>(reason), ENUMERATED, UNIVERSAL)
+      .encode(static_cast<length_type>(reason), ENUMERATED, UNIVERSAL)
    .get_contents();
    }
 
@@ -561,7 +561,7 @@ MemoryVector<byte> CRL_ReasonCode::encode_inner() const
 *************************************************/
 void CRL_ReasonCode::decode_inner(const MemoryRegion<byte>& in)
    {
-   u32bit reason_code = 0;
+   length_type reason_code = 0;
    BER_Decoder(in).decode(reason_code, ENUMERATED, UNIVERSAL);
    reason = static_cast<CRL_Code>(reason_code);
    }

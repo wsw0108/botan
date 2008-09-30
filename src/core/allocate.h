@@ -19,8 +19,8 @@ class BOTAN_DLL Allocator
    public:
       static Allocator* get(bool);
 
-      virtual void* allocate(u32bit) = 0;
-      virtual void deallocate(void*, u32bit) = 0;
+      virtual void* allocate(length_type) = 0;
+      virtual void deallocate(void*, length_type) = 0;
 
       virtual std::string type() const = 0;
 

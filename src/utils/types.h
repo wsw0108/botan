@@ -26,6 +26,8 @@ typedef signed int s32bit;
    typedef unsigned long long u64bit;
 #endif
 
+typedef u64bit length_type;
+
 }
 
 namespace Botan_types {

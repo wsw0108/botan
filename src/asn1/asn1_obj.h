@@ -55,7 +55,7 @@ class BOTAN_DLL X509_Time : public ASN1_Object
       X509_Time(const std::string&, ASN1_Tag);
    private:
       bool passes_sanity_check() const;
-      u32bit year, month, day, hour, minute, second;
+      length_type year, month, day, hour, minute, second;
       ASN1_Tag tag;
    };
 

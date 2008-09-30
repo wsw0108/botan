@@ -20,7 +20,7 @@ enum Signature_Format { IEEE_1363, DER_SEQUENCE };
 class BOTAN_DLL PK_Encryptor
    {
    public:
-      SecureVector<byte> encrypt(const byte[], u32bit,
+      SecureVector<byte> encrypt(const byte[], length_type,
                                  RandomNumberGenerator&) const;
       SecureVector<byte> encrypt(const MemoryRegion<byte>&,
                                  RandomNumberGenerator&) const;
@@ -28,7 +28,7 @@ class BOTAN_DLL PK_Encryptor
       virtual u32bit maximum_input_size() const = 0;
       virtual ~PK_Encryptor() {}
    private:
-      virtual SecureVector<byte> enc(const byte[], u32bit,
+      virtual SecureVector<byte> enc(const byte[], length_type,
                                      RandomNumberGenerator&) const = 0;
    };
 
@@ -38,11 +38,11 @@ class BOTAN_DLL PK_Encryptor
 class BOTAN_DLL PK_Decryptor
    {
    public:
-      SecureVector<byte> decrypt(const byte[], u32bit) const;
+      SecureVector<byte> decrypt(const byte[], length_type) const;
       SecureVector<byte> decrypt(const MemoryRegion<byte>&) const;
       virtual ~PK_Decryptor() {}
    private:
-      virtual SecureVector<byte> dec(const byte[], u32bit) const = 0;
+      virtual SecureVector<byte> dec(const byte[], length_type) const = 0;
    };
 
 /*************************************************
@@ -51,13 +51,11 @@ class BOTAN_DLL PK_Decryptor
 class BOTAN_DLL PK_Signer
    {
    public:
-      SecureVector<byte> sign_message(const byte[], u32bit,
-                                      RandomNumberGenerator&);
-      SecureVector<byte> sign_message(const MemoryRegion<byte>&,
-                                      RandomNumberGenerator&);
+      SecureVector<byte> sign_message(const byte[], length_type);
+      SecureVector<byte> sign_message(const MemoryRegion<byte>&);
 
       void update(byte);
-      void update(const byte[], u32bit);
+      void update(const byte[], length_type);
       void update(const MemoryRegion<byte>&);
 
       SecureVector<byte> signature(RandomNumberGenerator&);
@@ -81,15 +79,15 @@ class BOTAN_DLL PK_Signer
 class BOTAN_DLL PK_Verifier
    {
    public:
-      bool verify_message(const byte[], u32bit, const byte[], u32bit);
+      bool verify_message(const byte[], length_type, const byte[], length_type);
       bool verify_message(const MemoryRegion<byte>&,
                           const MemoryRegion<byte>&);
 
       void update(byte);
-      void update(const byte[], u32bit);
+      void update(const byte[], length_type);
       void update(const MemoryRegion<byte>&);
 
-      bool check_signature(const byte[], u32bit);
+      bool check_signature(const byte[], length_type);
       bool check_signature(const MemoryRegion<byte>&);
 
       void set_input_format(Signature_Format);
@@ -98,9 +96,9 @@ class BOTAN_DLL PK_Verifier
       virtual ~PK_Verifier();
    protected:
       virtual bool validate_signature(const MemoryRegion<byte>&,
-                                      const byte[], u32bit) = 0;
-      virtual u32bit key_message_parts() const = 0;
-      virtual u32bit key_message_part_size() const = 0;
+                                      const byte[], length_type) = 0;
+      virtual length_type key_message_parts() const = 0;
+      virtual length_type key_message_part_size() const = 0;
 
       Signature_Format sig_format;
       EMSA* emsa;
@@ -115,10 +113,10 @@ class BOTAN_DLL PK_Verifier
 class BOTAN_DLL PK_Key_Agreement
    {
    public:
-      SymmetricKey derive_key(u32bit, const byte[], u32bit,
+      SymmetricKey derive_key(length_type, const byte[], length_type,
                               const std::string& = "") const;
-      SymmetricKey derive_key(u32bit, const byte[], u32bit,
-                                      const byte[], u32bit) const;
+      SymmetricKey derive_key(length_type, const byte[], length_type,
+                              const byte[], length_type) const;
 
       PK_Key_Agreement(const PK_Key_Agreement_Key&, const std::string&);
    private:
@@ -135,7 +133,7 @@ class BOTAN_DLL PK_Key_Agreement
 class BOTAN_DLL PK_Encryptor_MR_with_EME : public PK_Encryptor
    {
    public:
-      u32bit maximum_input_size() const;
+      length_type maximum_input_size() const;
 
       PK_Encryptor_MR_with_EME(const PK_Encrypting_Key&, const std::string&);
       ~PK_Encryptor_MR_with_EME() { delete encoder; }
@@ -144,7 +142,7 @@ class BOTAN_DLL PK_Encryptor_MR_with_EME : public PK_Encryptor
       PK_Encryptor_MR_with_EME(const PK_Encryptor_MR_with_EME&);
       PK_Encryptor_MR_with_EME& operator=(const PK_Encryptor_MR_with_EME&);
 
-      SecureVector<byte> enc(const byte[], u32bit,
+      SecureVector<byte> enc(const byte[], length_type,
                              RandomNumberGenerator& rng) const;
 
       const PK_Encrypting_Key& key;
@@ -163,7 +161,7 @@ class BOTAN_DLL PK_Decryptor_MR_with_EME : public PK_Decryptor
       PK_Decryptor_MR_with_EME(const PK_Decryptor_MR_with_EME&);
       PK_Decryptor_MR_with_EME& operator=(const PK_Decryptor_MR_with_EME&);
 
-      SecureVector<byte> dec(const byte[], u32bit) const;
+      SecureVector<byte> dec(const byte[], length_type) const;
 
       const PK_Decrypting_Key& key;
       const EME* encoder;
@@ -180,9 +178,9 @@ class BOTAN_DLL PK_Verifier_with_MR : public PK_Verifier
       PK_Verifier_with_MR(const PK_Verifying_with_MR_Key&);
       PK_Verifier_with_MR& operator=(const PK_Verifier_with_MR&);
 
-      bool validate_signature(const MemoryRegion<byte>&, const byte[], u32bit);
-      u32bit key_message_parts() const { return key.message_parts(); }
-      u32bit key_message_part_size() const { return key.message_part_size(); }
+      bool validate_signature(const MemoryRegion<byte>&, const byte[], length_type);
+      length_type key_message_parts() const { return key.message_parts(); }
+      length_type key_message_part_size() const { return key.message_part_size(); }
 
       const PK_Verifying_with_MR_Key& key;
    };
@@ -198,9 +196,9 @@ class BOTAN_DLL PK_Verifier_wo_MR : public PK_Verifier
       PK_Verifier_wo_MR(const PK_Verifying_wo_MR_Key&);
       PK_Verifier_wo_MR& operator=(const PK_Verifier_wo_MR&);
 
-      bool validate_signature(const MemoryRegion<byte>&, const byte[], u32bit);
-      u32bit key_message_parts() const { return key.message_parts(); }
-      u32bit key_message_part_size() const { return key.message_part_size(); }
+      bool validate_signature(const MemoryRegion<byte>&, const byte[], length_type);
+      length_type key_message_parts() const { return key.message_parts(); }
+      length_type key_message_part_size() const { return key.message_part_size(); }
 
       const PK_Verifying_wo_MR_Key& key;
    };

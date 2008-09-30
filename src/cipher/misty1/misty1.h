@@ -19,11 +19,11 @@ class BOTAN_DLL MISTY1 : public BlockCipher
       void clear() throw() { EK.clear(); DK.clear(); }
       std::string name() const { return "MISTY1"; }
       BlockCipher* clone() const { return new MISTY1; }
-      MISTY1(u32bit = 8);
+      MISTY1(length_type = 8);
    private:
       void enc(const byte[], byte[]) const;
       void dec(const byte[], byte[]) const;
-      void key(const byte[], u32bit);
+      void key(const byte[], length_type);
 
       static const byte EK_ORDER[100];
       static const byte DK_ORDER[100];

@@ -20,12 +20,12 @@ class BOTAN_DLL NR_PublicKey : public PK_Verifying_with_MR_Key,
    public:
       std::string algo_name() const { return "NR"; }
 
-      SecureVector<byte> verify(const byte[], u32bit) const;
-      u32bit max_input_bits() const;
+      SecureVector<byte> verify(const byte[], length_type) const;
+      length_type max_input_bits() const;
 
       DL_Group::Format group_format() const { return DL_Group::ANSI_X9_57; }
-      u32bit message_parts() const { return 2; }
-      u32bit message_part_size() const;
+      length_type message_parts() const { return 2; }
+      length_type message_part_size() const;
 
       NR_PublicKey() {}
       NR_PublicKey(const DL_Group&, const BigInt&);
@@ -43,7 +43,7 @@ class BOTAN_DLL NR_PrivateKey : public NR_PublicKey,
                                 public virtual DL_Scheme_PrivateKey
    {
    public:
-      SecureVector<byte> sign(const byte[], u32bit,
+      SecureVector<byte> sign(const byte[], length_type,
                               RandomNumberGenerator& rng) const;
 
       bool check_key(RandomNumberGenerator& rng, bool) const;

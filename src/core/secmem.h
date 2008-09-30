@@ -18,9 +18,9 @@ template<typename T>
 class MemoryRegion
    {
    public:
-      u32bit size() const { return used; }
-      u32bit is_empty() const { return (used == 0); }
-      u32bit has_items() const { return (used != 0); }
+      length_type size() const { return used; }
+      bool is_empty() const { return (used == 0); }
+      bool has_items() const { return (used != 0); }
 
       operator T* () { return buf; }
       operator const T* () const { return buf; }
@@ -44,15 +44,15 @@ class MemoryRegion
       MemoryRegion<T>& operator=(const MemoryRegion<T>& in)
          { if(this != &in) set(in); return (*this); }
 
-      void copy(const T in[], u32bit n)
+      void copy(const T in[], length_type n)
          { copy(0, in, n); }
-      void copy(u32bit off, const T in[], u32bit n)
+      void copy(length_type off, const T in[], length_type n)
          { copy_mem(buf + off, in, (n > size() - off) ? (size() - off) : n); }
 
-      void set(const T in[], u32bit n)    { create(n); copy(in, n); }
+      void set(const T in[], length_type n)    { create(n); copy(in, n); }
       void set(const MemoryRegion<T>& in) { set(in.begin(), in.size()); }
 
-      void append(const T data[], u32bit n)
+      void append(const T data[], length_type n)
          { grow_to(size()+n); copy(size() - n, data, n); }
       void append(T x) { append(&x, 1); }
       void append(const MemoryRegion<T>& x) { append(x.begin(), x.size()); }
@@ -60,8 +60,8 @@ class MemoryRegion
       void clear() { clear_mem(buf, allocated); }
       void destroy() { create(0); }
 
-      void create(u32bit);
-      void grow_to(u32bit);
+      void create(length_type);
+      void grow_to(length_type);
       void swap(MemoryRegion<T>&);
 
       ~MemoryRegion() { deallocate(buf, allocated); }
@@ -75,20 +75,20 @@ class MemoryRegion
          set(other.buf, other.used);
          }
 
-      void init(bool locking, u32bit length = 0)
-         { alloc = Allocator::get(locking); create(length); }
+      void init(bool locking, length_type size = 0)
+         { alloc = Allocator::get(locking); create(size); }
    private:
-      T* allocate(u32bit n)
+      T* allocate(length_type n)
          {
          return static_cast<T*>(alloc->allocate(sizeof(T)*n));
          }
 
-      void deallocate(T* p, u32bit n)
+      void deallocate(T* p, length_type n)
          { alloc->deallocate(p, sizeof(T)*n); }
 
       T* buf;
-      u32bit used;
-      u32bit allocated;
+      length_type used;
+      length_type allocated;
       Allocator* alloc;
    };
 
@@ -96,7 +96,7 @@ class MemoryRegion
 * Create a new buffer                            *
 *************************************************/
 template<typename T>
-void MemoryRegion<T>::create(u32bit n)
+void MemoryRegion<T>::create(length_type n)
    {
    if(n <= allocated) { clear(); used = n; return; }
    deallocate(buf, allocated);
@@ -108,7 +108,7 @@ void MemoryRegion<T>::create(u32bit n)
 * Increase the size of the buffer                *
 *************************************************/
 template<typename T>
-void MemoryRegion<T>::grow_to(u32bit n)
+void MemoryRegion<T>::grow_to(length_type n)
    {
    if(n > used && n <= allocated)
       {
@@ -135,7 +135,7 @@ bool MemoryRegion<T>::operator<(const MemoryRegion<T>& in) const
    if(size() < in.size()) return true;
    if(size() > in.size()) return false;
 
-   for(u32bit j = 0; j != size(); j++)
+   for(length_type j = 0; j != size(); j++)
       {
       if(buf[j] < in[j]) return true;
       if(buf[j] > in[j]) return false;
@@ -166,8 +166,8 @@ class MemoryVector : public MemoryRegion<T>
       MemoryVector<T>& operator=(const MemoryRegion<T>& in)
          { if(this != &in) set(in); return (*this); }
 
-      MemoryVector(u32bit n = 0) { MemoryRegion<T>::init(false, n); }
-      MemoryVector(const T in[], u32bit n)
+      MemoryVector(length_type n = 0) { MemoryRegion<T>::init(false, n); }
+      MemoryVector(const T in[], length_type n)
          { MemoryRegion<T>::init(false); set(in, n); }
       MemoryVector(const MemoryRegion<T>& in)
          { MemoryRegion<T>::init(false); set(in); }
@@ -185,8 +185,8 @@ class SecureVector : public MemoryRegion<T>
       SecureVector<T>& operator=(const MemoryRegion<T>& in)
          { if(this != &in) set(in); return (*this); }
 
-      SecureVector(u32bit n = 0) { MemoryRegion<T>::init(true, n); }
-      SecureVector(const T in[], u32bit n)
+      SecureVector(length_type n = 0) { MemoryRegion<T>::init(true, n); }
+      SecureVector(const T in[], length_type n)
          { MemoryRegion<T>::init(true); set(in, n); }
       SecureVector(const MemoryRegion<T>& in)
          { MemoryRegion<T>::init(true); set(in); }
@@ -197,7 +197,7 @@ class SecureVector : public MemoryRegion<T>
 /*************************************************
 * Locked Fixed Length Buffer                     *
 *************************************************/
-template<typename T, u32bit L>
+template<typename T, length_type L>
 class SecureBuffer : public MemoryRegion<T>
    {
    public:
@@ -205,7 +205,7 @@ class SecureBuffer : public MemoryRegion<T>
          { if(this != &in) set(in); return (*this); }
 
       SecureBuffer() { MemoryRegion<T>::init(true, L); }
-      SecureBuffer(const T in[], u32bit n)
+      SecureBuffer(const T in[], length_type n)
          { MemoryRegion<T>::init(true, L); copy(in, n); }
    private:
       SecureBuffer<T, L>& operator=(const MemoryRegion<T>& in)

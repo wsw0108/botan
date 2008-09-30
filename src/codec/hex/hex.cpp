@@ -13,7 +13,7 @@ namespace Botan {
 /*************************************************
 * Hex_Encoder Constructor                        *
 *************************************************/
-Hex_Encoder::Hex_Encoder(bool breaks, u32bit length, Case c) :
+Hex_Encoder::Hex_Encoder(bool breaks, length_type length, Case c) :
    casing(c), line_length(breaks ? length : 0)
    {
    in.create(64);
@@ -46,19 +46,19 @@ void Hex_Encoder::encode(byte in, byte out[2], Hex_Encoder::Case casing)
 /*************************************************
 * Encode and send a block                        *
 *************************************************/
-void Hex_Encoder::encode_and_send(const byte block[], u32bit length)
+void Hex_Encoder::encode_and_send(const byte block[], length_type length)
    {
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       encode(block[j], out + 2*j, casing);
 
    if(line_length == 0)
       send(out, 2*length);
    else
       {
-      u32bit remaining = 2*length, offset = 0;
+      length_type remaining = 2*length, offset = 0;
       while(remaining)
          {
-         u32bit sent = std::min(line_length - counter, remaining);
+         length_type sent = std::min(line_length - counter, remaining);
          send(out + offset, sent);
          counter += sent;
          remaining -= sent;
@@ -75,7 +75,7 @@ void Hex_Encoder::encode_and_send(const byte block[], u32bit length)
 /*************************************************
 * Convert some data into hex format              *
 *************************************************/
-void Hex_Encoder::write(const byte input[], u32bit length)
+void Hex_Encoder::write(const byte input[], length_type length)
    {
    in.copy(position, input, length);
    if(position + length >= in.size())
@@ -150,9 +150,9 @@ byte Hex_Decoder::decode(const byte hex[2])
 /*************************************************
 * Decode and send a block                        *
 *************************************************/
-void Hex_Decoder::decode_and_send(const byte block[], u32bit length)
+void Hex_Decoder::decode_and_send(const byte block[], length_type length)
    {
-   for(u32bit j = 0; j != length / 2; ++j)
+   for(length_type j = 0; j != length / 2; ++j)
       out[j] = decode(block + 2*j);
    send(out, length / 2);
    }
@@ -160,9 +160,9 @@ void Hex_Decoder::decode_and_send(const byte block[], u32bit length)
 /*************************************************
 * Convert some data from hex format              *
 *************************************************/
-void Hex_Decoder::write(const byte input[], u32bit length)
+void Hex_Decoder::write(const byte input[], length_type length)
    {
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       {
       if(is_valid(input[j]))
          in[position++] = input[j];

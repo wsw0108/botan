@@ -20,7 +20,7 @@ class BOTAN_DLL OFB : public BlockCipherMode
       OFB(const std::string&,
           const SymmetricKey&, const InitializationVector&);
    private:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
    };
 
 }

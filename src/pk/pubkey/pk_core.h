@@ -46,8 +46,8 @@ class BOTAN_DLL IF_Core
 class BOTAN_DLL DSA_Core
    {
    public:
-      SecureVector<byte> sign(const byte[], u32bit, const BigInt&) const;
-      bool verify(const byte[], u32bit, const byte[], u32bit) const;
+      SecureVector<byte> sign(const byte[], length_type, const BigInt&) const;
+      bool verify(const byte[], length_type, const byte[], length_type) const;
 
       DSA_Core& operator=(const DSA_Core&);
 
@@ -65,8 +65,8 @@ class BOTAN_DLL DSA_Core
 class BOTAN_DLL NR_Core
    {
    public:
-      SecureVector<byte> sign(const byte[], u32bit, const BigInt&) const;
-      SecureVector<byte> verify(const byte[], u32bit) const;
+      SecureVector<byte> sign(const byte[], length_type, const BigInt&) const;
+      SecureVector<byte> verify(const byte[], length_type) const;
 
       NR_Core& operator=(const NR_Core&);
 
@@ -84,8 +84,8 @@ class BOTAN_DLL NR_Core
 class BOTAN_DLL ELG_Core
    {
    public:
-      SecureVector<byte> encrypt(const byte[], u32bit, const BigInt&) const;
-      SecureVector<byte> decrypt(const byte[], u32bit) const;
+      SecureVector<byte> encrypt(const byte[], length_type, const BigInt&) const;
+      SecureVector<byte> decrypt(const byte[], length_type) const;
 
       ELG_Core& operator=(const ELG_Core&);
 
@@ -100,7 +100,7 @@ class BOTAN_DLL ELG_Core
    private:
       ELG_Operation* op;
       Blinder blinder;
-      u32bit p_bytes;
+      length_type p_bytes;
    };
 
 /*************************************************

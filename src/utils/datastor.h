@@ -48,7 +48,7 @@ class BOTAN_DLL Data_Store
 
       void add(const std::multimap<std::string, std::string>&);
       void add(const std::string&, const std::string&);
-      void add(const std::string&, u32bit);
+      void add(const std::string&, length_type);
       void add(const std::string&, const MemoryRegion<byte>&);
    private:
       std::multimap<std::string, std::string> contents;

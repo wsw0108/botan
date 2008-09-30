@@ -16,8 +16,8 @@ namespace Botan {
 class BOTAN_DLL Malloc_Allocator : public Allocator
    {
    public:
-      void* allocate(u32bit);
-      void deallocate(void*, u32bit);
+      void* allocate(length_type);
+      void deallocate(void*, length_type);
 
       std::string type() const { return "malloc"; }
    };
@@ -32,8 +32,8 @@ class BOTAN_DLL Locking_Allocator : public Pooling_Allocator
 
       std::string type() const { return "locking"; }
    private:
-      void* alloc_block(u32bit);
-      void dealloc_block(void*, u32bit);
+      void* alloc_block(length_type);
+      void dealloc_block(void*, length_type);
    };
 
 }

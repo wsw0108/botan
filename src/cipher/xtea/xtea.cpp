@@ -16,7 +16,7 @@ void XTEA::enc(const byte in[], byte out[]) const
    {
    u32bit L = load_be<u32bit>(in, 0), R = load_be<u32bit>(in, 1);
 
-   for(u32bit j = 0; j != 32; ++j)
+   for(length_type j = 0; j != 32; ++j)
       {
       L += (((R << 4) ^ (R >> 5)) + R) ^ EK[2*j];
       R += (((L << 4) ^ (L >> 5)) + L) ^ EK[2*j+1];
@@ -32,7 +32,7 @@ void XTEA::dec(const byte in[], byte out[]) const
    {
    u32bit L = load_be<u32bit>(in, 0), R = load_be<u32bit>(in, 1);
 
-   for(u32bit j = 32; j > 0; --j)
+   for(length_type j = 32; j > 0; --j)
       {
       R -= (((L << 4) ^ (L >> 5)) + L) ^ EK[2*j - 1];
       L -= (((R << 4) ^ (R >> 5)) + R) ^ EK[2*j - 2];
@@ -44,7 +44,7 @@ void XTEA::dec(const byte in[], byte out[]) const
 /*************************************************
 * XTEA Key Schedule                              *
 *************************************************/
-void XTEA::key(const byte key[], u32bit)
+void XTEA::key(const byte key[], length_type)
    {
    static const u32bit DELTAS[64] = {
       0x00000000, 0x9E3779B9, 0x9E3779B9, 0x3C6EF372, 0x3C6EF372, 0xDAA66D2B,
@@ -68,10 +68,10 @@ void XTEA::key(const byte key[], u32bit)
       0x02, 0x03, 0x03, 0x02 };
 
    SecureBuffer<u32bit, 4> UK;
-   for(u32bit j = 0; j != 4; ++j)
+   for(length_type j = 0; j != 4; ++j)
       UK[j] = load_be<u32bit>(key, j);
 
-   for(u32bit j = 0; j != 64; ++j)
+   for(length_type j = 0; j != 64; ++j)
       EK[j] = DELTAS[j] + UK[KEY_INDEX[j]];
    }
 

@@ -12,9 +12,9 @@ namespace Botan {
 /*************************************************
 * Update an ANSI X9.19 MAC Calculation           *
 *************************************************/
-void ANSI_X919_MAC::add_data(const byte input[], u32bit length)
+void ANSI_X919_MAC::add_data(const byte input[], length_type length)
    {
-   u32bit xored = std::min(8 - position, length);
+   length_type xored = std::min(8 - position, length);
    xor_buf(state + position, input, xored);
    position += xored;
 
@@ -51,7 +51,7 @@ void ANSI_X919_MAC::final_result(byte mac[])
 /*************************************************
 * ANSI X9.19 MAC Key Schedule                    *
 *************************************************/
-void ANSI_X919_MAC::key(const byte key[], u32bit length)
+void ANSI_X919_MAC::key(const byte key[], length_type length)
    {
    e->set_key(key, 8);
    if(length == 8) d->set_key(key, 8);

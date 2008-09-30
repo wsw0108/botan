@@ -122,15 +122,15 @@ void CAST_256::dec(const byte in[], byte out[]) const
 /*************************************************
 * CAST-256 Key Schedule                          *
 *************************************************/
-void CAST_256::key(const byte key[], u32bit length)
+void CAST_256::key(const byte key[], length_type length)
    {
    SecureBuffer<u32bit, 8> TMP;
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       TMP[j/4] = (TMP[j/4] << 8) + key[j];
 
    u32bit A = TMP[0], B = TMP[1], C = TMP[2], D = TMP[3],
           E = TMP[4], F = TMP[5], G = TMP[6], H = TMP[7];
-   for(u32bit j = 0; j != 48; j += 4)
+   for(length_type j = 0; j != 48; j += 4)
       {
       round1(G, H, KEY_MASK[4*j+ 0], KEY_ROT[(4*j+ 0) % 32]);
       round2(F, G, KEY_MASK[4*j+ 1], KEY_ROT[(4*j+ 1) % 32]);

@@ -20,7 +20,7 @@ class BOTAN_DLL DH_PublicKey : public virtual DL_Scheme_PublicKey
       std::string algo_name() const { return "DH"; }
 
       MemoryVector<byte> public_value() const;
-      u32bit max_input_bits() const;
+      length_type max_input_bits() const;
 
       DL_Group::Format group_format() const { return DL_Group::ANSI_X9_42; }
 
@@ -38,7 +38,7 @@ class BOTAN_DLL DH_PrivateKey : public DH_PublicKey,
                                 public virtual DL_Scheme_PrivateKey
    {
    public:
-      SecureVector<byte> derive_key(const byte[], u32bit) const;
+      SecureVector<byte> derive_key(const byte[], length_type) const;
       SecureVector<byte> derive_key(const DH_PublicKey&) const;
       SecureVector<byte> derive_key(const BigInt&) const;
 

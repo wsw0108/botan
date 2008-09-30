@@ -14,7 +14,7 @@ namespace Botan {
 *************************************************/
 void Tiger::hash(const byte input[])
    {
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       X[j] = load_le<u64bit>(input, j);
 
    u64bit A = digest[0], B = digest[1], C = digest[2];
@@ -23,7 +23,7 @@ void Tiger::hash(const byte input[])
    pass(C, A, B, X, 7); mix(X);
    pass(B, C, A, X, 9);
 
-   for(u32bit j = 3; j != PASS; ++j)
+   for(length_type j = 3; j != PASS; ++j)
       {
       mix(X);
       pass(A, B, C, X, 9);
@@ -38,7 +38,7 @@ void Tiger::hash(const byte input[])
 *************************************************/
 void Tiger::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; ++j)
+   for(length_type j = 0; j != OUTPUT_LENGTH; ++j)
       output[j] = get_byte(7 - (j % 8), digest[j/8]);
    }
 
@@ -140,7 +140,7 @@ std::string Tiger::name() const
 /*************************************************
 * Tiger Constructor                              *
 *************************************************/
-Tiger::Tiger(u32bit hashlen, u32bit pass) :
+Tiger::Tiger(length_type hashlen, length_type pass) :
    MDx_HashFunction(hashlen, 64, false, false), PASS(pass)
    {
    if(OUTPUT_LENGTH != 16 && OUTPUT_LENGTH != 20 && OUTPUT_LENGTH != 24)

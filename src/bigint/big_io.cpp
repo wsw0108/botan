@@ -26,7 +26,7 @@ std::ostream& operator<<(std::ostream& stream, const BigInt& n)
       if(n < 0)
          stream.write("-", 1);
       SecureVector<byte> buffer = BigInt::encode(n, base);
-      u32bit skip = 0;
+      length_type skip = 0;
       while(buffer[skip] == '0' && skip < buffer.size())
          ++skip;
       stream.write(reinterpret_cast<const char*>(buffer.begin()) + skip,

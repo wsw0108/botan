@@ -30,8 +30,8 @@ void DSA_PublicKey::X509_load_hook()
 /*************************************************
 * DSA Verification Function                      *
 *************************************************/
-bool DSA_PublicKey::verify(const byte msg[], u32bit msg_len,
-                           const byte sig[], u32bit sig_len) const
+bool DSA_PublicKey::verify(const byte msg[], length_type msg_len,
+                           const byte sig[], length_type sig_len) const
    {
    return core.verify(msg, msg_len, sig, sig_len);
    }
@@ -39,7 +39,7 @@ bool DSA_PublicKey::verify(const byte msg[], u32bit msg_len,
 /*************************************************
 * Return the maximum input size in bits          *
 *************************************************/
-u32bit DSA_PublicKey::max_input_bits() const
+length_type DSA_PublicKey::max_input_bits() const
    {
    return group_q().bits();
    }
@@ -47,7 +47,7 @@ u32bit DSA_PublicKey::max_input_bits() const
 /*************************************************
 * Return the size of each portion of the sig     *
 *************************************************/
-u32bit DSA_PublicKey::message_part_size() const
+length_type DSA_PublicKey::message_part_size() const
    {
    return group_q().bytes();
    }
@@ -89,7 +89,7 @@ void DSA_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
 /*************************************************
 * DSA Signature Operation                        *
 *************************************************/
-SecureVector<byte> DSA_PrivateKey::sign(const byte in[], u32bit length,
+SecureVector<byte> DSA_PrivateKey::sign(const byte in[], length_type length,
                                         RandomNumberGenerator& rng) const
    {
    const BigInt& q = group_q();

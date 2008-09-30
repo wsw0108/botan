@@ -43,9 +43,9 @@ void CTS_Encryption::encrypt(const byte block[])
 /*************************************************
 * Encrypt in CTS mode                            *
 *************************************************/
-void CTS_Encryption::write(const byte input[], u32bit length)
+void CTS_Encryption::write(const byte input[], length_type length)
    {
-   u32bit copied = std::min(BUFFER_SIZE - position, length);
+   length_type copied = std::min(BUFFER_SIZE - position, length);
    buffer.copy(position, input, copied);
    length -= copied;
    input += copied;
@@ -125,9 +125,9 @@ void CTS_Decryption::decrypt(const byte block[])
 /*************************************************
 * Decrypt in CTS mode                            *
 *************************************************/
-void CTS_Decryption::write(const byte input[], u32bit length)
+void CTS_Decryption::write(const byte input[], length_type length)
    {
-   u32bit copied = std::min(BUFFER_SIZE - position, length);
+   length_type copied = std::min(BUFFER_SIZE - position, length);
    buffer.copy(position, input, copied);
    length -= copied;
    input += copied;

@@ -18,31 +18,31 @@ namespace Botan {
 class BOTAN_DLL Randpool : public RandomNumberGenerator
    {
    public:
-      void randomize(byte[], u32bit);
+      void randomize(byte[], length_type);
       bool is_seeded() const;
       void clear() throw();
       std::string name() const;
 
       void reseed();
       void add_entropy_source(EntropySource*);
-      void add_entropy(const byte[], u32bit);
+      void add_entropy(const byte[], length_type);
 
       Randpool(BlockCipher*, MessageAuthenticationCode*,
-               u32bit pool_blocks = 32,
-               u32bit iterations_before_reseed = 128);
+               length_type pool_blocks = 32,
+               length_type iterations_before_reseed = 128);
 
       ~Randpool();
    private:
       void update_buffer();
       void mix_pool();
 
-      u32bit ITERATIONS_BEFORE_RESEED, POOL_BLOCKS;
+      length_type ITERATIONS_BEFORE_RESEED, POOL_BLOCKS;
       BlockCipher* cipher;
       MessageAuthenticationCode* mac;
 
       std::vector<EntropySource*> entropy_sources;
       SecureVector<byte> pool, buffer, counter;
-      u32bit entropy;
+      length_type entropy;
    };
 
 }

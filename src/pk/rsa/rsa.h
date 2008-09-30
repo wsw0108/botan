@@ -20,10 +20,10 @@ class BOTAN_DLL RSA_PublicKey : public PK_Encrypting_Key,
    public:
       std::string algo_name() const { return "RSA"; }
 
-      SecureVector<byte> encrypt(const byte[], u32bit,
+      SecureVector<byte> encrypt(const byte[], length_type,
                                  RandomNumberGenerator& rng) const;
 
-      SecureVector<byte> verify(const byte[], u32bit) const;
+      SecureVector<byte> verify(const byte[], length_type) const;
 
       RSA_PublicKey() {}
       RSA_PublicKey(const BigInt&, const BigInt&);
@@ -40,10 +40,10 @@ class BOTAN_DLL RSA_PrivateKey : public RSA_PublicKey,
                                  public IF_Scheme_PrivateKey
    {
    public:
-      SecureVector<byte> sign(const byte[], u32bit,
+      SecureVector<byte> sign(const byte[], length_type,
                               RandomNumberGenerator&) const;
 
-      SecureVector<byte> decrypt(const byte[], u32bit) const;
+      SecureVector<byte> decrypt(const byte[], length_type) const;
 
       bool check_key(RandomNumberGenerator& rng, bool) const;
 
@@ -55,7 +55,7 @@ class BOTAN_DLL RSA_PrivateKey : public RSA_PublicKey,
 
       RSA_PrivateKey(RandomNumberGenerator&, u32bit bits, u32bit = 65537);
    private:
-      BigInt private_op(const byte[], u32bit) const;
+      BigInt private_op(const byte[], length_type) const;
    };
 
 }

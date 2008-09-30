@@ -52,7 +52,7 @@ void Lion::dec(const byte in[], byte out[]) const
 /*************************************************
 * Lion Key Schedule                              *
 *************************************************/
-void Lion::key(const byte key[], u32bit length)
+void Lion::key(const byte key[], length_type length)
    {
    clear();
 

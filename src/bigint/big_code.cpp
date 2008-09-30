@@ -21,14 +21,14 @@ void BigInt::encode(byte output[], const BigInt& n, Base base)
       {
       SecureVector<byte> binary(n.encoded_size(Binary));
       n.binary_encode(binary);
-      for(u32bit j = 0; j != binary.size(); ++j)
+      for(length_type j = 0; j != binary.size(); ++j)
          Hex_Encoder::encode(binary[j], output + 2*j);
       }
    else if(base == Octal)
       {
       BigInt copy = n;
-      const u32bit output_size = n.encoded_size(Octal);
-      for(u32bit j = 0; j != output_size; ++j)
+      const length_type output_size = n.encoded_size(Octal);
+      for(length_type j = 0; j != output_size; ++j)
          {
          output[output_size - 1 - j] = Charset::digit2char(copy % 8);
          copy /= 8;
@@ -39,8 +39,8 @@ void BigInt::encode(byte output[], const BigInt& n, Base base)
       BigInt copy = n;
       BigInt remainder;
       copy.set_sign(Positive);
-      const u32bit output_size = n.encoded_size(Decimal);
-      for(u32bit j = 0; j != output_size; ++j)
+      const length_type output_size = n.encoded_size(Decimal);
+      for(length_type j = 0; j != output_size; ++j)
          {
          divide(copy, 10, copy, remainder);
          output[output_size - 1 - j] =
@@ -61,7 +61,7 @@ SecureVector<byte> BigInt::encode(const BigInt& n, Base base)
    SecureVector<byte> output(n.encoded_size(base));
    encode(output, n, base);
    if(base != Binary)
-      for(u32bit j = 0; j != output.size(); ++j)
+      for(length_type j = 0; j != output.size(); ++j)
          if(output[j] == 0)
             output[j] = '0';
    return output;
@@ -70,13 +70,13 @@ SecureVector<byte> BigInt::encode(const BigInt& n, Base base)
 /*************************************************
 * Encode a BigInt, with leading 0s if needed     *
 *************************************************/
-SecureVector<byte> BigInt::encode_1363(const BigInt& n, u32bit bytes)
+SecureVector<byte> BigInt::encode_1363(const BigInt& n, length_type bytes)
    {
-   const u32bit n_bytes = n.bytes();
+   const length_type n_bytes = n.bytes();
    if(n_bytes > bytes)
       throw Encoding_Error("encode_1363: n is too large to encode properly");
 
-   const u32bit leading_0s = bytes - n_bytes;
+   const length_type leading_0s = bytes - n_bytes;
 
    SecureVector<byte> output(bytes);
    encode(output + leading_0s, n, Binary);
@@ -94,7 +94,7 @@ BigInt BigInt::decode(const MemoryRegion<byte>& buf, Base base)
 /*************************************************
 * Decode a BigInt                                *
 *************************************************/
-BigInt BigInt::decode(const byte buf[], u32bit length, Base base)
+BigInt BigInt::decode(const byte buf[], length_type length, Base base)
    {
    BigInt r;
    if(base == Binary)
@@ -102,11 +102,11 @@ BigInt BigInt::decode(const byte buf[], u32bit length, Base base)
    else if(base == Hexadecimal)
       {
       SecureVector<byte> hex;
-      for(u32bit j = 0; j != length; ++j)
+      for(length_type j = 0; j != length; ++j)
          if(Hex_Decoder::is_valid(buf[j]))
             hex.append(buf[j]);
 
-      u32bit offset = (hex.size() % 2);
+      length_type offset = (hex.size() % 2);
       SecureVector<byte> binary(hex.size() / 2 + offset);
 
       if(offset)
@@ -115,14 +115,14 @@ BigInt BigInt::decode(const byte buf[], u32bit length, Base base)
          binary[0] = Hex_Decoder::decode(temp);
          }
 
-      for(u32bit j = offset; j != binary.size(); ++j)
+      for(length_type j = offset; j != binary.size(); ++j)
          binary[j] = Hex_Decoder::decode(hex+2*j-offset);
       r.binary_decode(binary, binary.size());
       }
    else if(base == Decimal || base == Octal)
       {
-      const u32bit RADIX = ((base == Decimal) ? 10 : 8);
-      for(u32bit j = 0; j != length; ++j)
+      const length_type RADIX = ((base == Decimal) ? 10 : 8);
+      for(length_type j = 0; j != length; ++j)
          {
          if(Charset::is_space(buf[j]))
             continue;

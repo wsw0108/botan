@@ -12,7 +12,7 @@ namespace Botan {
 /*************************************************
 * Generate a buffer of random bytes              *
 *************************************************/
-void ANSI_X931_RNG::randomize(byte out[], u32bit length)
+void ANSI_X931_RNG::randomize(byte out[], length_type length)
    {
    if(!is_seeded())
       reseed();
@@ -22,7 +22,7 @@ void ANSI_X931_RNG::randomize(byte out[], u32bit length)
       if(position == R.size())
          update_buffer();
 
-      const u32bit copied = std::min(length, R.size() - position);
+      const length_type copied = std::min(length, R.size() - position);
 
       copy_mem(out, R + position, copied);
       out += copied;

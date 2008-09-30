@@ -22,10 +22,10 @@ Filter::Filter()
 /*************************************************
 * Send data to all ports                         *
 *************************************************/
-void Filter::send(const byte input[], u32bit length)
+void Filter::send(const byte input[], length_type length)
    {
    bool nothing_attached = true;
-   for(u32bit j = 0; j != total_ports(); ++j)
+   for(length_type j = 0; j != total_ports(); ++j)
       if(next[j])
          {
          if(write_queue.has_items())
@@ -45,7 +45,7 @@ void Filter::send(const byte input[], u32bit length)
 void Filter::new_msg()
    {
    start_msg();
-   for(u32bit j = 0; j != total_ports(); ++j)
+   for(length_type j = 0; j != total_ports(); ++j)
       if(next[j])
          next[j]->new_msg();
    }
@@ -56,7 +56,7 @@ void Filter::new_msg()
 void Filter::finish_msg()
    {
    end_msg();
-   for(u32bit j = 0; j != total_ports(); ++j)
+   for(length_type j = 0; j != total_ports(); ++j)
       if(next[j])
          next[j]->finish_msg();
    }
@@ -78,7 +78,7 @@ void Filter::attach(Filter* new_filter)
 /*************************************************
 * Set the active port on a filter                *
 *************************************************/
-void Filter::set_port(u32bit new_port)
+void Filter::set_port(length_type new_port)
    {
    if(new_port >= total_ports())
       throw Invalid_Argument("Filter: Invalid port number");
@@ -98,7 +98,7 @@ Filter* Filter::get_next() const
 /*************************************************
 * Set the next Filters                           *
 *************************************************/
-void Filter::set_next(Filter* filters[], u32bit size)
+void Filter::set_next(Filter* filters[], length_type size)
    {
    while(size && filters && filters[size-1] == 0)
       --size;
@@ -109,14 +109,14 @@ void Filter::set_next(Filter* filters[], u32bit size)
    port_num = 0;
    filter_owns = 0;
 
-   for(u32bit j = 0; j != size; ++j)
+   for(length_type j = 0; j != size; ++j)
       next[j] = filters[j];
    }
 
 /*************************************************
 * Return the total number of ports               *
 *************************************************/
-u32bit Filter::total_ports() const
+length_type Filter::total_ports() const
    {
    return next.size();
    }

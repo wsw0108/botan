@@ -12,7 +12,7 @@ namespace Botan {
 /*************************************************
 * Combine cipher stream with message             *
 *************************************************/
-void ARC4::cipher(const byte in[], byte out[], u32bit length)
+void ARC4::cipher(const byte in[], byte out[], length_type length)
    {
    while(length >= buffer.size() - position)
       {
@@ -32,7 +32,7 @@ void ARC4::cipher(const byte in[], byte out[], u32bit length)
 void ARC4::generate()
    {
    u32bit SX, SY;
-   for(u32bit j = 0; j != buffer.size(); j += 4)
+   for(length_type j = 0; j != buffer.size(); j += 4)
       {
       SX = state[X+1]; Y = (Y + SX) % 256; SY = state[Y];
       state[X+1] = SY; state[Y] = SX;
@@ -57,17 +57,17 @@ void ARC4::generate()
 /*************************************************
 * ARC4 Key Schedule                              *
 *************************************************/
-void ARC4::key(const byte key[], u32bit length)
+void ARC4::key(const byte key[], length_type length)
    {
    clear();
-   for(u32bit j = 0; j != 256; ++j)
+   for(length_type j = 0; j != 256; ++j)
       state[j] = j;
-   for(u32bit j = 0, state_index = 0; j != 256; ++j)
+   for(length_type j = 0, state_index = 0; j != 256; ++j)
       {
       state_index = (state_index + key[j % length] + state[j]) % 256;
       std::swap(state[j], state[state_index]);
       }
-   for(u32bit j = 0; j <= SKIP; j += buffer.size())
+   for(length_type j = 0; j <= SKIP; j += buffer.size())
       generate();
    position += (SKIP % buffer.size());
    }
@@ -95,7 +95,7 @@ void ARC4::clear() throw()
 /*************************************************
 * ARC4 Constructor                               *
 *************************************************/
-ARC4::ARC4(u32bit s) : StreamCipher(1, 256), SKIP(s)
+ARC4::ARC4(length_type s) : StreamCipher(1, 256), SKIP(s)
    {
    clear();
    }

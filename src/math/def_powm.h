@@ -29,7 +29,7 @@ class BOTAN_DLL Fixed_Window_Exponentiator : public Modular_Exponentiator
    private:
       Modular_Reducer reducer;
       BigInt exp;
-      u32bit window_bits;
+      length_type window_bits;
       std::vector<BigInt> g;
       Power_Mod::Usage_Hints hints;
    };
@@ -53,7 +53,7 @@ class BOTAN_DLL Montgomery_Exponentiator : public Modular_Exponentiator
       BigInt R2, R_mod;
       std::vector<BigInt> g;
       word mod_prime;
-      u32bit mod_words, exp_bits, window_bits;
+      length_type mod_words, exp_bits, window_bits;
       Power_Mod::Usage_Hints hints;
    };
 

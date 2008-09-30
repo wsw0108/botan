@@ -17,7 +17,7 @@ namespace Botan {
 class BOTAN_DLL Filter
    {
    public:
-      virtual void write(const byte[], u32bit) = 0;
+      virtual void write(const byte[], length_type) = 0;
       virtual void start_msg() {}
       virtual void end_msg() {}
       virtual bool attachable() { return true; }
@@ -25,7 +25,7 @@ class BOTAN_DLL Filter
       void finish_msg();
       virtual ~Filter() {}
    protected:
-      void send(const byte[], u32bit);
+      void send(const byte[], length_type);
       void send(byte input) { send(&input, 1); }
       void send(const MemoryRegion<byte>& in) { send(in.begin(), in.size()); }
       Filter();
@@ -36,19 +36,19 @@ class BOTAN_DLL Filter
       friend class Pipe;
       friend class Fanout_Filter;
 
-      u32bit total_ports() const;
-      u32bit current_port() const { return port_num; }
-      void set_port(u32bit);
+      length_type total_ports() const;
+      length_type current_port() const { return port_num; }
+      void set_port(length_type);
 
-      u32bit owns() const { return filter_owns; }
+      length_type owns() const { return filter_owns; }
 
       void attach(Filter*);
-      void set_next(Filter*[], u32bit);
+      void set_next(Filter*[], length_type);
       Filter* get_next() const;
 
       SecureVector<byte> write_queue;
       std::vector<Filter*> next;
-      u32bit port_num, filter_owns;
+      length_type port_num, filter_owns;
       bool owned;
    };
 
@@ -60,8 +60,8 @@ class BOTAN_DLL Fanout_Filter : public Filter
    protected:
       void incr_owns() { ++filter_owns; }
 
-      void set_port(u32bit n) { Filter::set_port(n); }
-      void set_next(Filter* f[], u32bit n) { Filter::set_next(f, n); }
+      void set_port(length_type n) { Filter::set_port(n); }
+      void set_next(Filter* f[], length_type n) { Filter::set_next(f, n); }
       void attach(Filter* f) { Filter::attach(f); }
    };
 

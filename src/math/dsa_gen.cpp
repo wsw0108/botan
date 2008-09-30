@@ -17,7 +17,7 @@ namespace {
 /*************************************************
 * Check if this size is allowed by FIPS 186-3    *
 *************************************************/
-bool fips186_3_valid_size(u32bit pbits, u32bit qbits)
+bool fips186_3_valid_size(length_type pbits, length_type qbits)
    {
    if(qbits == 160)
       return (pbits == 512 || pbits == 768 || pbits == 1024);
@@ -38,7 +38,7 @@ bool fips186_3_valid_size(u32bit pbits, u32bit qbits)
 *************************************************/
 bool DL_Group::generate_dsa_primes(RandomNumberGenerator& rng,
                                    BigInt& p, BigInt& q,
-                                   u32bit pbits, u32bit qbits,
+                                   length_type pbits, length_type qbits,
                                    const MemoryRegion<byte>& seed_c)
    {
    if(!fips186_3_valid_size(pbits, qbits))
@@ -57,7 +57,7 @@ bool DL_Group::generate_dsa_primes(RandomNumberGenerator& rng,
 
    std::auto_ptr<HashFunction> hash(get_hash("SHA-" + to_string(qbits)));
 
-   const u32bit HASH_SIZE = hash->OUTPUT_LENGTH;
+   const length_type HASH_SIZE = hash->OUTPUT_LENGTH;
 
    class Seed
       {
@@ -68,7 +68,7 @@ bool DL_Group::generate_dsa_primes(RandomNumberGenerator& rng,
 
          Seed& operator++()
             {
-            for(u32bit j = seed.size(); j > 0; --j)
+            for(length_type j = seed.size(); j > 0; --j)
                if(++seed[j-1])
                   break;
             return (*this);
@@ -86,15 +86,15 @@ bool DL_Group::generate_dsa_primes(RandomNumberGenerator& rng,
    if(!is_prime(q, rng))
       return false;
 
-   const u32bit n = (pbits-1) / (HASH_SIZE * 8),
-                b = (pbits-1) % (HASH_SIZE * 8);
+   const length_type n = (pbits-1) / (HASH_SIZE * 8),
+                     b = (pbits-1) % (HASH_SIZE * 8);
 
    BigInt X;
    SecureVector<byte> V(HASH_SIZE * (n+1));
 
-   for(u32bit j = 0; j != 4096; ++j)
+   for(length_type j = 0; j != 4096; ++j)
       {
-      for(u32bit k = 0; k <= n; ++k)
+      for(length_type k = 0; k <= n; ++k)
          {
          ++seed;
          hash->update(seed);
@@ -118,7 +118,8 @@ bool DL_Group::generate_dsa_primes(RandomNumberGenerator& rng,
 *************************************************/
 SecureVector<byte> DL_Group::generate_dsa_primes(RandomNumberGenerator& rng,
                                                  BigInt& p, BigInt& q,
-                                                 u32bit pbits, u32bit qbits)
+                                                 length_type pbits,
+                                                 length_type qbits)
    {
    SecureVector<byte> seed(qbits/8);
 

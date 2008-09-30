@@ -17,7 +17,8 @@ class BOTAN_DLL SHA_64_BASE : public MDx_HashFunction
    {
    protected:
       void clear() throw();
-      SHA_64_BASE(u32bit out) : MDx_HashFunction(out, 128, true, true, 16) {}
+      SHA_64_BASE(length_type out) :
+         MDx_HashFunction(out, 128, true, true, 16) {}
       SecureBuffer<u64bit, 8> digest;
    private:
       void hash(const byte[]);

@@ -12,7 +12,7 @@ namespace Botan {
 /*************************************************
 * Update a HMAC Calculation                      *
 *************************************************/
-void HMAC::add_data(const byte input[], u32bit length)
+void HMAC::add_data(const byte input[], length_type length)
    {
    hash->update(input, length);
    }
@@ -32,7 +32,7 @@ void HMAC::final_result(byte mac[])
 /*************************************************
 * HMAC Key Schedule                              *
 *************************************************/
-void HMAC::key(const byte key[], u32bit length)
+void HMAC::key(const byte key[], length_type length)
    {
    hash->clear();
    std::fill(i_key.begin(), i_key.end(), 0x36);

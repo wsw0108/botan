@@ -30,14 +30,14 @@ namespace {
 void do_exec(const std::vector<std::string>& arg_list,
              const std::vector<std::string>& paths)
    {
-   const u32bit args = arg_list.size() - 1;
+   const length_type args = arg_list.size() - 1;
 
    const char* arg1 = (args >= 1) ? arg_list[1].c_str() : 0;
    const char* arg2 = (args >= 2) ? arg_list[2].c_str() : 0;
    const char* arg3 = (args >= 3) ? arg_list[3].c_str() : 0;
    const char* arg4 = (args >= 4) ? arg_list[4].c_str() : 0;
 
-   for(u32bit j = 0; j != paths.size(); j++)
+   for(length_type j = 0; j != paths.size(); j++)
       {
       const std::string full_path = paths[j] + "/" + arg_list[0];
       const char* fsname = full_path.c_str();
@@ -60,7 +60,7 @@ struct pipe_wrapper
 /*************************************************
 * Read from the pipe                             *
 *************************************************/
-u32bit DataSource_Command::read(byte buf[], u32bit length)
+length_type DataSource_Command::read(byte buf[], length_type length)
    {
    if(end_of_data())
       return 0;
@@ -86,13 +86,13 @@ u32bit DataSource_Command::read(byte buf[], u32bit length)
       return 0;
       }
 
-   return static_cast<u32bit>(got);
+   return static_cast<length_type>(got);
    }
 
 /*************************************************
 * Peek at the pipe contents                      *
 *************************************************/
-u32bit DataSource_Command::peek(byte[], u32bit, u32bit) const
+length_type DataSource_Command::peek(byte[], length_type, length_type) const
    {
    if(end_of_data())
       throw Invalid_State("DataSource_Command: Cannot peek when out of data");
@@ -131,7 +131,7 @@ std::string DataSource_Command::id() const
 void DataSource_Command::create_pipe(const std::vector<std::string>& paths)
    {
    bool found_something = false;
-   for(u32bit j = 0; j != paths.size(); j++)
+   for(length_type j = 0; j != paths.size(); j++)
       {
       const std::string full_path = paths[j] + "/" + arg_list[0];
       if(::access(full_path.c_str(), X_OK) == 0)

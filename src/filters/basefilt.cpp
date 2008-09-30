@@ -21,9 +21,9 @@ Chain::Chain(Filter* f1, Filter* f2, Filter* f3, Filter* f4)
 /*************************************************
 * Chain Constructor                              *
 *************************************************/
-Chain::Chain(Filter* filters[], u32bit count)
+Chain::Chain(Filter* filters[], length_type count)
    {
-   for(u32bit j = 0; j != count; ++j)
+   for(length_type j = 0; j != count; ++j)
       if(filters[j])
          {
          attach(filters[j]);
@@ -43,7 +43,7 @@ Fork::Fork(Filter* f1, Filter* f2, Filter* f3, Filter* f4)
 /*************************************************
 * Fork Constructor                               *
 *************************************************/
-Fork::Fork(Filter* filters[], u32bit count)
+Fork::Fork(Filter* filters[], length_type count)
    {
    set_next(filters, count);
    }
@@ -62,7 +62,7 @@ void Keyed_Filter::set_key(const SymmetricKey& key)
 /*************************************************
 * Check if a keylength is valid                  *
 *************************************************/
-bool Keyed_Filter::valid_keylength(u32bit n) const
+bool Keyed_Filter::valid_keylength(length_type n) const
    {
    if(base_ptr)
       return base_ptr->valid_keylength(n);

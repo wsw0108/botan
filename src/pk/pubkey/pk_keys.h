@@ -24,9 +24,9 @@ class BOTAN_DLL Public_Key
       virtual bool check_key(RandomNumberGenerator&, bool) const
          { return true; }
 
-      virtual u32bit message_parts() const { return 1; }
-      virtual u32bit message_part_size() const { return 0; }
-      virtual u32bit max_input_bits() const = 0;
+      virtual length_type message_parts() const { return 1; }
+      virtual length_type message_part_size() const { return 0; }
+      virtual length_type max_input_bits() const = 0;
 
       virtual class X509_Encoder* x509_encoder() const = 0;
       virtual class X509_Decoder* x509_decoder() = 0;
@@ -57,7 +57,7 @@ class BOTAN_DLL Private_Key : public virtual Public_Key
 class BOTAN_DLL PK_Encrypting_Key : public virtual Public_Key
    {
    public:
-      virtual SecureVector<byte> encrypt(const byte[], u32bit,
+      virtual SecureVector<byte> encrypt(const byte[], length_type,
                                          RandomNumberGenerator&) const = 0;
       virtual ~PK_Encrypting_Key() {}
    };
@@ -68,7 +68,7 @@ class BOTAN_DLL PK_Encrypting_Key : public virtual Public_Key
 class BOTAN_DLL PK_Decrypting_Key : public virtual Private_Key
    {
    public:
-      virtual SecureVector<byte> decrypt(const byte[], u32bit) const = 0;
+      virtual SecureVector<byte> decrypt(const byte[], length_type) const = 0;
       virtual ~PK_Decrypting_Key() {}
    };
 
@@ -78,7 +78,7 @@ class BOTAN_DLL PK_Decrypting_Key : public virtual Private_Key
 class BOTAN_DLL PK_Signing_Key : public virtual Private_Key
    {
    public:
-      virtual SecureVector<byte> sign(const byte[], u32bit,
+      virtual SecureVector<byte> sign(const byte[], length_type,
                                       RandomNumberGenerator& rng) const = 0;
       virtual ~PK_Signing_Key() {}
    };
@@ -89,7 +89,7 @@ class BOTAN_DLL PK_Signing_Key : public virtual Private_Key
 class BOTAN_DLL PK_Verifying_with_MR_Key : public virtual Public_Key
    {
    public:
-      virtual SecureVector<byte> verify(const byte[], u32bit) const = 0;
+      virtual SecureVector<byte> verify(const byte[], length_type) const = 0;
       virtual ~PK_Verifying_with_MR_Key() {}
    };
 
@@ -99,8 +99,8 @@ class BOTAN_DLL PK_Verifying_with_MR_Key : public virtual Public_Key
 class BOTAN_DLL PK_Verifying_wo_MR_Key : public virtual Public_Key
    {
    public:
-      virtual bool verify(const byte[], u32bit,
-                          const byte[], u32bit) const = 0;
+      virtual bool verify(const byte[], length_type,
+                          const byte[], length_type) const = 0;
       virtual ~PK_Verifying_wo_MR_Key() {}
    };
 
@@ -110,7 +110,9 @@ class BOTAN_DLL PK_Verifying_wo_MR_Key : public virtual Public_Key
 class BOTAN_DLL PK_Key_Agreement_Key : public virtual Private_Key
    {
    public:
-      virtual SecureVector<byte> derive_key(const byte[], u32bit) const = 0;
+      virtual SecureVector<byte> derive_key(const byte[],
+                                            length_type) const = 0;
+
       virtual MemoryVector<byte> public_value() const = 0;
       virtual ~PK_Key_Agreement_Key() {}
    };

@@ -65,7 +65,7 @@ void IDEA::enc(const byte in[], byte out[]) const
    u16bit X3 = load_be<u16bit>(in, 2);
    u16bit X4 = load_be<u16bit>(in, 3);
 
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       {
       X1 = mul(X1, EK[6*j+0]);
       X2 += EK[6*j+1];
@@ -103,7 +103,7 @@ void IDEA::dec(const byte in[], byte out[]) const
    u16bit X3 = load_be<u16bit>(in, 2);
    u16bit X4 = load_be<u16bit>(in, 3);
 
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       {
       X1 = mul(X1, DK[6*j+0]);
       X2 += DK[6*j+1];
@@ -134,12 +134,12 @@ void IDEA::dec(const byte in[], byte out[]) const
 /*************************************************
 * IDEA Key Schedule                              *
 *************************************************/
-void IDEA::key(const byte key[], u32bit)
+void IDEA::key(const byte key[], length_type)
    {
-   for(u32bit j = 0; j != 8; ++j)
+   for(length_type j = 0; j != 8; ++j)
       EK[j] = load_be<u16bit>(key, j);
 
-   for(u32bit j = 1, k = 8, offset = 0; k != 52; j %= 8, ++j, ++k)
+   for(length_type j = 1, k = 8, offset = 0; k != 52; j %= 8, ++j, ++k)
       {
       EK[j+7+offset] = static_cast<u16bit>((EK[(j     % 8) + offset] << 9) |
                                            (EK[((j+1) % 8) + offset] >> 7));
@@ -151,7 +151,7 @@ void IDEA::key(const byte key[], u32bit)
    DK[49] = -EK[1];
    DK[48] = mul_inv(EK[0]);
 
-   for(u32bit j = 1, k = 4, counter = 47; j != 8; ++j, k += 6)
+   for(length_type j = 1, k = 4, counter = 47; j != 8; ++j, k += 6)
       {
       DK[counter--] = EK[k+1];
       DK[counter--] = EK[k];

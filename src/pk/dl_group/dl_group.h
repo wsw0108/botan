@@ -1,6 +1,6 @@
 /*************************************************
 * Discrete Logarithm Group Header File           *
-* (C) 1999-2008 Jack Lloyd                       *
+* (C) 1999-2007 Jack Lloyd                       *
 *************************************************/
 
 #ifndef BOTAN_DL_PARAM_H__
@@ -54,9 +54,9 @@ class BOTAN_DLL DL_Group
       DL_Group();
       DL_Group(const std::string&);
 
-      DL_Group(RandomNumberGenerator& rng, PrimeType, u32bit, u32bit = 0);
+      DL_Group(RandomNumberGenerator& rng, PrimeType, length_type, length_type = 0);
       DL_Group(RandomNumberGenerator& rng, const MemoryRegion<byte>&,
-               u32bit = 1024, u32bit = 0);
+               length_type = 1024, length_type = 0);
 
       DL_Group(const BigInt& p, const BigInt& g);
       DL_Group(const BigInt& p, const BigInt& g, const BigInt& q);

@@ -17,15 +17,15 @@ namespace {
 u32bit choose_window_bits(u32bit exp_bits, u32bit,
                           Power_Mod::Usage_Hints hints)
    {
-   static const u32bit wsize[][2] = {
+   static const length_type wsize[][2] = {
       { 2048, 4 }, { 1024, 3 }, { 256, 2 }, { 128, 1 }, { 0, 0 }
    };
 
-   u32bit window_bits = 1;
+   length_type window_bits = 1;
 
    if(exp_bits)
       {
-      for(u32bit j = 0; wsize[j][0]; ++j)
+      for(length_type j = 0; wsize[j][0]; ++j)
          {
          if(exp_bits >= wsize[j][0])
             {
@@ -47,11 +47,11 @@ u32bit choose_window_bits(u32bit exp_bits, u32bit,
 * Montgomery Reduction                           *
 *************************************************/
 inline void montgomery_reduce(BigInt& out, MemoryRegion<word>& z_buf,
-                              const BigInt& x_bn, u32bit x_size, word u)
+                              const BigInt& x_bn, length_type x_size, word u)
    {
    const word* x = x_bn.data();
    word* z = z_buf.begin();
-   u32bit z_size = z_buf.size();
+   length_type z_size = z_buf.size();
 
    bigint_monty_redc(z, z_size, x, x_size, u);
 
@@ -89,12 +89,12 @@ void Montgomery_Exponentiator::set_base(const BigInt& base)
    montgomery_reduce(g[0], z, modulus, mod_words, mod_prime);
 
    const BigInt& x = g[0];
-   const u32bit x_sig = x.sig_words();
+   const length_type x_sig = x.sig_words();
 
-   for(u32bit j = 1; j != g.size(); ++j)
+   for(length_type j = 1; j != g.size(); ++j)
       {
       const BigInt& y = g[j-1];
-      const u32bit y_sig = y.sig_words();
+      const length_type y_sig = y.sig_words();
 
       z.clear();
       bigint_mul(z.begin(), z.size(), workspace,
@@ -110,15 +110,15 @@ void Montgomery_Exponentiator::set_base(const BigInt& base)
 *************************************************/
 BigInt Montgomery_Exponentiator::execute() const
    {
-   const u32bit exp_nibbles = (exp_bits + window_bits - 1) / window_bits;
+   const length_type exp_nibbles = (exp_bits + window_bits - 1) / window_bits;
 
    BigInt x = R_mod;
    SecureVector<word> z(2 * (mod_words + 1));
    SecureVector<word> workspace(2 * (mod_words + 1));
 
-   for(u32bit j = exp_nibbles; j > 0; --j)
+   for(length_type j = exp_nibbles; j > 0; --j)
       {
-      for(u32bit k = 0; k != window_bits; ++k)
+      for(length_type k = 0; k != window_bits; ++k)
          {
          z.clear();
          bigint_sqr(z.begin(), z.size(), workspace,
@@ -127,7 +127,7 @@ BigInt Montgomery_Exponentiator::execute() const
          montgomery_reduce(x, z, modulus, mod_words, mod_prime);
          }
 
-      u32bit nibble = exp.get_substring(window_bits*(j-1), window_bits);
+      length_type nibble = exp.get_substring(window_bits*(j-1), window_bits);
       if(nibble)
          {
          const BigInt& y = g[nibble-1];

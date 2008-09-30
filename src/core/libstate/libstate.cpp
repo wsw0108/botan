@@ -240,7 +240,7 @@ void Library_State::initialize(const InitializerOptions& args,
    cached_default_allocator = 0;
 
    std::vector<Allocator*> mod_allocs = modules.allocators(mutex_factory);
-   for(u32bit j = 0; j != mod_allocs.size(); ++j)
+   for(length_type j = 0; j != mod_allocs.size(); ++j)
       add_allocator(mod_allocs[j]);
 
    set_default_allocator(modules.default_allocator());
@@ -248,7 +248,7 @@ void Library_State::initialize(const InitializerOptions& args,
    load_default_config();
 
    std::vector<Engine*> mod_engines = modules.engines();
-   for(u32bit j = 0; j != mod_engines.size(); ++j)
+   for(length_type j = 0; j != mod_engines.size(); ++j)
       engines.push_back(mod_engines[j]);
 
 #if defined(BOTAN_HAS_SELFTEST)
@@ -279,7 +279,7 @@ Library_State::~Library_State()
 
    cached_default_allocator = 0;
 
-   for(u32bit j = 0; j != allocators.size(); ++j)
+   for(length_type j = 0; j != allocators.size(); ++j)
       {
       allocators[j]->destroy();
       delete allocators[j];

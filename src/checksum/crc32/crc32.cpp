@@ -11,7 +11,7 @@ namespace Botan {
 /*************************************************
 * Update a CRC32 Checksum                        *
 *************************************************/
-void CRC32::add_data(const byte input[], u32bit length)
+void CRC32::add_data(const byte input[], length_type length)
    {
    const u32bit TABLE[256] = {
       0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F,
@@ -81,7 +81,7 @@ void CRC32::add_data(const byte input[], u32bit length)
       length -= 16;
       }
 
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       tmp = TABLE[(tmp ^ input[j]) & 0xFF] ^ (tmp >> 8);
 
    crc = tmp;

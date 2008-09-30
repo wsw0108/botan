@@ -19,7 +19,7 @@ void RC5::enc(const byte in[], byte out[]) const
    u32bit A = load_le<u32bit>(in, 0), B = load_le<u32bit>(in, 1);
 
    A += S[0]; B += S[1];
-   for(u32bit j = 0; j != ROUNDS; j += 4)
+   for(length_type j = 0; j != ROUNDS; j += 4)
       {
       A = rotate_left(A ^ B, B % 32) + S[2*j+2];
       B = rotate_left(B ^ A, A % 32) + S[2*j+3];
@@ -41,7 +41,7 @@ void RC5::dec(const byte in[], byte out[]) const
    {
    u32bit A = load_le<u32bit>(in, 0), B = load_le<u32bit>(in, 1);
 
-   for(u32bit j = ROUNDS; j != 0; j -= 4)
+   for(length_type j = ROUNDS; j != 0; j -= 4)
       {
       B = rotate_right(B - S[2*j+1], A % 32) ^ A;
       A = rotate_right(A - S[2*j  ], B % 32) ^ B;
@@ -60,18 +60,20 @@ void RC5::dec(const byte in[], byte out[]) const
 /*************************************************
 * RC5 Key Schedule                               *
 *************************************************/
-void RC5::key(const byte key[], u32bit length)
+void RC5::key(const byte key[], length_type length)
    {
-   const u32bit WORD_KEYLENGTH = (((length - 1) / 4) + 1),
-                MIX_ROUNDS     = 3*std::max(WORD_KEYLENGTH, S.size());
+   const length_type WORD_KEYLENGTH = (((length - 1) / 4) + 1),
+                     MIX_ROUNDS     = 3*std::max(WORD_KEYLENGTH, S.size());
    S[0] = 0xB7E15163;
-   for(u32bit j = 1; j != S.size(); ++j)
+   for(length_type j = 1; j != S.size(); ++j)
       S[j] = S[j-1] + 0x9E3779B9;
 
    SecureBuffer<u32bit, 8> K;
    for(s32bit j = length-1; j >= 0; --j)
       K[j/4] = (K[j/4] << 8) + key[j];
-   for(u32bit j = 0, A = 0, B = 0; j != MIX_ROUNDS; ++j)
+
+   u32bit A = 0, B = 0;
+   for(length_type j = 0; j != MIX_ROUNDS; ++j)
       {
       A = rotate_left(S[j % S.size()] + A + B, 3);
       B = rotate_left(K[j % WORD_KEYLENGTH] + A + B, (A + B) % 32);
@@ -91,7 +93,7 @@ std::string RC5::name() const
 /*************************************************
 * RC5 Constructor                                *
 *************************************************/
-RC5::RC5(u32bit r) : BlockCipher(8, 1, 32), ROUNDS(r)
+RC5::RC5(length_type r) : BlockCipher(8, 1, 32), ROUNDS(r)
    {
    if(ROUNDS < 8 || ROUNDS > 32 || (ROUNDS % 4 != 0))
       throw Invalid_Argument(name() + ": Invalid number of rounds");

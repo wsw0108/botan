@@ -11,7 +11,7 @@ namespace Botan {
 /*************************************************
 * Constructor for Invalid_Key_Length             *
 *************************************************/
-Invalid_Key_Length::Invalid_Key_Length(const std::string& name, u32bit length)
+Invalid_Key_Length::Invalid_Key_Length(const std::string& name, length_type length)
    {
    set_msg(name + " cannot accept a key of length " + to_string(length));
    }
@@ -28,7 +28,7 @@ Invalid_Block_Size::Invalid_Block_Size(const std::string& mode,
 /*************************************************
 * Constructor for Invalid_IV_Length              *
 *************************************************/
-Invalid_IV_Length::Invalid_IV_Length(const std::string& mode, u32bit bad_len)
+Invalid_IV_Length::Invalid_IV_Length(const std::string& mode, length_type bad_len)
    {
    set_msg("IV length " + to_string(bad_len) + " is invalid for " + mode);
    }
@@ -52,7 +52,7 @@ Invalid_Algorithm_Name::Invalid_Algorithm_Name(const std::string& name)
 /*************************************************
 * Constructor for Config_Error                   *
 *************************************************/
-Config_Error::Config_Error(const std::string& err, u32bit line)
+Config_Error::Config_Error(const std::string& err, length_type line)
    {
    set_msg("Config error at line " + to_string(line) + ": " + err);
    }

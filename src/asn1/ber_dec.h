@@ -32,12 +32,12 @@ class BOTAN_DLL BER_Decoder
 
       BER_Decoder& decode_null();
       BER_Decoder& decode(bool&);
-      BER_Decoder& decode(u32bit&);
+      BER_Decoder& decode(length_type&);
       BER_Decoder& decode(class BigInt&);
       BER_Decoder& decode(MemoryRegion<byte>&, ASN1_Tag);
 
       BER_Decoder& decode(bool&, ASN1_Tag, ASN1_Tag = CONTEXT_SPECIFIC);
-      BER_Decoder& decode(u32bit&, ASN1_Tag, ASN1_Tag = CONTEXT_SPECIFIC);
+      BER_Decoder& decode(length_type&, ASN1_Tag, ASN1_Tag = CONTEXT_SPECIFIC);
       BER_Decoder& decode(class BigInt&,
                           ASN1_Tag, ASN1_Tag = CONTEXT_SPECIFIC);
       BER_Decoder& decode(MemoryRegion<byte>&, ASN1_Tag,
@@ -55,7 +55,7 @@ class BOTAN_DLL BER_Decoder
                                           ASN1_Tag, u16bit);
 
       BER_Decoder(DataSource&);
-      BER_Decoder(const byte[], u32bit);
+      BER_Decoder(const byte[], length_type);
       BER_Decoder(const MemoryRegion<byte>&);
       BER_Decoder(const BER_Decoder&);
       ~BER_Decoder();

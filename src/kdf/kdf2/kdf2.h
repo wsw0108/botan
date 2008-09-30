@@ -17,8 +17,8 @@ namespace Botan {
 class BOTAN_DLL KDF2 : public KDF
    {
    public:
-      SecureVector<byte> derive(u32bit, const byte[], u32bit,
-                                const byte[], u32bit) const;
+      SecureVector<byte> derive(length_type, const byte[], length_type,
+                                const byte[], length_type) const;
 
       KDF2(HashFunction* h) : hash(h) {}
       KDF2(const KDF2& other) : KDF(), hash(other.hash->clone()) {}

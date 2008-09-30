@@ -15,18 +15,18 @@ SecureVector<byte> emsa1_encoding(const MemoryRegion<byte>& msg,
    if(8*msg.size() <= output_bits)
       return msg;
 
-   u32bit shift = 8*msg.size() - output_bits;
+   length_type shift = 8*msg.size() - output_bits;
 
-   u32bit byte_shift = shift / 8, bit_shift = shift % 8;
+   length_type byte_shift = shift / 8, bit_shift = shift % 8;
    SecureVector<byte> digest(msg.size() - byte_shift);
 
-   for(u32bit j = 0; j != msg.size() - byte_shift; ++j)
+   for(length_type j = 0; j != msg.size() - byte_shift; ++j)
       digest[j] = msg[j];
 
    if(bit_shift)
       {
       byte carry = 0;
-      for(u32bit j = 0; j != digest.size(); ++j)
+      for(length_type j = 0; j != digest.size(); ++j)
          {
          byte temp = digest[j];
          digest[j] = (temp >> bit_shift) | carry;
@@ -70,7 +70,7 @@ SecureVector<byte> EMSA1::encoding_of(const MemoryRegion<byte>& msg,
 * EMSA1 Decode/Verify Operation                  *
 *************************************************/
 bool EMSA1::verify(const MemoryRegion<byte>& coded,
-                   const MemoryRegion<byte>& raw, u32bit key_bits) throw()
+                   const MemoryRegion<byte>& raw, length_type key_bits) throw()
    {
    try {
       if(raw.size() != hash->OUTPUT_LENGTH)
@@ -82,13 +82,13 @@ bool EMSA1::verify(const MemoryRegion<byte>& coded,
       if(our_coding[0] != 0) return false;
       if(our_coding.size() <= coded.size()) return false;
 
-      u32bit offset = 0;
+      length_type offset = 0;
       while(our_coding[offset] == 0 && offset < our_coding.size())
          ++offset;
       if(our_coding.size() - offset != coded.size())
          return false;
 
-      for(u32bit j = 0; j != coded.size(); ++j)
+      for(length_type j = 0; j != coded.size(); ++j)
          if(coded[j] != our_coding[j+offset])
             return false;
 

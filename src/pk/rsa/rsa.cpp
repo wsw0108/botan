@@ -33,7 +33,7 @@ BigInt RSA_PublicKey::public_op(const BigInt& i) const
 /*************************************************
 * RSA Encryption Function                        *
 *************************************************/
-SecureVector<byte> RSA_PublicKey::encrypt(const byte in[], u32bit len,
+SecureVector<byte> RSA_PublicKey::encrypt(const byte in[], length_type len,
                                           RandomNumberGenerator&) const
    {
    BigInt i(in, len);
@@ -43,7 +43,7 @@ SecureVector<byte> RSA_PublicKey::encrypt(const byte in[], u32bit len,
 /*************************************************
 * RSA Verification Function                      *
 *************************************************/
-SecureVector<byte> RSA_PublicKey::verify(const byte in[], u32bit len) const
+SecureVector<byte> RSA_PublicKey::verify(const byte in[], length_type len) const
    {
    BigInt i(in, len);
    return BigInt::encode(public_op(i));
@@ -95,7 +95,7 @@ RSA_PrivateKey::RSA_PrivateKey(RandomNumberGenerator& rng,
 /*************************************************
 * RSA Private Operation                          *
 *************************************************/
-BigInt RSA_PrivateKey::private_op(const byte in[], u32bit length) const
+BigInt RSA_PrivateKey::private_op(const byte in[], length_type length) const
    {
    BigInt i(in, length);
    if(i >= n)
@@ -110,7 +110,7 @@ BigInt RSA_PrivateKey::private_op(const byte in[], u32bit length) const
 /*************************************************
 * RSA Decryption Operation                       *
 *************************************************/
-SecureVector<byte> RSA_PrivateKey::decrypt(const byte in[], u32bit len) const
+SecureVector<byte> RSA_PrivateKey::decrypt(const byte in[], length_type len) const
    {
    return BigInt::encode(private_op(in, len));
    }
@@ -118,7 +118,7 @@ SecureVector<byte> RSA_PrivateKey::decrypt(const byte in[], u32bit len) const
 /*************************************************
 * RSA Signature Operation                        *
 *************************************************/
-SecureVector<byte> RSA_PrivateKey::sign(const byte in[], u32bit len,
+SecureVector<byte> RSA_PrivateKey::sign(const byte in[], length_type len,
                                         RandomNumberGenerator&) const
    {
    return BigInt::encode_1363(private_op(in, len), n.bytes());

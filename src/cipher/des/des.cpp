@@ -68,7 +68,7 @@ void DES::FP(u32bit& L, u32bit& R)
 *************************************************/
 void DES::raw_encrypt(u32bit& L, u32bit& R) const
    {
-   for(u32bit j = 0; j != 16; j += 2)
+   for(length_type j = 0; j != 16; j += 2)
       {
       u32bit T0, T1;
 
@@ -95,7 +95,7 @@ void DES::raw_encrypt(u32bit& L, u32bit& R) const
 *************************************************/
 void DES::raw_decrypt(u32bit& L, u32bit& R) const
    {
-   for(u32bit j = 16; j != 0; j -= 2)
+   for(length_type j = 16; j != 0; j -= 2)
       {
       u32bit T0, T1;
 
@@ -120,7 +120,7 @@ void DES::raw_decrypt(u32bit& L, u32bit& R) const
 /*************************************************
 * DES Key Schedule                               *
 *************************************************/
-void DES::key(const byte key[], u32bit)
+void DES::key(const byte key[], length_type)
    {
    static const byte ROT[16] = { 1, 1, 2, 2, 2, 2, 2, 2,
                                  1, 2, 2, 2, 2, 2, 2, 1 };
@@ -152,7 +152,7 @@ void DES::key(const byte key[], u32bit)
               ((key[1] & 0x08) <<  2) | ((key[0] & 0x08) <<  1) |
               ((key[3] & 0x10) >>  1) | ((key[2] & 0x10) >>  2) |
               ((key[1] & 0x10) >>  3) | ((key[0] & 0x10) >>  4);
-   for(u32bit j = 0; j != 16; ++j)
+   for(length_type j = 0; j != 16; ++j)
       {
       C = ((C << ROT[j]) | (C >> (28-ROT[j]))) & 0x0FFFFFFF;
       D = ((D << ROT[j]) | (D >> (28-ROT[j]))) & 0x0FFFFFFF;
@@ -216,7 +216,7 @@ void TripleDES::dec(const byte in[], byte out[]) const
 /*************************************************
 * TripleDES Key Schedule                         *
 *************************************************/
-void TripleDES::key(const byte key[], u32bit length)
+void TripleDES::key(const byte key[], length_type length)
    {
    des1.set_key(key, 8);
    des2.set_key(key + 8, 8);
@@ -249,7 +249,7 @@ void DESX::dec(const byte in[], byte out[]) const
 /*************************************************
 * DESX Key Schedule                              *
 *************************************************/
-void DESX::key(const byte key[], u32bit)
+void DESX::key(const byte key[], length_type)
    {
    K1.copy(key, 8);
    des.set_key(key + 8, 8);

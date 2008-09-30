@@ -333,17 +333,21 @@ void Serpent::dec(const byte in[], byte out[]) const
 /*************************************************
 * Serpent Key Schedule                           *
 *************************************************/
-void Serpent::key(const byte key[], u32bit length)
+void Serpent::key(const byte key[], length_type length)
    {
    const u32bit PHI = 0x9E3779B9;
 
    SecureBuffer<u32bit, 140> W;
-   for(u32bit j = 0; j != length / 4; ++j)
+   for(length_type j = 0; j != length / 4; ++j)
       W[j] = load_le<u32bit>(key, j);
 
    W[length / 4] |= u32bit(1) << ((length%4)*8);
-   for(u32bit j = 8; j != 140; ++j)
-      W[j] = rotate_left(W[j-8] ^ W[j-5] ^ W[j-3] ^ W[j-1] ^ PHI ^ (j-8), 11);
+   for(length_type j = 8; j != 140; ++j)
+      {
+      u32bit key_no = static_cast<u32bit>(j-8);
+      W[j] = rotate_left(W[j-8] ^ W[j-5] ^ W[j-3] ^ W[j-1] ^ PHI ^ key_no, 11);
+      }
+
    SBoxE4(W[  8],W[  9],W[ 10],W[ 11]); SBoxE3(W[ 12],W[ 13],W[ 14],W[ 15]);
    SBoxE2(W[ 16],W[ 17],W[ 18],W[ 19]); SBoxE1(W[ 20],W[ 21],W[ 22],W[ 23]);
    SBoxE8(W[ 24],W[ 25],W[ 26],W[ 27]); SBoxE7(W[ 28],W[ 29],W[ 30],W[ 31]);

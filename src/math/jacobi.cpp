@@ -32,7 +32,7 @@ s32bit jacobi(const BigInt& a, const BigInt& n)
       if(x.is_zero())
          return 0;
 
-      u32bit shifts = low_zero_bits(x);
+      length_type shifts = low_zero_bits(x);
       x >>= shifts;
       if(shifts % 2)
          {

@@ -12,10 +12,10 @@ namespace Botan {
 /*************************************************
 * Return a PKCS#5 PBKDF2 derived key             *
 *************************************************/
-OctetString PKCS5_PBKDF2::derive(u32bit key_len,
+OctetString PKCS5_PBKDF2::derive(length_type key_len,
                                  const std::string& passphrase,
-                                 const byte salt[], u32bit salt_size,
-                                 u32bit iterations) const
+                                 const byte salt[], length_type salt_size,
+                                 length_type iterations) const
    {
    if(iterations == 0)
       throw Invalid_Argument("PKCS#5 PBKDF2: Invalid iteration count");
@@ -42,7 +42,7 @@ OctetString PKCS5_PBKDF2::derive(u32bit key_len,
       mac->final(U);
       xor_buf(T, U, T_size);
 
-      for(u32bit j = 1; j != iterations; ++j)
+      for(length_type j = 1; j != iterations; ++j)
          {
          mac->update(U);
          mac->final(U);

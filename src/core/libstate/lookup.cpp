@@ -127,7 +127,7 @@ bool have_mac(const std::string& name)
 /*************************************************
 * Query the block size of a cipher or hash       *
 *************************************************/
-u32bit block_size_of(const std::string& name)
+length_type block_size_of(const std::string& name)
    {
    const BlockCipher* cipher = retrieve_block_cipher(global_state(), name);
    if(cipher)
@@ -143,7 +143,7 @@ u32bit block_size_of(const std::string& name)
 /*************************************************
 * Query the OUTPUT_LENGTH of a hash or MAC       *
 *************************************************/
-u32bit output_length_of(const std::string& name)
+length_type output_length_of(const std::string& name)
    {
    const HashFunction* hash = retrieve_hash(global_state(), name);
    if(hash)
@@ -159,7 +159,7 @@ u32bit output_length_of(const std::string& name)
 /*************************************************
 * Check if a keylength is valid for this algo    *
 *************************************************/
-bool valid_keylength_for(u32bit key_len, const std::string& name)
+bool valid_keylength_for(length_type key_len, const std::string& name)
    {
    const BlockCipher* bc = retrieve_block_cipher(global_state(), name);
    if(bc)
@@ -179,7 +179,7 @@ bool valid_keylength_for(u32bit key_len, const std::string& name)
 /*************************************************
 * Query the MINIMUM_KEYLENGTH of an algorithm    *
 *************************************************/
-u32bit min_keylength_of(const std::string& name)
+length_type min_keylength_of(const std::string& name)
    {
    const BlockCipher* bc = retrieve_block_cipher(global_state(), name);
    if(bc)
@@ -199,7 +199,7 @@ u32bit min_keylength_of(const std::string& name)
 /*************************************************
 * Query the MAXIMUM_KEYLENGTH of an algorithm    *
 *************************************************/
-u32bit max_keylength_of(const std::string& name)
+length_type max_keylength_of(const std::string& name)
    {
    const BlockCipher* bc = retrieve_block_cipher(global_state(), name);
    if(bc)
@@ -219,7 +219,7 @@ u32bit max_keylength_of(const std::string& name)
 /*************************************************
 * Query the KEYLENGTH_MULTIPLE of an algorithm   *
 *************************************************/
-u32bit keylength_multiple_of(const std::string& name)
+length_type keylength_multiple_of(const std::string& name)
    {
    const BlockCipher* bc = retrieve_block_cipher(global_state(), name);
    if(bc)

@@ -17,15 +17,15 @@ namespace {
 u32bit choose_window_bits(u32bit exp_bits, u32bit,
                           Power_Mod::Usage_Hints hints)
    {
-   static const u32bit wsize[][2] = {
+   static const length_type wsize[][2] = {
       { 2048, 7 }, { 1024, 6 }, { 256, 5 }, { 128, 4 }, { 64, 3 }, { 0, 0 }
    };
 
-   u32bit window_bits = 3;
+   length_type window_bits = 3;
 
    if(exp_bits)
       {
-      for(u32bit j = 0; wsize[j][0]; ++j)
+      for(length_type j = 0; wsize[j][0]; ++j)
          {
          if(exp_bits >= wsize[j][0])
             {
@@ -64,7 +64,7 @@ void Fixed_Window_Exponentiator::set_base(const BigInt& base)
 
    g.resize((1 << window_bits) - 1);
    g[0] = base;
-   for(u32bit j = 1; j != g.size(); ++j)
+   for(length_type j = 1; j != g.size(); ++j)
       g[j] = reducer.multiply(g[j-1], g[0]);
    }
 
@@ -73,15 +73,15 @@ void Fixed_Window_Exponentiator::set_base(const BigInt& base)
 *************************************************/
 BigInt Fixed_Window_Exponentiator::execute() const
    {
-   const u32bit exp_nibbles = (exp.bits() + window_bits - 1) / window_bits;
+   const length_type exp_nibbles = (exp.bits() + window_bits - 1) / window_bits;
 
    BigInt x = 1;
-   for(u32bit j = exp_nibbles; j > 0; --j)
+   for(length_type j = exp_nibbles; j > 0; --j)
       {
-      for(u32bit k = 0; k != window_bits; ++k)
+      for(length_type k = 0; k != window_bits; ++k)
          x = reducer.square(x);
 
-      u32bit nibble = exp.get_substring(window_bits*(j-1), window_bits);
+      length_type nibble = exp.get_substring(window_bits*(j-1), window_bits);
       if(nibble)
          x = reducer.multiply(x, g[nibble-1]);
       }

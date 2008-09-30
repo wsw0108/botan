@@ -40,7 +40,7 @@ void OID::clear()
 std::string OID::as_string() const
    {
    std::string oid_str;
-   for(u32bit j = 0; j != id.size(); ++j)
+   for(length_type j = 0; j != id.size(); ++j)
       {
       oid_str += to_string(id[j]);
       if(j != id.size() - 1)
@@ -56,7 +56,7 @@ bool OID::operator==(const OID& oid) const
    {
    if(id.size() != oid.id.size())
       return false;
-   for(u32bit j = 0; j != id.size(); ++j)
+   for(length_type j = 0; j != id.size(); ++j)
       if(id[j] != oid.id[j])
          return false;
    return true;
@@ -101,7 +101,7 @@ bool operator<(const OID& a, const OID& b)
       return true;
    if(oid1.size() > oid2.size())
       return false;
-   for(u32bit j = 0; j != oid1.size(); ++j)
+   for(length_type j = 0; j != oid1.size(); ++j)
       {
       if(oid1[j] < oid2[j])
          return true;
@@ -122,16 +122,16 @@ void OID::encode_into(DER_Encoder& der) const
    MemoryVector<byte> encoding;
    encoding.append(40 * id[0] + id[1]);
 
-   for(u32bit j = 2; j != id.size(); ++j)
+   for(length_type j = 2; j != id.size(); ++j)
       {
       if(id[j] == 0)
          encoding.append(0);
       else
          {
-         u32bit blocks = high_bit(id[j]) + 6;
+         length_type blocks = high_bit(id[j]) + 6;
          blocks = (blocks - (blocks % 7)) / 7;
 
-         for(u32bit k = 0; k != blocks - 1; ++k)
+         for(length_type k = 0; k != blocks - 1; ++k)
             encoding.append(0x80 | ((id[j] >> 7*(blocks-k-1)) & 0x7F));
          encoding.append(id[j] & 0x7F);
          }
@@ -156,7 +156,7 @@ void OID::decode_from(BER_Decoder& decoder)
    id.push_back(obj.value[0] / 40);
    id.push_back(obj.value[0] % 40);
 
-   u32bit j = 0;
+   length_type j = 0;
    while(j != obj.value.size() - 1)
       {
       u32bit component = 0;

@@ -18,10 +18,10 @@ namespace Botan {
 class EGD_EntropySource : public EntropySource
    {
    public:
-      u32bit slow_poll(byte[], u32bit);
+      length_type slow_poll(byte[], length_type);
       EGD_EntropySource(const std::vector<std::string>& p) : paths(p) {}
    private:
-      u32bit do_poll(byte[], u32bit, const std::string&) const;
+      length_type do_poll(byte[], length_type, const std::string&) const;
       const std::vector<std::string> paths;
    };
 

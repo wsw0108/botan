@@ -41,7 +41,7 @@ SecureVector<byte> emsa3_encoding(const MemoryRegion<byte>& msg,
 /*************************************************
 * EMSA3 Update Operation                         *
 *************************************************/
-void EMSA3::update(const byte input[], u32bit length)
+void EMSA3::update(const byte input[], length_type length)
    {
    hash->update(input, length);
    }
@@ -58,7 +58,7 @@ SecureVector<byte> EMSA3::raw_data()
 * EMSA3 Encode Operation                         *
 *************************************************/
 SecureVector<byte> EMSA3::encoding_of(const MemoryRegion<byte>& msg,
-                                      u32bit output_bits,
+                                      length_type output_bits,
                                       RandomNumberGenerator&)
    {
    return emsa3_encoding(msg, output_bits, hash_id,
@@ -70,7 +70,7 @@ SecureVector<byte> EMSA3::encoding_of(const MemoryRegion<byte>& msg,
 *************************************************/
 bool EMSA3::verify(const MemoryRegion<byte>& coded,
                    const MemoryRegion<byte>& raw,
-                   u32bit key_bits) throw()
+                   length_type key_bits) throw()
    {
    try
       {

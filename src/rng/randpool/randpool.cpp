@@ -28,7 +28,7 @@ enum RANDPOOL_PRF_TAG {
 /*************************************************
 * Generate a buffer of random bytes              *
 *************************************************/
-void Randpool::randomize(byte out[], u32bit length)
+void Randpool::randomize(byte out[], length_type length)
    {
    if(!is_seeded())
       {
@@ -41,7 +41,7 @@ void Randpool::randomize(byte out[], u32bit length)
    update_buffer();
    while(length)
       {
-      const u32bit copied = std::min(length, buffer.size());
+      const length_type copied = std::min(length, buffer.size());
       copy_mem(out, buffer.begin(), copied);
       out += copied;
       length -= copied;
@@ -56,7 +56,7 @@ void Randpool::update_buffer()
    {
    const u64bit timestamp = system_time();
 
-   for(u32bit j = 0; j != counter.size(); ++j)
+   for(length_type j = 0; j != counter.size(); ++j)
       if(++counter[j])
          break;
    store_be(timestamp, counter + 4);
@@ -65,7 +65,7 @@ void Randpool::update_buffer()
    mac->update(counter, counter.size());
    SecureVector<byte> mac_val = mac->final();
 
-   for(u32bit j = 0; j != mac_val.size(); ++j)
+   for(length_type j = 0; j != mac_val.size(); ++j)
       buffer[j % buffer.size()] ^= mac_val[j];
    cipher->encrypt(buffer);
 
@@ -78,7 +78,7 @@ void Randpool::update_buffer()
 *************************************************/
 void Randpool::mix_pool()
    {
-   const u32bit BLOCK_SIZE = cipher->BLOCK_SIZE;
+   const length_type BLOCK_SIZE = cipher->BLOCK_SIZE;
 
    mac->update(static_cast<byte>(MAC_KEY));
    mac->update(pool, pool.size());
@@ -90,7 +90,7 @@ void Randpool::mix_pool()
 
    xor_buf(pool, buffer, BLOCK_SIZE);
    cipher->encrypt(pool);
-   for(u32bit j = 1; j != POOL_BLOCKS; ++j)
+   for(length_type j = 1; j != POOL_BLOCKS; ++j)
       {
       const byte* previous_block = pool + BLOCK_SIZE*(j-1);
       byte* this_block = pool + BLOCK_SIZE*j;

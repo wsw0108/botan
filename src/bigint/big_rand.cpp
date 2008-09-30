@@ -11,7 +11,7 @@ namespace Botan {
 /*************************************************
 * Construct a BigInt of a specific form          *
 *************************************************/
-BigInt::BigInt(NumberType type, u32bit bits)
+BigInt::BigInt(NumberType type, length_type bits)
    {
    set_sign(Positive);
 
@@ -25,7 +25,7 @@ BigInt::BigInt(NumberType type, u32bit bits)
 * Randomize this number                          *
 *************************************************/
 void BigInt::randomize(RandomNumberGenerator& rng,
-                       u32bit bitsize)
+                       length_type bitsize)
    {
    set_sign(Positive);
 

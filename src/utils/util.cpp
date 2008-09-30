@@ -31,7 +31,7 @@ u32bit round_down(u32bit n, u32bit align_to)
 /*************************************************
 * Choose the exponent size for a DL group
 *************************************************/
-u32bit dl_work_factor(u32bit bits)
+length_type dl_work_factor(length_type n_bits)
    {
 #if 0
    /*
@@ -59,7 +59,7 @@ u32bit dl_work_factor(u32bit bits)
       2.76 * std::pow(log_x, 1.0/3.0) * std::pow(std::log(log_x), 2.0/3.0);
 
    if(strength > MIN_ESTIMATE)
-      return static_cast<u32bit>(strength);
+      return static_cast<length_type>(strength);
    return MIN_ESTIMATE;
 #endif
    }
@@ -67,15 +67,15 @@ u32bit dl_work_factor(u32bit bits)
 /*************************************************
 * Estimate the entropy of the buffer             *
 *************************************************/
-u32bit entropy_estimate(const byte buffer[], u32bit length)
+length_type entropy_estimate(const byte buffer[], length_type length)
    {
    if(length <= 4)
       return 0;
 
-   u32bit estimate = 0;
+   length_type estimate = 0;
    byte last = 0, last_delta = 0, last_delta2 = 0;
 
-   for(u32bit j = 0; j != length; ++j)
+   for(length_type j = 0; j != length; ++j)
       {
       byte delta = last ^ buffer[j];
       last = buffer[j];

@@ -16,7 +16,7 @@ std::ostream& operator<<(std::ostream& stream, Pipe& pipe)
    SecureVector<byte> buffer(DEFAULT_BUFFERSIZE);
    while(stream.good() && pipe.remaining())
       {
-      u32bit got = pipe.read(buffer, buffer.size());
+      length_type got = pipe.read(buffer, buffer.size());
       stream.write(reinterpret_cast<const char*>(buffer.begin()), got);
       }
    if(!stream.good())

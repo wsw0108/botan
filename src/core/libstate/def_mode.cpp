@@ -62,7 +62,7 @@ Keyed_Filter* Default_Engine::get_cipher(const std::string& algo_spec,
          return 0;
 
       std::string mode = algo_parts[1];
-      u32bit bits = 0;
+      length_type bits = 0;
 
       if(mode.find("CFB") != std::string::npos ||
          mode.find("EAX") != std::string::npos)

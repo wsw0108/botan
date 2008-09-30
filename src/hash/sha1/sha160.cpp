@@ -54,7 +54,7 @@ inline void F4(u32bit A, u32bit& B, u32bit C, u32bit D, u32bit& E, u32bit msg)
 *************************************************/
 void SHA_160::hash(const byte input[])
    {
-   for(u32bit j = 0; j != 16; j += 4)
+   for(length_type j = 0; j != 16; j += 4)
       {
       W[j  ] = load_be<u32bit>(input, j);
       W[j+1] = load_be<u32bit>(input, j+1);
@@ -62,7 +62,7 @@ void SHA_160::hash(const byte input[])
       W[j+3] = load_be<u32bit>(input, j+3);
       }
 
-   for(u32bit j = 16; j != 80; j += 4)
+   for(length_type j = 16; j != 80; j += 4)
       {
       W[j  ] = rotate_left((W[j-3] ^ W[j-8] ^ W[j-14] ^ W[j-16]), 1);
       W[j+1] = rotate_left((W[j-2] ^ W[j-7] ^ W[j-13] ^ W[j-15]), 1);
@@ -114,7 +114,7 @@ void SHA_160::hash(const byte input[])
 *************************************************/
 void SHA_160::copy_out(byte output[])
    {
-   for(u32bit j = 0; j != OUTPUT_LENGTH; j += 4)
+   for(length_type j = 0; j != OUTPUT_LENGTH; j += 4)
       store_be(digest[j/4], output + j);
    }
 

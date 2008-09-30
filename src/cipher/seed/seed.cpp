@@ -29,7 +29,7 @@ void SEED::enc(const byte in[], byte out[]) const
 
    G_FUNC G;
 
-   for(u32bit j = 0; j != 16; j += 2)
+   for(length_type j = 0; j != 16; j += 2)
       {
       u32bit T0, T1;
 
@@ -63,7 +63,7 @@ void SEED::dec(const byte in[], byte out[]) const
 
    G_FUNC G;
 
-   for(u32bit j = 0; j != 16; j += 2)
+   for(length_type j = 0; j != 16; j += 2)
       {
       u32bit T0, T1;
 
@@ -88,7 +88,7 @@ void SEED::dec(const byte in[], byte out[]) const
 /*************************************************
 * SEED Key Schedule                              *
 *************************************************/
-void SEED::key(const byte key[], u32bit)
+void SEED::key(const byte key[], length_type)
    {
    const u32bit RC[16] = {
       0x9E3779B9, 0x3C6EF373, 0x78DDE6E6, 0xF1BBCDCC,
@@ -99,12 +99,12 @@ void SEED::key(const byte key[], u32bit)
 
    SecureBuffer<u32bit, 4> WK;
 
-   for(u32bit j = 0; j != 4; ++j)
+   for(length_type j = 0; j != 4; ++j)
       WK[j] = load_be<u32bit>(key, j);
 
    G_FUNC G;
 
-   for(u32bit j = 0; j != 16; j += 2)
+   for(length_type j = 0; j != 16; j += 2)
       {
       K[2*j  ] = G(WK[0] + WK[2] - RC[j]);
       K[2*j+1] = G(WK[1] - WK[3] + RC[j]) ^ K[2*j];

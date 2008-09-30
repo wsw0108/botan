@@ -38,7 +38,7 @@ namespace Botan {
 /*************************************************
 * Byte Extraction Function                       *
 *************************************************/
-template<typename T> inline byte get_byte(u32bit byte_num, T input)
+template<typename T> inline byte get_byte(length_type byte_num, T input)
    {
    return (input >> ((sizeof(T)-1-(byte_num&(sizeof(T)-1))) << 3));
    }
@@ -76,27 +76,27 @@ inline u64bit make_u64bit(byte i0, byte i1, byte i2, byte i3,
 * Endian-Specific Word Loading Operations        *
 *************************************************/
 template<typename T>
-inline T load_be(const byte in[], u32bit off)
+inline T load_be(const byte in[], length_type off)
    {
    in += off * sizeof(T);
    T out = 0;
-   for(u32bit j = 0; j != sizeof(T); j++)
+   for(length_type j = 0; j != sizeof(T); j++)
       out = (out << 8) | in[j];
    return out;
    }
 
 template<typename T>
-inline T load_le(const byte in[], u32bit off)
+inline T load_le(const byte in[], length_type off)
    {
    in += off * sizeof(T);
    T out = 0;
-   for(u32bit j = 0; j != sizeof(T); j++)
+   for(length_type j = 0; j != sizeof(T); j++)
       out = (out << 8) | in[sizeof(T)-1-j];
    return out;
    }
 
 template<>
-inline u16bit load_be<u16bit>(const byte in[], u32bit off)
+inline u16bit load_be<u16bit>(const byte in[], length_type off)
    {
 #if BOTAN_TARGET_UNALIGNED_LOADSTOR_OK
    return BOTAN_ENDIAN_N2B(*(reinterpret_cast<const u16bit*>(in) + off));
@@ -107,7 +107,7 @@ inline u16bit load_be<u16bit>(const byte in[], u32bit off)
    }
 
 template<>
-inline u16bit load_le<u16bit>(const byte in[], u32bit off)
+inline u16bit load_le<u16bit>(const byte in[], length_type off)
    {
 #if BOTAN_TARGET_UNALIGNED_LOADSTOR_OK
    return BOTAN_ENDIAN_N2L(*(reinterpret_cast<const u16bit*>(in) + off));
@@ -118,7 +118,7 @@ inline u16bit load_le<u16bit>(const byte in[], u32bit off)
    }
 
 template<>
-inline u32bit load_be<u32bit>(const byte in[], u32bit off)
+inline u32bit load_be<u32bit>(const byte in[], length_type off)
    {
 #if BOTAN_TARGET_UNALIGNED_LOADSTOR_OK
    return BOTAN_ENDIAN_N2B(*(reinterpret_cast<const u32bit*>(in) + off));
@@ -129,7 +129,7 @@ inline u32bit load_be<u32bit>(const byte in[], u32bit off)
    }
 
 template<>
-inline u32bit load_le<u32bit>(const byte in[], u32bit off)
+inline u32bit load_le<u32bit>(const byte in[], length_type off)
    {
 #if BOTAN_TARGET_UNALIGNED_LOADSTOR_OK
    return BOTAN_ENDIAN_N2L(*(reinterpret_cast<const u32bit*>(in) + off));
@@ -140,7 +140,7 @@ inline u32bit load_le<u32bit>(const byte in[], u32bit off)
    }
 
 template<>
-inline u64bit load_be<u64bit>(const byte in[], u32bit off)
+inline u64bit load_be<u64bit>(const byte in[], length_type off)
    {
 #if BOTAN_TARGET_UNALIGNED_LOADSTOR_OK
    return BOTAN_ENDIAN_N2B(*(reinterpret_cast<const u64bit*>(in) + off));
@@ -152,7 +152,7 @@ inline u64bit load_be<u64bit>(const byte in[], u32bit off)
    }
 
 template<>
-inline u64bit load_le<u64bit>(const byte in[], u32bit off)
+inline u64bit load_le<u64bit>(const byte in[], length_type off)
    {
 #if BOTAN_TARGET_UNALIGNED_LOADSTOR_OK
    return BOTAN_ENDIAN_N2L(*(reinterpret_cast<const u64bit*>(in) + off));

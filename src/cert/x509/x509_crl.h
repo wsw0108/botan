@@ -29,7 +29,7 @@ class BOTAN_DLL X509_CRL : public X509_Object
       X509_DN issuer_dn() const;
       MemoryVector<byte> authority_key_id() const;
 
-      u32bit crl_number() const;
+      length_type crl_number() const;
       X509_Time this_update() const;
       X509_Time next_update() const;
 

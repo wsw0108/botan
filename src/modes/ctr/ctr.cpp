@@ -32,9 +32,9 @@ CTR_BE::CTR_BE(const std::string& cipher_name, const SymmetricKey& key,
 /*************************************************
 * CTR-BE Encryption/Decryption                   *
 *************************************************/
-void CTR_BE::write(const byte input[], u32bit length)
+void CTR_BE::write(const byte input[], length_type length)
    {
-   u32bit copied = std::min(BLOCK_SIZE - position, length);
+   length_type copied = std::min(BLOCK_SIZE - position, length);
    xor_buf(buffer + position, input, copied);
    send(buffer + position, copied);
    input += copied;

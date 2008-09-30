@@ -30,7 +30,7 @@ void NR_PublicKey::X509_load_hook()
 /*************************************************
 * Nyberg-Rueppel Verification Function           *
 *************************************************/
-SecureVector<byte> NR_PublicKey::verify(const byte sig[], u32bit sig_len) const
+SecureVector<byte> NR_PublicKey::verify(const byte sig[], length_type sig_len) const
    {
    return core.verify(sig, sig_len);
    }
@@ -38,7 +38,7 @@ SecureVector<byte> NR_PublicKey::verify(const byte sig[], u32bit sig_len) const
 /*************************************************
 * Return the maximum input size in bits          *
 *************************************************/
-u32bit NR_PublicKey::max_input_bits() const
+length_type NR_PublicKey::max_input_bits() const
    {
    return (group_q().bits() - 1);
    }
@@ -46,7 +46,7 @@ u32bit NR_PublicKey::max_input_bits() const
 /*************************************************
 * Return the size of each portion of the sig     *
 *************************************************/
-u32bit NR_PublicKey::message_part_size() const
+length_type NR_PublicKey::message_part_size() const
    {
    return group_q().bytes();
    }
@@ -89,7 +89,7 @@ void NR_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
 /*************************************************
 * Nyberg-Rueppel Signature Operation             *
 *************************************************/
-SecureVector<byte> NR_PrivateKey::sign(const byte in[], u32bit length,
+SecureVector<byte> NR_PrivateKey::sign(const byte in[], length_type length,
                                        RandomNumberGenerator& rng) const
    {
    const BigInt& q = group_q();

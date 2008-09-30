@@ -18,7 +18,7 @@ using namespace Botan;
 class ECB_Encryption_ErrorCheck : public Filter
    {
    public:
-      void write(const byte[], u32bit);
+      void write(const byte[], length_type);
       void end_msg();
       ECB_Encryption_ErrorCheck(const std::string& cipher_name,
                                 const std::string&,
@@ -37,14 +37,14 @@ class ECB_Encryption_ErrorCheck : public Filter
       ~ECB_Encryption_ErrorCheck()
          { delete cipher; delete input_hash; delete decrypt_hash; }
    private:
-      const u32bit BLOCKSIZE;
+      const length_type BLOCKSIZE;
       BlockCipher* cipher;
       SecureVector<byte> buffer;
-      u32bit position;
+      length_type position;
       HashFunction* input_hash, *decrypt_hash;
    };
 
-void ECB_Encryption_ErrorCheck::write(const byte input[], u32bit length)
+void ECB_Encryption_ErrorCheck::write(const byte input[], length_type length)
    {
    input_hash->update(input, length);
    buffer.copy(position, input, length);

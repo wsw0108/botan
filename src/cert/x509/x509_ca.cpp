@@ -88,8 +88,8 @@ X509_Certificate X509_CA::make_cert(PK_Signer* signer,
                                     const X509_DN& subject_dn,
                                     const Extensions& extensions)
    {
-   const u32bit X509_CERT_VERSION = 3;
-   const u32bit SERIAL_BITS = 128;
+   const length_type X509_CERT_VERSION = 3;
+   const length_type SERIAL_BITS = 128;
 
    BigInt serial_no(rng, SERIAL_BITS);
 
@@ -128,7 +128,7 @@ X509_Certificate X509_CA::make_cert(PK_Signer* signer,
 * Create a new, empty CRL                        *
 *************************************************/
 X509_CRL X509_CA::new_crl(RandomNumberGenerator& rng,
-                          u32bit next_update) const
+                          length_type next_update) const
    {
    std::vector<CRL_Entry> empty;
    return make_crl(empty, 1, next_update, rng);
@@ -140,7 +140,7 @@ X509_CRL X509_CA::new_crl(RandomNumberGenerator& rng,
 X509_CRL X509_CA::update_crl(const X509_CRL& crl,
                              const std::vector<CRL_Entry>& new_revoked,
                              RandomNumberGenerator& rng,
-                             u32bit next_update) const
+                             length_type next_update) const
    {
    std::vector<CRL_Entry> already_revoked = crl.get_revoked();
    std::vector<CRL_Entry> all_revoked;
@@ -151,7 +151,7 @@ X509_CRL X509_CA::update_crl(const X509_CRL& crl,
       throw Invalid_Argument("X509_CA::update_crl: Invalid CRL provided");
 
    std::set<SecureVector<byte> > removed_from_crl;
-   for(u32bit j = 0; j != new_revoked.size(); ++j)
+   for(length_type j = 0; j != new_revoked.size(); ++j)
       {
       if(new_revoked[j].reason_code() == DELETE_CRL_ENTRY)
          removed_from_crl.insert(new_revoked[j].serial_number());
@@ -159,7 +159,7 @@ X509_CRL X509_CA::update_crl(const X509_CRL& crl,
          all_revoked.push_back(new_revoked[j]);
       }
 
-   for(u32bit j = 0; j != already_revoked.size(); ++j)
+   for(length_type j = 0; j != already_revoked.size(); ++j)
       {
       std::set<SecureVector<byte> >::const_iterator i;
       i = removed_from_crl.find(already_revoked[j].serial_number());

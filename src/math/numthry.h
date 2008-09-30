@@ -44,7 +44,7 @@ BigInt ressol(const BigInt& x, const BigInt& p);
 /*************************************************
 * Utility Functions                              *
 *************************************************/
-u32bit BOTAN_DLL low_zero_bits(const BigInt&);
+length_type BOTAN_DLL low_zero_bits(const BigInt&);
 
 /*************************************************
 * Primality Testing                              *
@@ -90,7 +90,7 @@ class BOTAN_DLL MillerRabin_Test
       MillerRabin_Test(const BigInt&);
    private:
       BigInt n, r, n_minus_1;
-      u32bit s;
+      length_type s;
       Fixed_Exponent_Power_Mod pow_mod;
       Modular_Reducer reducer;
    };

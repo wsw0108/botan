@@ -75,9 +75,9 @@ SecureVector<byte> PKCS8_decode(DataSource& source, const User_Interface& ui,
    if(!is_encrypted)
       key = key_data;
 
-   const u32bit MAX_TRIES = 3;
+   const length_type MAX_TRIES = 3;
 
-   u32bit tries = 0;
+   length_type tries = 0;
    while(true)
       {
       try {
@@ -102,7 +102,7 @@ SecureVector<byte> PKCS8_decode(DataSource& source, const User_Interface& ui,
             key = decryptor.read_all();
             }
 
-         u32bit version;
+         length_type version;
 
          BER_Decoder(key)
             .start_cons(SEQUENCE)
@@ -139,7 +139,7 @@ void encode(const Private_Key& key, Pipe& pipe, X509_Encoding encoding)
    if(!encoder.get())
       throw Encoding_Error("PKCS8::encode: Key does not support encoding");
 
-   const u32bit PKCS8_VERSION = 0;
+   const length_type PKCS8_VERSION = 0;
 
    SecureVector<byte> contents =
       DER_Encoder()

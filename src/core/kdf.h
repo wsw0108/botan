@@ -17,22 +17,30 @@ namespace Botan {
 class BOTAN_DLL KDF
    {
    public:
-      SecureVector<byte> derive_key(u32bit, const MemoryRegion<byte>&,
+      SecureVector<byte> derive_key(length_type,
+                                    const MemoryRegion<byte>&,
                                     const std::string& = "") const;
-      SecureVector<byte> derive_key(u32bit, const MemoryRegion<byte>&,
-                                    const MemoryRegion<byte>&) const;
-      SecureVector<byte> derive_key(u32bit, const MemoryRegion<byte>&,
-                                    const byte[], u32bit) const;
 
-      SecureVector<byte> derive_key(u32bit, const byte[], u32bit,
+      SecureVector<byte> derive_key(length_type,
+                                    const MemoryRegion<byte>&,
+                                    const MemoryRegion<byte>&) const;
+
+      SecureVector<byte> derive_key(length_type,
+                                    const MemoryRegion<byte>&,
+                                    const byte[], length_type) const;
+
+      SecureVector<byte> derive_key(length_type,
+                                    const byte[], length_type,
                                     const std::string& = "") const;
-      SecureVector<byte> derive_key(u32bit, const byte[], u32bit,
-                                    const byte[], u32bit) const;
+
+      SecureVector<byte> derive_key(length_type, const byte[], length_type,
+                                    const byte[], length_type) const;
 
       virtual ~KDF() {}
    private:
-      virtual SecureVector<byte> derive(u32bit, const byte[], u32bit,
-                                        const byte[], u32bit) const = 0;
+      virtual SecureVector<byte> derive(length_type,
+                                        const byte[], length_type,
+                                        const byte[], length_type) const = 0;
    };
 
 /*************************************************
@@ -41,7 +49,8 @@ class BOTAN_DLL KDF
 class BOTAN_DLL MGF
    {
    public:
-      virtual void mask(const byte[], u32bit, byte[], u32bit) const = 0;
+      virtual void mask(const byte[], length_type,
+                        byte[], length_type) const = 0;
       virtual ~MGF() {}
    };
 

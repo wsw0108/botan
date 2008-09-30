@@ -33,13 +33,13 @@ class BOTAN_DLL X509_Cert_Options
       X509_Time start, end;
 
       bool is_CA;
-      u32bit path_limit;
+      length_type path_limit;
       Key_Constraints constraints;
       std::vector<OID> ex_constraints;
 
       void sanity_check() const;
 
-      void CA_key(u32bit = 8);
+      void CA_key(length_type = 8);
       void not_before(const std::string&);
       void not_after(const std::string&);
 
@@ -48,7 +48,7 @@ class BOTAN_DLL X509_Cert_Options
       void add_ex_constraint(const std::string&);
 
       X509_Cert_Options(const std::string& = "",
-                        u32bit expire = 365 * 24 * 60 * 60);
+                        length_type expire = 365 * 24 * 60 * 60);
    };
 
 namespace X509 {
