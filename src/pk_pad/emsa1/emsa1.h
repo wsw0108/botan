@@ -19,14 +19,14 @@ class BOTAN_DLL EMSA1 : public EMSA
       EMSA1(HashFunction* h) : hash(h) {}
       ~EMSA1() { delete hash; }
    private:
-      void update(const byte[], u32bit);
+      void update(const byte[], length_type);
       SecureVector<byte> raw_data();
 
-      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, u32bit,
+      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, length_type,
                                      RandomNumberGenerator& rng);
 
       bool verify(const MemoryRegion<byte>&, const MemoryRegion<byte>&,
-                  u32bit) throw();
+                  length_type) throw();
 
       HashFunction* hash;
    };

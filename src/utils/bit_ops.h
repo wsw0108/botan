@@ -84,28 +84,6 @@ inline u32bit ctz(T n)
    return 8*sizeof(T);
    }
 
-<<<<<<< variant A
->>>>>>> variant B
-/*************************************************
-* Simple Bit Manipulation                        *
-*************************************************/
-bool power_of_2(u64bit);
-length_type high_bit(u64bit);
-length_type low_bit(u64bit);
-length_type significant_bytes(u64bit);
-length_type hamming_weight(u64bit);
-
-####### Ancestor
-/*************************************************
-* Simple Bit Manipulation                        *
-*************************************************/
-bool power_of_2(u64bit);
-u32bit high_bit(u64bit);
-u32bit low_bit(u64bit);
-u32bit significant_bytes(u64bit);
-u32bit hamming_weight(u64bit);
-
-======= end
 }
 
 #endif

@@ -25,7 +25,7 @@ class BOTAN_DLL PK_Encryptor
       SecureVector<byte> encrypt(const MemoryRegion<byte>&,
                                  RandomNumberGenerator&) const;
 
-      virtual u32bit maximum_input_size() const = 0;
+      virtual length_type maximum_input_size() const = 0;
       virtual ~PK_Encryptor() {}
    private:
       virtual SecureVector<byte> enc(const byte[], length_type,

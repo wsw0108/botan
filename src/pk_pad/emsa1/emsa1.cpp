@@ -10,7 +10,7 @@ namespace Botan {
 namespace {
 
 SecureVector<byte> emsa1_encoding(const MemoryRegion<byte>& msg,
-                                  u32bit output_bits)
+                                  length_type output_bits)
    {
    if(8*msg.size() <= output_bits)
       return msg;
@@ -41,7 +41,7 @@ SecureVector<byte> emsa1_encoding(const MemoryRegion<byte>& msg,
 /*************************************************
 * EMSA1 Update Operation                         *
 *************************************************/
-void EMSA1::update(const byte input[], u32bit length)
+void EMSA1::update(const byte input[], length_type length)
    {
    hash->update(input, length);
    }
@@ -58,7 +58,7 @@ SecureVector<byte> EMSA1::raw_data()
 * EMSA1 Encode Operation                         *
 *************************************************/
 SecureVector<byte> EMSA1::encoding_of(const MemoryRegion<byte>& msg,
-                                      u32bit output_bits,
+                                      length_type output_bits,
                                       RandomNumberGenerator&)
    {
    if(msg.size() != hash->OUTPUT_LENGTH)

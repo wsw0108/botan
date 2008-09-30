@@ -16,13 +16,13 @@ namespace Botan {
 class BOTAN_DLL EMSA_Raw : public EMSA
    {
    private:
-      void update(const byte[], u32bit);
+      void update(const byte[], length_type);
       SecureVector<byte> raw_data();
 
-      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, u32bit,
+      SecureVector<byte> encoding_of(const MemoryRegion<byte>&, length_type,
                                      RandomNumberGenerator&);
       bool verify(const MemoryRegion<byte>&, const MemoryRegion<byte>&,
-                  u32bit) throw();
+                  length_type) throw();
 
       SecureVector<byte> message;
    };

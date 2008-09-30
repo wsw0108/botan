@@ -16,8 +16,8 @@ namespace Botan {
 class BOTAN_DLL EntropySource
    {
    public:
-      virtual u32bit slow_poll(byte[], u32bit) = 0;
-      virtual u32bit fast_poll(byte[], u32bit);
+      virtual length_type slow_poll(byte[], length_type) = 0;
+      virtual length_type fast_poll(byte[], length_type);
       virtual ~EntropySource() {}
    };
 
@@ -29,7 +29,7 @@ class BOTAN_DLL RandomNumberGenerator
    public:
       static RandomNumberGenerator* make_rng();
 
-      virtual void randomize(byte[], u32bit) = 0;
+      virtual void randomize(byte[], length_type) = 0;
       virtual bool is_seeded() const = 0;
       virtual void clear() throw() = 0;
 
@@ -37,7 +37,7 @@ class BOTAN_DLL RandomNumberGenerator
 
       virtual void reseed() {}
       virtual void add_entropy_source(EntropySource*) = 0;
-      virtual void add_entropy(const byte[], u32bit) = 0;
+      virtual void add_entropy(const byte[], length_type) = 0;
 
       RandomNumberGenerator() {}
       virtual ~RandomNumberGenerator() {}
@@ -53,11 +53,11 @@ class BOTAN_DLL RandomNumberGenerator
 class BOTAN_DLL Null_RNG : public RandomNumberGenerator
    {
    public:
-      void randomize(byte[], u32bit) { throw PRNG_Unseeded("Null_RNG"); }
+      void randomize(byte[], length_type) { throw PRNG_Unseeded("Null_RNG"); }
       void clear() throw() {};
 
       bool is_seeded() const { return false; }
-      void add_entropy(const byte[], u32bit) {}
+      void add_entropy(const byte[], length_type) {}
       void add_entropy_source(EntropySource* es) { delete es; }
    };
 

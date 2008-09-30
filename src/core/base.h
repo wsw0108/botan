@@ -105,7 +105,7 @@ class BOTAN_DLL BufferedComputation
 
       void final(byte out[]) { final_result(out); }
       SecureVector<byte> final();
-      SecureVector<byte> process(const byte[], u32bit);
+      SecureVector<byte> process(const byte[], length_type);
       SecureVector<byte> process(const MemoryRegion<byte>&);
       SecureVector<byte> process(const std::string&);
 

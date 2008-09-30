@@ -14,19 +14,19 @@ namespace {
 * EMSA3 Encode Operation                         *
 *************************************************/
 SecureVector<byte> emsa3_encoding(const MemoryRegion<byte>& msg,
-                                  u32bit output_bits,
+                                  length_type output_bits,
                                   const MemoryRegion<byte>& hash_id,
-                                  u32bit hash_size)
+                                  length_type hash_size)
    {
    if(msg.size() != hash_size)
       throw Encoding_Error("EMSA3::encoding_of: Bad input length");
 
-   u32bit output_length = output_bits / 8;
+   length_type output_length = output_bits / 8;
    if(output_length < hash_id.size() + hash_size + 10)
       throw Encoding_Error("EMSA3::pad: Output length is too small");
 
    SecureVector<byte> T(output_length);
-   const u32bit P_LENGTH = output_length - hash_size - hash_id.size() - 2;
+   const length_type P_LENGTH = output_length - hash_size - hash_id.size() - 2;
 
    T[0] = 0x01;
    set_mem(T+1, P_LENGTH, 0xFF);

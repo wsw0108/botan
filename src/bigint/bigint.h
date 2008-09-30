@@ -50,9 +50,9 @@ class BOTAN_DLL BigInt
 
       bool is_zero() const
          {
-         const u32bit sw = sig_words();
+         const length_type sw = sig_words();
 
-         for(u32bit i = 0; i != sw; ++i)
+         for(length_type i = 0; i != sw; ++i)
             if(reg[i])
                return false;
          return true;
@@ -66,7 +66,7 @@ class BOTAN_DLL BigInt
 
       bool get_bit(length_type) const;
       u32bit get_substring(u32bit, u32bit) const;
-      byte byte_at(u32bit) const;
+      byte byte_at(length_type) const;
 
       // same as operator[], remove this
       word word_at(length_type n) const
@@ -82,9 +82,9 @@ class BOTAN_DLL BigInt
       void set_sign(Sign);
       BigInt abs() const;
 
-      u32bit size() const { return get_reg().size(); }
+      length_type size() const { return get_reg().size(); }
 
-      u32bit sig_words() const
+      length_type sig_words() const
          {
          const word* x = reg.begin();
          length_type sig = reg.size();
@@ -94,8 +94,8 @@ class BOTAN_DLL BigInt
          return sig;
          }
 
-      u32bit bytes() const;
-      u32bit bits() const;
+      length_type bytes() const;
+      length_type bits() const;
 
       const word* data() const { return reg.begin(); }
       SecureVector<word>& get_reg() { return reg; }
@@ -104,11 +104,11 @@ class BOTAN_DLL BigInt
       void grow_reg(length_type);
       void grow_to(length_type);
 
-      word& operator[](u32bit i) { return reg[i]; }
-      word operator[](u32bit i) const { return reg[i]; }
+      word& operator[](length_type i) { return reg[i]; }
+      word operator[](length_type i) const { return reg[i]; }
       void clear() { get_reg().clear(); }
 
-      void randomize(RandomNumberGenerator& rng, u32bit n);
+      void randomize(RandomNumberGenerator& rng, length_type n);
 
       void binary_encode(byte[]) const;
       void binary_decode(const byte[], length_type);
@@ -131,7 +131,7 @@ class BOTAN_DLL BigInt
       BigInt(const BigInt&);
       BigInt(const std::string&);
       BigInt(const byte[], length_type, Base = Binary);
-      BigInt(RandomNumberGenerator& rng, u32bit bits);
+      BigInt(RandomNumberGenerator& rng, length_type bits);
       BigInt(Sign, length_type);
       BigInt(NumberType, length_type);
    private:
