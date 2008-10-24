@@ -15,7 +15,7 @@ namespace Botan {
 * DSA Public Key                                 *
 *************************************************/
 class BOTAN_DLL DSA_PublicKey : public PK_Verifying_wo_MR_Key,
-                                public virtual DL_Scheme_PublicKey
+                                public DL_Scheme_PublicKey
    {
    public:
       std::string algo_name() const { return "DSA"; }
@@ -38,11 +38,15 @@ class BOTAN_DLL DSA_PublicKey : public PK_Verifying_wo_MR_Key,
 /*************************************************
 * DSA Private Key                                *
 *************************************************/
-class BOTAN_DLL DSA_PrivateKey : public DSA_PublicKey,
-                                 public PK_Signing_Key,
-                                 public virtual DL_Scheme_PrivateKey
+class BOTAN_DLL DSA_PrivateKey : public PK_Signing_Key,
+                                 public DL_Scheme_PrivateKey
    {
    public:
+      /**
+        Return a new public key matching this private key
+      */
+      DSA_PublicKey* public_key() const;
+
       SecureVector<byte> sign(const byte[], u32bit,
                               RandomNumberGenerator& rng) const;
 
@@ -52,6 +56,8 @@ class BOTAN_DLL DSA_PrivateKey : public DSA_PublicKey,
       DSA_PrivateKey(RandomNumberGenerator&, const DL_Group&,
                      const BigInt& = 0);
    private:
+      DSA_Core core;
+
       void PKCS8_load_hook(RandomNumberGenerator& rng, bool = false);
    };
 

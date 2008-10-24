@@ -79,9 +79,49 @@ class BOTAN_DLL Public_Key
 /**
 * Private Key Base Class
 */
-class BOTAN_DLL Private_Key : public virtual Public_Key
+class BOTAN_DLL Private_Key
    {
    public:
+      /**
+      * Get the name of the underlying public key scheme.
+      * @return the name of the public key scheme
+      */
+      virtual std::string algo_name() const = 0;
+
+      /**
+      * Get the OID of the underlying public key scheme.
+      * @return the OID of the public key scheme
+      */
+      virtual OID get_oid() const;
+
+      /**
+      * Test the key values for consistency.
+      * @param rng rng to use
+      * @param strong whether to perform strong and lengthy version
+      * of the test
+      * @return true if the test is passed
+      */
+      virtual bool check_key(RandomNumberGenerator&, bool) const
+         { return true; }
+
+      /**
+      * Find out the number of message parts supported by this scheme.
+      * @return the number of message parts
+      */
+      virtual u32bit message_parts() const { return 1; }
+
+      /**
+      * Find out the message part size supported by this scheme/key.
+      * @return the size of the message parts
+      */
+      virtual u32bit message_part_size() const { return 0; }
+
+      /**
+      * Get the maximum message size in bits supported by this public key.
+      * @return the maximum message in bits
+      */
+      virtual u32bit max_input_bits() const = 0;
+
       /**
       * Get a PKCS#8 encoder that can be used to encode this key in PKCS#8 format.
       * @return an PKCS#8 encoder for this key
@@ -104,7 +144,7 @@ class BOTAN_DLL Private_Key : public virtual Public_Key
 /**
 * PK Encrypting Key.
 */
-class BOTAN_DLL PK_Encrypting_Key : public virtual Public_Key
+class BOTAN_DLL PK_Encrypting_Key : public Public_Key
    {
    public:
       virtual SecureVector<byte> encrypt(const byte[], u32bit,
@@ -115,7 +155,7 @@ class BOTAN_DLL PK_Encrypting_Key : public virtual Public_Key
 /**
 * PK Decrypting Key
 */
-class BOTAN_DLL PK_Decrypting_Key : public virtual Private_Key
+class BOTAN_DLL PK_Decrypting_Key : public Private_Key
    {
    public:
       virtual SecureVector<byte> decrypt(const byte[], u32bit) const = 0;
@@ -125,7 +165,7 @@ class BOTAN_DLL PK_Decrypting_Key : public virtual Private_Key
 /**
 * PK Signing Key
 */
-class BOTAN_DLL PK_Signing_Key : public virtual Private_Key
+class BOTAN_DLL PK_Signing_Key : public Private_Key
    {
    public:
       virtual SecureVector<byte> sign(const byte[], u32bit,
@@ -136,7 +176,7 @@ class BOTAN_DLL PK_Signing_Key : public virtual Private_Key
 /**
 * PK Verifying Key, Message Recovery Version
 */
-class BOTAN_DLL PK_Verifying_with_MR_Key : public virtual Public_Key
+class BOTAN_DLL PK_Verifying_with_MR_Key : public Public_Key
    {
    public:
       virtual SecureVector<byte> verify(const byte[], u32bit) const = 0;
@@ -146,7 +186,7 @@ class BOTAN_DLL PK_Verifying_with_MR_Key : public virtual Public_Key
 /**
 * PK Verifying Key, No Message Recovery Version
 */
-class BOTAN_DLL PK_Verifying_wo_MR_Key : public virtual Public_Key
+class BOTAN_DLL PK_Verifying_wo_MR_Key : public Public_Key
    {
    public:
       virtual bool verify(const byte[], u32bit,
@@ -157,7 +197,7 @@ class BOTAN_DLL PK_Verifying_wo_MR_Key : public virtual Public_Key
 /**
 * PK Secret Value Derivation Key
 */
-class BOTAN_DLL PK_Key_Agreement_Key : public virtual Private_Key
+class BOTAN_DLL PK_Key_Agreement_Key : public Private_Key
    {
    public:
       virtual SecureVector<byte> derive_key(const byte[], u32bit) const = 0;
