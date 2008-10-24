@@ -104,6 +104,14 @@ SecureVector<byte> DSA_PrivateKey::sign(const byte in[], u32bit length,
    return core.sign(in, length, k);
    }
 
+/**
+* Return the cooresponding public key
+*/
+DSA_PublicKey* DSA_PrivateKey::public_key() const
+   {
+   return new DSA_PublicKey(get_domain(), y);
+   }
+
 /*************************************************
 * Check Private DSA Parameters                   *
 *************************************************/

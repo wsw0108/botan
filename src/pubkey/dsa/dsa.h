@@ -27,6 +27,11 @@ class BOTAN_DLL DSA_PublicKey : public PK_Verifying_wo_MR_Key,
       bool verify(const byte[], u32bit, const byte[], u32bit) const;
       u32bit max_input_bits() const;
 
+      X509_Encoder* x509_encoder() const
+         { return DL_Scheme_PublicKey::x509_encoder(); }
+      X509_Decoder* x509_decoder()
+         { return DL_Scheme_PublicKey::x509_decoder(); }
+
       DSA_PublicKey() {}
       DSA_PublicKey(const DL_Group&, const BigInt&);
    protected:
@@ -51,6 +56,11 @@ class BOTAN_DLL DSA_PrivateKey : public PK_Signing_Key,
                               RandomNumberGenerator& rng) const;
 
       bool check_key(RandomNumberGenerator& rng, bool) const;
+
+      PKCS8_Encoder* pkcs8_encoder() const
+         { return DL_Scheme_PrivateKey::pkcs8_encoder(); }
+      PKCS8_Decoder* pkcs8_decoder(RandomNumberGenerator& rng)
+         { return DL_Scheme_PrivateKey::pkcs8_decoder(rng); }
 
       DSA_PrivateKey() {}
       DSA_PrivateKey(RandomNumberGenerator&, const DL_Group&,

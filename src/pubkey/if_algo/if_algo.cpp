@@ -13,14 +13,14 @@ namespace Botan {
 /*************************************************
 * Return the X.509 public key encoder            *
 *************************************************/
-X509_Encoder* IF_Scheme_PublicKey::x509_encoder() const
+X509_Encoder* IF_Scheme_PublicKey::x509_encoder(const OID& oid) const
    {
    class IF_Scheme_Encoder : public X509_Encoder
       {
       public:
          AlgorithmIdentifier alg_id() const
             {
-            return AlgorithmIdentifier(key->get_oid(),
+            return AlgorithmIdentifier(oid,
                                        AlgorithmIdentifier::USE_NULL_PARAM);
             }
 
@@ -34,12 +34,14 @@ X509_Encoder* IF_Scheme_PublicKey::x509_encoder() const
             .get_contents();
             }
 
-         IF_Scheme_Encoder(const IF_Scheme_PublicKey* k) : key(k) {}
+         IF_Scheme_Encoder(const IF_Scheme_PublicKey* k, const OID& o) :
+            key(k), oid(o) {}
       private:
          const IF_Scheme_PublicKey* key;
+         OID oid;
       };
 
-   return new IF_Scheme_Encoder(this);
+   return new IF_Scheme_Encoder(this, oid);
    }
 
 /*************************************************
@@ -75,14 +77,14 @@ X509_Decoder* IF_Scheme_PublicKey::x509_decoder()
 /*************************************************
 * Return the PKCS #8 public key encoder          *
 *************************************************/
-PKCS8_Encoder* IF_Scheme_PrivateKey::pkcs8_encoder() const
+PKCS8_Encoder* IF_Scheme_PrivateKey::pkcs8_encoder(const OID& oid) const
    {
    class IF_Scheme_Encoder : public PKCS8_Encoder
       {
       public:
          AlgorithmIdentifier alg_id() const
             {
-            return AlgorithmIdentifier(key->get_oid(),
+            return AlgorithmIdentifier(oid,
                                        AlgorithmIdentifier::USE_NULL_PARAM);
             }
 
@@ -103,12 +105,14 @@ PKCS8_Encoder* IF_Scheme_PrivateKey::pkcs8_encoder() const
             .get_contents();
             }
 
-         IF_Scheme_Encoder(const IF_Scheme_PrivateKey* k) : key(k) {}
+         IF_Scheme_Encoder(const IF_Scheme_PrivateKey* k, const OID& o) :
+            key(k), oid(o) {}
       private:
          const IF_Scheme_PrivateKey* key;
+         OID oid;
       };
 
-   return new IF_Scheme_Encoder(this);
+   return new IF_Scheme_Encoder(this, oid);
    }
 
 /*************************************************

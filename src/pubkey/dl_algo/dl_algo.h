@@ -7,6 +7,8 @@
 #define BOTAN_DL_ALGO_H__
 
 #include <botan/dl_group.h>
+#include <botan/x509_key.h>
+#include <botan/pkcs8.h>
 #include <botan/rng.h>
 
 namespace Botan {
@@ -58,7 +60,7 @@ class BOTAN_DLL DL_Scheme_PublicKey
       * Get an X509 encoder for this key.
       * @return an encoder usable to encode this key.
       */
-      X509_Encoder* x509_encoder() const;
+      X509_Encoder* x509_encoder(const OID& oid) const;
 
       /**
       * Get an X509 decoder for this key.
@@ -126,7 +128,7 @@ class BOTAN_DLL DL_Scheme_PrivateKey
       * Get an PKCS#8 encoder for this key.
       * @return an encoder usable to encode this key.
       */
-      PKCS8_Encoder* pkcs8_encoder() const;
+      PKCS8_Encoder* pkcs8_encoder(const OID& oid) const;
 
       /**
       * Get an PKCS#8 decoder for this key.
