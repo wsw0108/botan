@@ -7,6 +7,7 @@
 #include <botan/numthry.h>
 #include <botan/keypair.h>
 #include <botan/look_pk.h>
+#include <memory>
 
 namespace Botan {
 
@@ -103,6 +104,14 @@ SecureVector<byte> DSA_PrivateKey::sign(const byte in[], u32bit length,
    return core.sign(in, length, k);
    }
 
+/**
+* Return the cooresponding public key
+*/
+DSA_PublicKey* DSA_PrivateKey::public_key() const
+   {
+   return new DSA_PublicKey(get_domain(), y);
+   }
+
 /*************************************************
 * Check Private DSA Parameters                   *
 *************************************************/
@@ -116,9 +125,11 @@ bool DSA_PrivateKey::check_key(RandomNumberGenerator& rng, bool strong) const
 
    try
       {
+      std::auto_ptr<DSA_PublicKey> pubkey(this->public_key());
+
       KeyPair::check_key(rng,
                          get_pk_signer(*this, "EMSA1(SHA-1)"),
-                         get_pk_verifier(*this, "EMSA1(SHA-1)")
+                         get_pk_verifier(*pubkey, "EMSA1(SHA-1)")
          );
       }
    catch(Self_Test_Failure)
