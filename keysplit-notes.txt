@@ -1,0 +1,6 @@
+
+Problems:
+
+Forcing return of a new key object just to get the encoding of
+the public key is a pain in the ass.
+
