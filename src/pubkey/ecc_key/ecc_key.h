@@ -76,11 +76,8 @@ class BOTAN_DLL EC_PublicKey : public virtual Public_Key
          //assert(mp_public_point.get() == 0);
          }
 
-      /**
-      * Get an x509_encoder that can be used to encode this key.
-      * @result an x509_encoder for this key
-      */
-      X509_Encoder* x509_encoder() const;
+      std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+         subject_public_key_info() const;
 
       /**
       * Get an x509_decoder that can be used to decode a stored key into

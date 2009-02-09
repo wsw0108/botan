@@ -10,33 +10,15 @@
 
 namespace Botan {
 
-/*************************************************
-* Return the X.509 public key encoder            *
-*************************************************/
-X509_Encoder* DL_Scheme_PublicKey::x509_encoder() const
+std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+DL_Scheme_PublicKey::subject_public_key_info() const
    {
-   class DL_Scheme_Encoder : public X509_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            MemoryVector<byte> group =
-               key->group.DER_encode(key->group_format());
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              this->group.DER_encode(this->group_format()));
 
-            return AlgorithmIdentifier(key->get_oid(), group);
-            }
+   MemoryVector<byte> key_bits = DER_Encoder().encode(this->get_y()).get_contents();
 
-         MemoryVector<byte> key_bits() const
-            {
-            return DER_Encoder().encode(key->y).get_contents();
-            }
-
-         DL_Scheme_Encoder(const DL_Scheme_PublicKey* k) : key(k) {}
-      private:
-         const DL_Scheme_PublicKey* key;
-      };
-
-   return new DL_Scheme_Encoder(this);
+   return std::make_pair(alg_id, key_bits);
    }
 
 /*************************************************

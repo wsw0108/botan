@@ -61,33 +61,18 @@ void EC_PublicKey::X509_load_hook()
       }
    }
 
-X509_Encoder* EC_PublicKey::x509_encoder() const
+std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+EC_PublicKey::subject_public_key_info() const
    {
-   class EC_Key_Encoder : public X509_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            key->affirm_init();
+   this->affirm_init();
 
-            SecureVector<byte> params =
-               encode_der_ec_dompar(key->domain_parameters(), key->m_param_enc);
+   SecureVector<byte> params =
+      encode_der_ec_dompar(this->domain_parameters(), this->m_param_enc);
 
-            return AlgorithmIdentifier(key->get_oid(), params);
-            }
+   AlgorithmIdentifier alg_id(this->get_oid(), params);
+   MemoryVector<byte> key_bits = EC2OSP(*(this->mp_public_point), PointGFp::COMPRESSED);
 
-         MemoryVector<byte> key_bits() const
-            {
-            key->affirm_init();
-            return EC2OSP(*(key->mp_public_point), PointGFp::COMPRESSED);
-            }
-
-         EC_Key_Encoder(const EC_PublicKey* k): key(k) {}
-      private:
-         const EC_PublicKey* key;
-      };
-
-   return new EC_Key_Encoder(this);
+   return std::make_pair(alg_id, key_bits);
    }
 
 X509_Decoder* EC_PublicKey::x509_decoder()

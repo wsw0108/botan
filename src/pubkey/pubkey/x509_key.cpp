@@ -22,15 +22,14 @@ namespace X509 {
 *************************************************/
 void encode(const Public_Key& key, Pipe& pipe, X509_Encoding encoding)
    {
-   std::auto_ptr<X509_Encoder> encoder(key.x509_encoder());
-   if(!encoder.get())
-      throw Encoding_Error("X509::encode: Key does not support encoding");
+   std::pair<AlgorithmIdentifier, MemoryVector<byte> > sub_pubkey =
+      key.subject_public_key_info();
 
    MemoryVector<byte> der =
       DER_Encoder()
          .start_cons(SEQUENCE)
-            .encode(encoder->alg_id())
-            .encode(encoder->key_bits(), BIT_STRING)
+            .encode(sub_pubkey.first)
+            .encode(sub_pubkey.second, BIT_STRING)
          .end_cons()
       .get_contents();
 

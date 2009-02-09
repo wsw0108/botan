@@ -56,11 +56,8 @@ class BOTAN_DLL DL_Scheme_PublicKey : public virtual Public_Key
       */
       virtual DL_Group::Format group_format() const = 0;
 
-      /**
-      * Get an X509 encoder for this key.
-      * @return an encoder usable to encode this key.
-      */
-      X509_Encoder* x509_encoder() const;
+      std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+         subject_public_key_info() const;
 
       /**
       * Get an X509 decoder for this key.

@@ -8,7 +8,9 @@
 
 #include <botan/secmem.h>
 #include <botan/asn1_oid.h>
+#include <botan/alg_id.h>
 #include <botan/rng.h>
+#include <utility>
 
 namespace Botan {
 
@@ -59,10 +61,11 @@ class BOTAN_DLL Public_Key
       virtual u32bit max_input_bits() const = 0;
 
       /**
-      * Get an X509 encoder that can be used to encode this key in X509 format.
-      * @return an X509 encoder for this key
+      * Return data needed to encode as a subjectPublicKeyInfo
+      * @return algorithm identifier and key bits
       */
-      virtual class X509_Encoder* x509_encoder() const = 0;
+      virtual std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+         subject_public_key_info() const = 0;
 
       /**
       * Get an X509 decoder that can be used to set the values of this

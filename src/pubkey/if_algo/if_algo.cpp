@@ -10,36 +10,23 @@
 
 namespace Botan {
 
-/*************************************************
-* Return the X.509 public key encoder            *
-*************************************************/
-X509_Encoder* IF_Scheme_PublicKey::x509_encoder() const
+/**
+* Return the X.509 subjectPublicKeyInfo for a RSA/RW key
+*/
+std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+IF_Scheme_PublicKey::subject_public_key_info() const
    {
-   class IF_Scheme_Encoder : public X509_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            return AlgorithmIdentifier(key->get_oid(),
-                                       AlgorithmIdentifier::USE_NULL_PARAM);
-            }
+   DER_Encoder key_bits;
 
-         MemoryVector<byte> key_bits() const
-            {
-            return DER_Encoder()
-               .start_cons(SEQUENCE)
-                  .encode(key->n)
-                  .encode(key->e)
-               .end_cons()
-            .get_contents();
-            }
+   key_bits.start_cons(SEQUENCE)
+              .encode(this->get_n())
+              .encode(this->get_e())
+           .end_cons();
 
-         IF_Scheme_Encoder(const IF_Scheme_PublicKey* k) : key(k) {}
-      private:
-         const IF_Scheme_PublicKey* key;
-      };
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              AlgorithmIdentifier::USE_NULL_PARAM);
 
-   return new IF_Scheme_Encoder(this);
+   return std::make_pair(alg_id, key_bits.get_contents());
    }
 
 /*************************************************
