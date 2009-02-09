@@ -136,18 +136,17 @@ SecureVector<byte> PKCS8_decode(DataSource& source, const User_Interface& ui,
 *************************************************/
 void encode(const Private_Key& key, Pipe& pipe, X509_Encoding encoding)
    {
-   std::auto_ptr<PKCS8_Encoder> encoder(key.pkcs8_encoder());
-   if(!encoder.get())
-      throw Encoding_Error("PKCS8::encode: Key does not support encoding");
-
    const u32bit PKCS8_VERSION = 0;
+
+   std::pair<AlgorithmIdentifier, SecureVector<byte> > pkcs8_encoding =
+      key.pkcs8_encoding();
 
    SecureVector<byte> contents =
       DER_Encoder()
          .start_cons(SEQUENCE)
             .encode(PKCS8_VERSION)
-            .encode(encoder->alg_id())
-            .encode(encoder->key_bits(), OCTET_STRING)
+            .encode(pkcs8_encoding.first)
+            .encode(pkcs8_encoding.second, OCTET_STRING)
          .end_cons()
       .get_contents();
 

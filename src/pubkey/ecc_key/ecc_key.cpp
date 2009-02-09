@@ -158,44 +158,28 @@ void EC_PrivateKey::generate_private_key(RandomNumberGenerator& rng)
    tmp_private_value.swap(m_private_value);
    }
 
-/**
-* Return the PKCS #8 public key encoder
-**/
-PKCS8_Encoder* EC_PrivateKey::pkcs8_encoder() const
+std::pair<AlgorithmIdentifier, SecureVector<byte> >
+EC_PrivateKey::pkcs8_encoding() const
    {
-   class EC_Key_Encoder : public PKCS8_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            key->affirm_init();
+   this->affirm_init();
 
-            SecureVector<byte> params =
-               encode_der_ec_dompar(key->domain_parameters(), ENC_EXPLICIT);
+   MemoryVector<byte> params =
+      encode_der_ec_dompar(this->domain_parameters(), ENC_EXPLICIT);
 
-            return AlgorithmIdentifier(key->get_oid(), params);
-            }
+   AlgorithmIdentifier alg_id(this->get_oid(), params);
 
-         MemoryVector<byte> key_bits() const
-            {
-            key->affirm_init();
-            SecureVector<byte> octstr_secret =
-               BigInt::encode_1363(key->m_private_value, key->m_private_value.bytes());
+   SecureVector<byte> octstr_secret =
+      BigInt::encode_1363(this->m_private_value, this->m_private_value.bytes());
 
-            return DER_Encoder()
-               .start_cons(SEQUENCE)
-               .encode(BigInt(1))
-               .encode(octstr_secret, OCTET_STRING)
-               .end_cons()
-               .get_contents();
-            }
+   SecureVector<byte> key_bits =
+      DER_Encoder()
+      .start_cons(SEQUENCE)
+         .encode(BigInt(1))
+         .encode(octstr_secret, OCTET_STRING)
+      .end_cons()
+      .get_contents();
 
-         EC_Key_Encoder(const EC_PrivateKey* k): key(k) {}
-      private:
-         const EC_PrivateKey* key;
-      };
-
-   return new EC_Key_Encoder(this);
+   return std::make_pair(alg_id, key_bits);
    }
 
 /**

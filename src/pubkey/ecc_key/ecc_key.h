@@ -110,11 +110,8 @@ class BOTAN_DLL EC_PrivateKey : public virtual EC_PublicKey, public virtual Priv
    {
    public:
 
-      /**
-      * Get an PKCS#8 encoder that can be used to encoded this key.
-      * @result an PKCS#8 encoder for this key
-      */
-      PKCS8_Encoder* pkcs8_encoder() const;
+      std::pair<AlgorithmIdentifier, SecureVector<byte> >
+         pkcs8_encoding() const;
 
       /**
       * Get an PKCS#8 decoder that can be used to decoded a stored key into

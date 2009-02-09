@@ -59,43 +59,28 @@ X509_Decoder* IF_Scheme_PublicKey::x509_decoder()
    return new IF_Scheme_Decoder(this);
    }
 
-/*************************************************
-* Return the PKCS #8 public key encoder          *
-*************************************************/
-PKCS8_Encoder* IF_Scheme_PrivateKey::pkcs8_encoder() const
+std::pair<AlgorithmIdentifier, SecureVector<byte> >
+IF_Scheme_PrivateKey::pkcs8_encoding() const
    {
-   class IF_Scheme_Encoder : public PKCS8_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            return AlgorithmIdentifier(key->get_oid(),
-                                       AlgorithmIdentifier::USE_NULL_PARAM);
-            }
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              AlgorithmIdentifier::USE_NULL_PARAM);
 
-         MemoryVector<byte> key_bits() const
-            {
-            return DER_Encoder()
-               .start_cons(SEQUENCE)
-                  .encode(static_cast<u32bit>(0))
-                  .encode(key->n)
-                  .encode(key->e)
-                  .encode(key->d)
-                  .encode(key->p)
-                  .encode(key->q)
-                  .encode(key->d1)
-                  .encode(key->d2)
-                  .encode(key->c)
-               .end_cons()
-            .get_contents();
-            }
+   SecureVector<byte> key_bits =
+      DER_Encoder()
+        .start_cons(SEQUENCE)
+           .encode(static_cast<u32bit>(0))
+           .encode(this->n)
+           .encode(this->e)
+           .encode(this->d)
+           .encode(this->p)
+           .encode(this->q)
+           .encode(this->d1)
+           .encode(this->d2)
+           .encode(this->c)
+        .end_cons()
+        .get_contents();
 
-         IF_Scheme_Encoder(const IF_Scheme_PrivateKey* k) : key(k) {}
-      private:
-         const IF_Scheme_PrivateKey* key;
-      };
-
-   return new IF_Scheme_Encoder(this);
+   return std::make_pair(alg_id, key_bits);
    }
 
 /*************************************************

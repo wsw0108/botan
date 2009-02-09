@@ -49,33 +49,16 @@ X509_Decoder* DL_Scheme_PublicKey::x509_decoder()
    return new DL_Scheme_Decoder(this);
    }
 
-/*************************************************
-* Return the PKCS #8 private key encoder         *
-*************************************************/
-PKCS8_Encoder* DL_Scheme_PrivateKey::pkcs8_encoder() const
+std::pair<AlgorithmIdentifier, SecureVector<byte> >
+DL_Scheme_PrivateKey::pkcs8_encoding() const
    {
-   class DL_Scheme_Encoder : public PKCS8_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            MemoryVector<byte> group =
-               key->group.DER_encode(key->group_format());
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              this->group.DER_encode(this->group_format()));
 
-            return AlgorithmIdentifier(key->get_oid(), group);
-            }
+   SecureVector<byte> key_bits =
+      DER_Encoder().encode(this->get_x()).get_contents();
 
-         MemoryVector<byte> key_bits() const
-            {
-            return DER_Encoder().encode(key->x).get_contents();
-            }
-
-         DL_Scheme_Encoder(const DL_Scheme_PrivateKey* k) : key(k) {}
-      private:
-         const DL_Scheme_PrivateKey* key;
-      };
-
-   return new DL_Scheme_Encoder(this);
+   return std::make_pair(alg_id, key_bits);
    }
 
 /*************************************************
