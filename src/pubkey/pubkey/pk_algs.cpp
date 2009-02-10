@@ -68,7 +68,7 @@ Public_Key* get_public_key(const std::string& alg_name)
    if(alg_name == "ECDSA") return new ECDSA_PublicKey;
 #endif
 
-   return 0;
+   throw Lookup_Error("PK algorithm " + alg_name + " not found");
    }
 
 /*************************************************
@@ -104,7 +104,7 @@ Private_Key* get_private_key(const std::string& alg_name)
    if(alg_name == "ECDSA") return new ECDSA_PrivateKey;
 #endif
 
-   return 0;
+   throw Lookup_Error("PK algorithm " + alg_name + " not found");
    }
 
 }
