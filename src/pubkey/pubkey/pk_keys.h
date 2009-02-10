@@ -1,7 +1,7 @@
-/*************************************************
-* PK Key Types Header File                       *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* PK Key Types Header File
+* (C) 1999-2009 Jack Lloyd
+*/
 
 #ifndef BOTAN_PK_KEYS_H__
 #define BOTAN_PK_KEYS_H__
@@ -66,13 +66,6 @@ class BOTAN_DLL Public_Key
       */
       virtual std::pair<AlgorithmIdentifier, MemoryVector<byte> >
          subject_public_key_info() const = 0;
-
-      /**
-      * Get an X509 decoder that can be used to set the values of this
-      * key based on an X509 encoded key object.
-      * @return an X509 decoder for this key
-      */
-      virtual class X509_Decoder* x509_decoder() = 0;
 
       virtual ~Public_Key() {}
    protected:
@@ -169,9 +162,9 @@ class BOTAN_DLL PK_Key_Agreement_Key : public virtual Private_Key
       virtual ~PK_Key_Agreement_Key() {}
    };
 
-/*************************************************
-* Typedefs                                       *
-*************************************************/
+/**
+* Typedefs
+*/
 typedef PK_Key_Agreement_Key PK_KA_Key;
 typedef Public_Key X509_PublicKey;
 typedef Private_Key PKCS8_PrivateKey;

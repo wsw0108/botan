@@ -51,6 +51,9 @@ class BOTAN_DLL ECDSA_PublicKey : public virtual EC_PublicKey,
       */
       ECDSA_PublicKey() {}
 
+      ECDSA_PublicKey(const AlgorithmIdentifier& alg_id,
+                      const MemoryRegion<byte>& key_bits);
+
       /**
       * Construct a public key from a given public point.
       * @param dom_par the domain parameters associated with this key

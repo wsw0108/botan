@@ -14,17 +14,6 @@
 namespace Botan {
 
 /**
-* This class represents abstract X.509 public key decoders.
-*/
-class BOTAN_DLL X509_Decoder
-   {
-   public:
-      virtual void alg_id(const AlgorithmIdentifier&) = 0;
-      virtual void key_bits(const MemoryRegion<byte>&) = 0;
-      virtual ~X509_Decoder() {}
-   };
-
-/**
 * This namespace contains functions for handling X509 objects.
 */
 namespace X509 {

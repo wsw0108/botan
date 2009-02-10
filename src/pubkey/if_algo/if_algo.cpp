@@ -29,36 +29,6 @@ IF_Scheme_PublicKey::subject_public_key_info() const
    return std::make_pair(alg_id, key_bits.get_contents());
    }
 
-/*************************************************
-* Return the X.509 public key decoder            *
-*************************************************/
-X509_Decoder* IF_Scheme_PublicKey::x509_decoder()
-   {
-   class IF_Scheme_Decoder : public X509_Decoder
-      {
-      public:
-         void alg_id(const AlgorithmIdentifier&) {}
-
-         void key_bits(const MemoryRegion<byte>& bits)
-            {
-            BER_Decoder(bits)
-               .start_cons(SEQUENCE)
-               .decode(key->n)
-               .decode(key->e)
-               .verify_end()
-               .end_cons();
-
-            key->X509_load_hook();
-            }
-
-         IF_Scheme_Decoder(IF_Scheme_PublicKey* k) : key(k) {}
-      private:
-         IF_Scheme_PublicKey* key;
-      };
-
-   return new IF_Scheme_Decoder(this);
-   }
-
 std::pair<AlgorithmIdentifier, SecureVector<byte> >
 IF_Scheme_PrivateKey::pkcs8_encoding() const
    {

@@ -1,7 +1,7 @@
-/*************************************************
-* RSA Header File                                *
-* (C) 1999-2008 Jack Lloyd                       *
-*************************************************/
+/*
+* RSA Header File
+* (C) 1999-2009 Jack Lloyd
+*/
 
 #ifndef BOTAN_RSA_H__
 #define BOTAN_RSA_H__
@@ -26,7 +26,11 @@ class BOTAN_DLL RSA_PublicKey : public PK_Encrypting_Key,
       SecureVector<byte> verify(const byte[], u32bit) const;
 
       RSA_PublicKey() {}
-      RSA_PublicKey(const BigInt&, const BigInt&);
+
+      RSA_PublicKey(const AlgorithmIdentifier& alg_id,
+                    const MemoryRegion<byte>& key_bits);
+
+      RSA_PublicKey(const BigInt& n, const BigInt& e);
    protected:
       BigInt public_op(const BigInt&) const;
    };

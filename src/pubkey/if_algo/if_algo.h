@@ -37,8 +37,6 @@ class BOTAN_DLL IF_Scheme_PublicKey : public virtual Public_Key
 
       std::pair<AlgorithmIdentifier, MemoryVector<byte> >
          subject_public_key_info() const;
-
-      X509_Decoder* x509_decoder();
    protected:
       virtual void X509_load_hook();
       BigInt n, e;

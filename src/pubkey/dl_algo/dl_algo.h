@@ -58,13 +58,6 @@ class BOTAN_DLL DL_Scheme_PublicKey : public virtual Public_Key
 
       std::pair<AlgorithmIdentifier, MemoryVector<byte> >
          subject_public_key_info() const;
-
-      /**
-      * Get an X509 decoder for this key.
-      * @return an decoder usable to decode a DL key and store the
-      * values in this instance.
-      */
-      X509_Decoder* x509_decoder();
    protected:
       BigInt y;
       DL_Group group;

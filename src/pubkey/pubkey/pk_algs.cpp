@@ -4,6 +4,7 @@
 *************************************************/
 
 #include <botan/pk_algs.h>
+#include <botan/oids.h>
 
 #if defined(BOTAN_HAS_RSA)
   #include <botan/rsa.h>
@@ -38,34 +39,47 @@ namespace Botan {
 /*************************************************
 * Get an PK public key object                    *
 *************************************************/
-Public_Key* get_public_key(const std::string& alg_name)
+Public_Key* get_public_key(const AlgorithmIdentifier& alg_id,
+                           const MemoryRegion<byte>& key_bits)
    {
+   const std::string alg_name = OIDS::lookup(alg_id.oid);
+   if(alg_name == "")
+      throw Decoding_Error("Unknown algorithm OID: " +
+                           alg_id.oid.as_string());
+
 #if defined(BOTAN_HAS_RSA)
-   if(alg_name == "RSA") return new RSA_PublicKey;
+   if(alg_name == "RSA")
+      return new RSA_PublicKey(alg_id, key_bits);
 #endif
 
 #if defined(BOTAN_HAS_DSA)
-   if(alg_name == "DSA") return new DSA_PublicKey;
+   if(alg_name == "DSA")
+      return new DSA_PublicKey(alg_id, key_bits);
 #endif
 
 #if defined(BOTAN_HAS_DIFFIE_HELLMAN)
-   if(alg_name == "DH")  return new DH_PublicKey;
+   if(alg_name == "DH")
+      return new DH_PublicKey(alg_id, key_bits);
 #endif
 
 #if defined(BOTAN_HAS_NYBERG_RUEPPEL)
-   if(alg_name == "NR")  return new NR_PublicKey;
+   if(alg_name == "NR")
+      return new NR_PublicKey(alg_id, key_bits);
 #endif
 
 #if defined(BOTAN_HAS_RW)
-   if(alg_name == "RW")  return new RW_PublicKey;
+   if(alg_name == "RW")
+      return new RW_PublicKey(alg_id, key_bits);
 #endif
 
 #if defined(BOTAN_HAS_ELG)
-   if(alg_name == "ELG") return new ElGamal_PublicKey;
+   if(alg_name == "ELG")
+      return new ElGamal_PublicKey(alg_id, key_bits);
 #endif
 
 #if defined(BOTAN_HAS_ECDSA)
-   if(alg_name == "ECDSA") return new ECDSA_PublicKey;
+   if(alg_name == "ECDSA")
+      return new ECDSA_PublicKey(alg_id, key_bits);
 #endif
 
    throw Lookup_Error("PK algorithm " + alg_name + " not found");
@@ -77,31 +91,38 @@ Public_Key* get_public_key(const std::string& alg_name)
 Private_Key* get_private_key(const std::string& alg_name)
    {
 #if defined(BOTAN_HAS_RSA)
-   if(alg_name == "RSA") return new RSA_PrivateKey;
+   if(alg_name == "RSA")
+      return new RSA_PrivateKey;
 #endif
 
 #if defined(BOTAN_HAS_DSA)
-   if(alg_name == "DSA") return new DSA_PrivateKey;
+   if(alg_name == "DSA")
+      return new DSA_PrivateKey;
 #endif
 
 #if defined(BOTAN_HAS_DIFFIE_HELLMAN)
-   if(alg_name == "DH")  return new DH_PrivateKey;
+   if(alg_name == "DH")
+      return new DH_PrivateKey;
 #endif
 
 #if defined(BOTAN_HAS_NYBERG_RUEPPEL)
-   if(alg_name == "NR")  return new NR_PrivateKey;
+   if(alg_name == "NR")
+      return new NR_PrivateKey;
 #endif
 
 #if defined(BOTAN_HAS_RW)
-   if(alg_name == "RW")  return new RW_PrivateKey;
+   if(alg_name == "RW")
+      return new RW_PrivateKey;
 #endif
 
 #if defined(BOTAN_HAS_ELG)
-   if(alg_name == "ELG") return new ElGamal_PrivateKey;
+   if(alg_name == "ELG")
+      return new ElGamal_PrivateKey;
 #endif
 
 #if defined(BOTAN_HAS_ECDSA)
-   if(alg_name == "ECDSA") return new ECDSA_PrivateKey;
+   if(alg_name == "ECDSA")
+      return new ECDSA_PrivateKey;
 #endif
 
    throw Lookup_Error("PK algorithm " + alg_name + " not found");

@@ -1,9 +1,9 @@
-/*************************************************
-* ECKAEG Header File                             *
-* (C) 2007 Falko Strenzke, FlexSecure GmbH       *
-*          Manuel Hartl, FlexSecure GmbH         *
-* (C) 2008 Jack Lloyd                            *
-*************************************************/
+/**
+* ECKAEG Header File
+* (C) 2007 Falko Strenzke, FlexSecure GmbH
+*          Manuel Hartl, FlexSecure GmbH
+* (C) 2008 Jack Lloyd
+*/
 
 #ifndef BOTAN_ECKAEG_KEY_H__
 #define BOTAN_ECKAEG_KEY_H__
@@ -25,6 +25,9 @@ class BOTAN_DLL ECKAEG_PublicKey : public virtual EC_PublicKey
       * this object with data from an encoded key.
       */
       ECKAEG_PublicKey() {}
+
+      ECKAEG_PublicKey(const AlgorithmIdentifier& alg_id,
+                       const MemoryRegion<byte>& key_bits);
 
       /**
       * Construct a public key from a given public point.

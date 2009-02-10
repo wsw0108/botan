@@ -1,7 +1,7 @@
-/*************************************************
-* ElGamal Source File                            *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* ElGamal Source File
+* (C) 1999-2009 Jack Lloyd
+*/
 
 #include <botan/elgamal.h>
 #include <botan/numthry.h>
@@ -11,9 +11,19 @@
 
 namespace Botan {
 
-/*************************************************
-* ElGamal_PublicKey Constructor                  *
-*************************************************/
+ElGamal_PublicKey::ElGamal_PublicKey(const AlgorithmIdentifier& alg_id,
+                                     const MemoryRegion<byte>& key_bits)
+   {
+   DataSource_Memory source(alg_id.parameters);
+   this->group.BER_decode(source, DL_Group::ANSI_X9_42);
+   BER_Decoder(key_bits).decode(this->y);
+
+   X509_load_hook();
+   }
+
+/**
+* ElGamal_PublicKey Constructor
+*/
 ElGamal_PublicKey::ElGamal_PublicKey(const DL_Group& grp, const BigInt& y1)
    {
    group = grp;
@@ -21,17 +31,17 @@ ElGamal_PublicKey::ElGamal_PublicKey(const DL_Group& grp, const BigInt& y1)
    X509_load_hook();
    }
 
-/*************************************************
-* Algorithm Specific X.509 Initialization Code   *
-*************************************************/
+/**
+* Algorithm Specific X.509 Initialization Code
+*/
 void ElGamal_PublicKey::X509_load_hook()
    {
    core = ELG_Core(group, y);
    }
 
-/*************************************************
-* ElGamal Encryption Function                    *
-*************************************************/
+/**
+* ElGamal Encryption Function
+*/
 SecureVector<byte>
 ElGamal_PublicKey::encrypt(const byte in[], u32bit length,
                            RandomNumberGenerator& rng) const
@@ -40,17 +50,17 @@ ElGamal_PublicKey::encrypt(const byte in[], u32bit length,
    return core.encrypt(in, length, k);
    }
 
-/*************************************************
-* Return the maximum input size in bits          *
-*************************************************/
+/**
+* Return the maximum input size in bits
+*/
 u32bit ElGamal_PublicKey::max_input_bits() const
    {
    return (group_p().bits() - 1);
    }
 
-/*************************************************
-* ElGamal_PrivateKey Constructor                 *
-*************************************************/
+/**
+* ElGamal_PrivateKey Constructor
+*/
 ElGamal_PrivateKey::ElGamal_PrivateKey(RandomNumberGenerator& rng,
                                        const DL_Group& grp,
                                        const BigInt& x_arg)
@@ -67,9 +77,9 @@ ElGamal_PrivateKey::ElGamal_PrivateKey(RandomNumberGenerator& rng,
       PKCS8_load_hook(rng, false);
    }
 
-/*************************************************
-* Algorithm Specific PKCS #8 Initialization Code *
-*************************************************/
+/**
+* Algorithm Specific PKCS #8 Initialization Code
+*/
 void ElGamal_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
                                          bool generated)
    {
@@ -83,18 +93,18 @@ void ElGamal_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
       load_check(rng);
    }
 
-/*************************************************
-* ElGamal Decryption Function                    *
-*************************************************/
+/**
+* ElGamal Decryption Function
+*/
 SecureVector<byte> ElGamal_PrivateKey::decrypt(const byte in[],
                                                u32bit length) const
    {
    return core.decrypt(in, length);
    }
 
-/*************************************************
-* Check Private ElGamal Parameters               *
-*************************************************/
+/**
+* Check Private ElGamal Parameters
+*/
 bool ElGamal_PrivateKey::check_key(RandomNumberGenerator& rng,
                                    bool strong) const
    {

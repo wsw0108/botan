@@ -1,7 +1,7 @@
-/*************************************************
-* RSA Source File                                *
-* (C) 1999-2008 Jack Lloyd                       *
-*************************************************/
+/*
+* RSA Source File
+* (C) 1999-2009 Jack Lloyd
+*/
 
 #include <botan/rsa.h>
 #include <botan/parsing.h>
@@ -11,9 +11,25 @@
 
 namespace Botan {
 
-/*************************************************
-* RSA_PublicKey Constructor                      *
-*************************************************/
+/**
+* RSA_PublicKey Constructor
+*/
+RSA_PublicKey::RSA_PublicKey(const AlgorithmIdentifier&,
+                             const MemoryRegion<byte>& key_bits)
+   {
+   BER_Decoder(key_bits)
+      .start_cons(SEQUENCE)
+         .decode(this->n)
+         .decode(this->e)
+      .verify_end()
+   .end_cons();
+
+   X509_load_hook();
+   }
+
+/**
+* RSA_PublicKey Constructor
+*/
 RSA_PublicKey::RSA_PublicKey(const BigInt& mod, const BigInt& exp)
    {
    n = mod;
@@ -21,9 +37,9 @@ RSA_PublicKey::RSA_PublicKey(const BigInt& mod, const BigInt& exp)
    X509_load_hook();
    }
 
-/*************************************************
-* RSA Public Operation                           *
-*************************************************/
+/**
+* RSA Public Operation
+*/
 BigInt RSA_PublicKey::public_op(const BigInt& i) const
    {
    if(i >= n)
@@ -31,9 +47,9 @@ BigInt RSA_PublicKey::public_op(const BigInt& i) const
    return core.public_op(i);
    }
 
-/*************************************************
-* RSA Encryption Function                        *
-*************************************************/
+/**
+* RSA Encryption Function
+*/
 SecureVector<byte> RSA_PublicKey::encrypt(const byte in[], u32bit len,
                                           RandomNumberGenerator&) const
    {
@@ -41,18 +57,18 @@ SecureVector<byte> RSA_PublicKey::encrypt(const byte in[], u32bit len,
    return BigInt::encode_1363(public_op(i), n.bytes());
    }
 
-/*************************************************
-* RSA Verification Function                      *
-*************************************************/
+/**
+* RSA Verification Function
+*/
 SecureVector<byte> RSA_PublicKey::verify(const byte in[], u32bit len) const
    {
    BigInt i(in, len);
    return BigInt::encode(public_op(i));
    }
 
-/*************************************************
-* Create a RSA private key                       *
-*************************************************/
+/**
+* Create a RSA private key
+*/
 RSA_PrivateKey::RSA_PrivateKey(RandomNumberGenerator& rng,
                                u32bit bits, u32bit exp)
    {
@@ -73,9 +89,9 @@ RSA_PrivateKey::RSA_PrivateKey(RandomNumberGenerator& rng,
       throw Self_Test_Failure(algo_name() + " private key generation failed");
    }
 
-/*************************************************
-* RSA_PrivateKey Constructor                     *
-*************************************************/
+/**
+* RSA_PrivateKey Constructor
+*/
 RSA_PrivateKey::RSA_PrivateKey(RandomNumberGenerator& rng,
                                const BigInt& prime1, const BigInt& prime2,
                                const BigInt& exp, const BigInt& d_exp,
@@ -93,9 +109,9 @@ RSA_PrivateKey::RSA_PrivateKey(RandomNumberGenerator& rng,
    PKCS8_load_hook(rng);
    }
 
-/*************************************************
-* RSA Private Operation                          *
-*************************************************/
+/**
+* RSA Private Operation
+*/
 BigInt RSA_PrivateKey::private_op(const byte in[], u32bit length) const
    {
    BigInt i(in, length);
@@ -108,26 +124,26 @@ BigInt RSA_PrivateKey::private_op(const byte in[], u32bit length) const
    return r;
    }
 
-/*************************************************
-* RSA Decryption Operation                       *
-*************************************************/
+/**
+* RSA Decryption Operation
+*/
 SecureVector<byte> RSA_PrivateKey::decrypt(const byte in[], u32bit len) const
    {
    return BigInt::encode(private_op(in, len));
    }
 
-/*************************************************
-* RSA Signature Operation                        *
-*************************************************/
+/**
+* RSA Signature Operation
+*/
 SecureVector<byte> RSA_PrivateKey::sign(const byte in[], u32bit len,
                                         RandomNumberGenerator&) const
    {
    return BigInt::encode_1363(private_op(in, len), n.bytes());
    }
 
-/*************************************************
-* Check Private RSA Parameters                   *
-*************************************************/
+/**
+* Check Private RSA Parameters
+*/
 bool RSA_PrivateKey::check_key(RandomNumberGenerator& rng, bool strong) const
    {
    if(!IF_Scheme_PrivateKey::check_key(rng, strong))

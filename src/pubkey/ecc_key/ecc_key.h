@@ -80,13 +80,6 @@ class BOTAN_DLL EC_PublicKey : public virtual Public_Key
          subject_public_key_info() const;
 
       /**
-      * Get an x509_decoder that can be used to decode a stored key into
-      * this key.
-      * @result an x509_decoder for this key
-      */
-      X509_Decoder* x509_decoder();
-
-      /**
       * Make sure that the public point and domain parameters of this key are set.
       * @throw Invalid_State if either of the two data members is not set
       */

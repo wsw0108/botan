@@ -86,25 +86,7 @@ Public_Key* load_key(DataSource& source)
       if(key_bits.is_empty())
          throw Decoding_Error("X.509 public key decoding failed");
 
-      const std::string alg_name = OIDS::lookup(alg_id.oid);
-      if(alg_name == "")
-         throw Decoding_Error("Unknown algorithm OID: " +
-                              alg_id.oid.as_string());
-
-      std::auto_ptr<Public_Key> key_obj(get_public_key(alg_name));
-      if(!key_obj.get())
-         throw Decoding_Error("Unknown PK algorithm/OID: " + alg_name + ", " +
-                              alg_id.oid.as_string());
-
-      std::auto_ptr<X509_Decoder> decoder(key_obj->x509_decoder());
-
-      if(!decoder.get())
-         throw Decoding_Error("Key does not support X.509 decoding");
-
-      decoder->alg_id(alg_id);
-      decoder->key_bits(key_bits);
-
-      return key_obj.release();
+      return get_public_key(alg_id, key_bits);
       }
    catch(Decoding_Error)
       {

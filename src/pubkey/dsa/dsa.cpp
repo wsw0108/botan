@@ -1,7 +1,7 @@
-/*************************************************
-* DSA Source File                                *
-* (C) 1999-2008 Jack Lloyd                       *
-*************************************************/
+/*
+* DSA Source File
+* (C) 1999-2009 Jack Lloyd
+*/
 
 #include <botan/dsa.h>
 #include <botan/numthry.h>
@@ -10,9 +10,18 @@
 
 namespace Botan {
 
-/*************************************************
-* DSA_PublicKey Constructor                      *
-*************************************************/
+DSA_PublicKey::DSA_PublicKey(const AlgorithmIdentifier& alg_id,
+                             const MemoryRegion<byte>& key_bits)
+   {
+   DataSource_Memory source(alg_id.parameters);
+   this->group.BER_decode(source, DL_Group::ANSI_X9_57);
+   BER_Decoder(key_bits).decode(this->y);
+   X509_load_hook();
+   }
+
+/**
+* DSA_PublicKey Constructor
+*/
 DSA_PublicKey::DSA_PublicKey(const DL_Group& grp, const BigInt& y1)
    {
    group = grp;
@@ -20,42 +29,42 @@ DSA_PublicKey::DSA_PublicKey(const DL_Group& grp, const BigInt& y1)
    X509_load_hook();
    }
 
-/*************************************************
-* Algorithm Specific X.509 Initialization Code   *
-*************************************************/
+/**
+* Algorithm Specific X.509 Initialization Code
+*/
 void DSA_PublicKey::X509_load_hook()
    {
    core = DSA_Core(group, y);
    }
 
-/*************************************************
-* DSA Verification Function                      *
-*************************************************/
+/**
+* DSA Verification Function
+*/
 bool DSA_PublicKey::verify(const byte msg[], u32bit msg_len,
                            const byte sig[], u32bit sig_len) const
    {
    return core.verify(msg, msg_len, sig, sig_len);
    }
 
-/*************************************************
-* Return the maximum input size in bits          *
-*************************************************/
+/**
+* Return the maximum input size in bits
+*/
 u32bit DSA_PublicKey::max_input_bits() const
    {
    return group_q().bits();
    }
 
-/*************************************************
-* Return the size of each portion of the sig     *
-*************************************************/
+/**
+* Return the size of each portion of the sig
+*/
 u32bit DSA_PublicKey::message_part_size() const
    {
    return group_q().bytes();
    }
 
-/*************************************************
-* Create a DSA private key                       *
-*************************************************/
+/**
+* Create a DSA private key
+*/
 DSA_PrivateKey::DSA_PrivateKey(RandomNumberGenerator& rng,
                                const DL_Group& grp,
                                const BigInt& x_arg)
@@ -72,9 +81,9 @@ DSA_PrivateKey::DSA_PrivateKey(RandomNumberGenerator& rng,
       PKCS8_load_hook(rng, false);
    }
 
-/*************************************************
-* Algorithm Specific PKCS #8 Initialization Code *
-*************************************************/
+/**
+* Algorithm Specific PKCS #8 Initialization Code
+*/
 void DSA_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
                                      bool generated)
    {
@@ -87,9 +96,9 @@ void DSA_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
       load_check(rng);
    }
 
-/*************************************************
-* DSA Signature Operation                        *
-*************************************************/
+/**
+* DSA Signature Operation
+*/
 SecureVector<byte> DSA_PrivateKey::sign(const byte in[], u32bit length,
                                         RandomNumberGenerator& rng) const
    {
@@ -103,9 +112,9 @@ SecureVector<byte> DSA_PrivateKey::sign(const byte in[], u32bit length,
    return core.sign(in, length, k);
    }
 
-/*************************************************
-* Check Private DSA Parameters                   *
-*************************************************/
+/**
+* Check Private DSA Parameters
+*/
 bool DSA_PrivateKey::check_key(RandomNumberGenerator& rng, bool strong) const
    {
    if(!DL_Scheme_PrivateKey::check_key(rng, strong) || x >= group_q())

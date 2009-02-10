@@ -93,6 +93,19 @@ ECDSA_PublicKey::ECDSA_PublicKey(const ECDSA_PublicKey& other)
    set_all_values(other);
    }
 
+ECDSA_PublicKey::ECDSA_PublicKey(const AlgorithmIdentifier& alg_id,
+                                 const MemoryRegion<byte>& key_bits)
+   {
+   mp_dom_pars.reset(new EC_Domain_Params(
+                        decode_ber_ec_dompar(alg_id.parameters)));
+
+   mp_public_point.reset(new PointGFp(
+                            OS2ECP(key_bits, domain_parameters().get_curve())
+                            ));
+
+   X509_load_hook();
+   }
+
 const ECDSA_PublicKey& ECDSA_PublicKey::operator=(const ECDSA_PublicKey& rhs)
    {
    set_all_values(rhs);
