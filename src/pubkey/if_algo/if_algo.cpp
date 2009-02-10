@@ -54,68 +54,6 @@ IF_Scheme_PrivateKey::pkcs8_encoding() const
    }
 
 /**
-* Return the PKCS #8 public key decoder
-*/
-PKCS8_Decoder* IF_Scheme_PrivateKey::pkcs8_decoder(RandomNumberGenerator& rng)
-   {
-   class IF_Scheme_Decoder : public PKCS8_Decoder
-      {
-      public:
-         void alg_id(const AlgorithmIdentifier&) {}
-
-         void key_bits(const MemoryRegion<byte>& bits)
-            {
-            u32bit version;
-
-            BER_Decoder(bits)
-               .start_cons(SEQUENCE)
-                  .decode(version)
-                  .decode(key->n)
-                  .decode(key->e)
-                  .decode(key->d)
-                  .decode(key->p)
-                  .decode(key->q)
-                  .decode(key->d1)
-                  .decode(key->d2)
-                  .decode(key->c)
-               .end_cons();
-
-            if(version != 0)
-               throw Decoding_Error("Unknown PKCS #1 key format version");
-
-            key->PKCS8_load_hook(rng);
-            }
-
-         IF_Scheme_Decoder(IF_Scheme_PrivateKey* k, RandomNumberGenerator& r) :
-            key(k), rng(r) {}
-      private:
-         IF_Scheme_PrivateKey* key;
-         RandomNumberGenerator& rng;
-      };
-
-   return new IF_Scheme_Decoder(this, rng);
-   }
-
-/**
-* Algorithm Specific PKCS #8 Initialization Code
-*/
-void IF_Scheme_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
-                                           bool generated)
-   {
-   if(n == 0)  n = p * q;
-   if(d1 == 0) d1 = d % (p - 1);
-   if(d2 == 0) d2 = d % (q - 1);
-   if(c == 0)  c = inverse_mod(q, p);
-
-   core = IF_Core(rng, e, n, d, p, q, d1, d2, c);
-
-   if(generated)
-      gen_check(rng);
-   else
-      load_check(rng);
-   }
-
-/**
 * Check IF Scheme Public Parameters
 */
 bool IF_Scheme_PublicKey::check_key(RandomNumberGenerator&, bool) const

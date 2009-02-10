@@ -193,6 +193,31 @@ void ECDSA_PrivateKey::set_all_values(const ECDSA_PrivateKey& other)
       mp_public_point.reset(new PointGFp(other.public_point()));
    }
 
+ECDSA_PrivateKey::ECDSA_PrivateKey(const AlgorithmIdentifier& alg_id,
+                                   const MemoryRegion<byte>& key_bits,
+                                   RandomNumberGenerator&)
+   {
+   this->mp_dom_pars.reset(
+      new EC_Domain_Params(decode_ber_ec_dompar(alg_id.parameters)));
+
+   u32bit version;
+   SecureVector<byte> octstr_secret;
+
+   BER_Decoder(key_bits)
+      .start_cons(SEQUENCE)
+      .decode(version)
+      .decode(octstr_secret, OCTET_STRING)
+      .verify_end()
+      .end_cons();
+
+   if(version != 1)
+      throw Decoding_Error("Wrong key format version for EC key");
+
+   m_private_value = BigInt::decode(octstr_secret, octstr_secret.size());
+
+   PKCS8_load_hook();
+   }
+
 ECDSA_PrivateKey::ECDSA_PrivateKey(ECDSA_PrivateKey const& other)
    : Public_Key(),
      EC_PublicKey(),

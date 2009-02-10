@@ -69,6 +69,36 @@ SecureVector<byte> RW_PublicKey::verify(const byte in[], u32bit len) const
 /**
 * Create a Rabin-Williams private key
 */
+RW_PrivateKey::RW_PrivateKey(const AlgorithmIdentifier&,
+                             const MemoryRegion<byte>& key_bits,
+                             RandomNumberGenerator& rng)
+   {
+   u32bit version;
+
+   BER_Decoder(key_bits)
+      .start_cons(SEQUENCE)
+      .decode(version)
+      .decode(this->n)
+      .decode(this->e)
+      .decode(this->d)
+      .decode(this->p)
+      .decode(this->q)
+      .decode(this->d1)
+      .decode(this->d2)
+      .decode(this->c)
+      .end_cons();
+
+   if(version != 0)
+      throw Decoding_Error("Unknown PKCS #1 RW key format version");
+
+   core = IF_Core(rng, e, n, d, p, q, d1, d2, c);
+
+   load_check(rng);
+   }
+
+/**
+* Create a Rabin-Williams private key
+*/
 RW_PrivateKey::RW_PrivateKey(RandomNumberGenerator& rng,
                              u32bit bits, u32bit exp)
    {
@@ -83,10 +113,18 @@ RW_PrivateKey::RW_PrivateKey(RandomNumberGenerator& rng,
    q = random_prime(rng, bits - p.bits(), e / 2, ((p % 8 == 3) ? 7 : 3), 8);
    d = inverse_mod(e, lcm(p - 1, q - 1) >> 1);
 
-   PKCS8_load_hook(rng, true);
+   n = p * q;
 
    if(n.bits() != bits)
       throw Self_Test_Failure(algo_name() + " private key generation failed");
+
+   d1 = d % (p - 1);
+   d2 = d % (q - 1);
+   c = inverse_mod(q, p);
+
+   core = IF_Core(rng, e, n, d, p, q, d1, d2, c);
+
+   gen_check(rng);
    }
 
 /**
@@ -100,13 +138,16 @@ RW_PrivateKey::RW_PrivateKey(RandomNumberGenerator& rng,
    p = prime1;
    q = prime2;
    e = exp;
-   d = d_exp;
-   n = mod;
+   d = (d_exp > 0) ? d_exp : inverse_mod(e, lcm(p - 1, q - 1) >> 1);
+   n = (mod > 0) ? mod : (p * q);
 
-   if(d == 0)
-      d = inverse_mod(e, lcm(p - 1, q - 1) >> 1);
+   d1 = d % (p - 1);
+   d2 = d % (q - 1);
+   c = inverse_mod(q, p);
 
-   PKCS8_load_hook(rng);
+   core = IF_Core(rng, e, n, d, p, q, d1, d2, c);
+
+   load_check(rng);
    }
 
 /**

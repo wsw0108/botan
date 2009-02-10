@@ -16,15 +16,17 @@ namespace Botan {
 * @param name the name of the desired public key algorithm
 * @return the public key object
 */
-BOTAN_DLL Public_Key*  get_public_key(const AlgorithmIdentifier& alg_id,
-                                      const MemoryRegion<byte>& key_bits);
+BOTAN_DLL Public_Key* get_public_key(const AlgorithmIdentifier& alg_id,
+                                     const MemoryRegion<byte>& key_bits);
 
 /**
 * Get an empty private key object.
 * @param name the name of the desired public key algorithm
 * @return the private key object
 */
-BOTAN_DLL Private_Key* get_private_key(const std::string&);
+BOTAN_DLL Private_Key* get_private_key(const AlgorithmIdentifier& alg_id,
+                                       const MemoryRegion<byte>& key_bits,
+                                       RandomNumberGenerator& rng);
 
 }
 

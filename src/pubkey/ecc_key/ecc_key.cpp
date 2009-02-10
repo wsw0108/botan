@@ -154,47 +154,6 @@ EC_PrivateKey::pkcs8_encoding() const
    return std::make_pair(alg_id, key_bits);
    }
 
-/**
-* Return the PKCS #8 public key decoder
-*/
-PKCS8_Decoder* EC_PrivateKey::pkcs8_decoder(RandomNumberGenerator&)
-   {
-   class EC_Key_Decoder : public PKCS8_Decoder
-      {
-      public:
-         void alg_id(const AlgorithmIdentifier& alg_id)
-            {
-            key->mp_dom_pars.reset(new EC_Domain_Params(decode_ber_ec_dompar(alg_id.parameters)));
-            }
-
-         void key_bits(const MemoryRegion<byte>& bits)
-            {
-            u32bit version;
-            SecureVector<byte> octstr_secret;
-
-            BER_Decoder(bits)
-               .start_cons(SEQUENCE)
-               .decode(version)
-               .decode(octstr_secret, OCTET_STRING)
-               .verify_end()
-               .end_cons();
-
-            key->m_private_value = BigInt::decode(octstr_secret, octstr_secret.size());
-
-            if(version != 1)
-               throw Decoding_Error("Wrong PKCS #1 key format version for EC key");
-
-            key->PKCS8_load_hook();
-            }
-
-         EC_Key_Decoder(EC_PrivateKey* k): key(k) {}
-      private:
-         EC_PrivateKey* key;
-      };
-
-   return new EC_Key_Decoder(this);
-   }
-
 void EC_PrivateKey::PKCS8_load_hook(bool)
    {
    // we cannot use affirm_init() here because mp_public_point might still be null

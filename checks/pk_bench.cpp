@@ -384,7 +384,8 @@ void benchmark_eckaeg(RandomNumberGenerator& rng,
 template<typename PRIV_KEY_TYPE>
 void benchmark_dsa_nr(RandomNumberGenerator& rng,
                       double seconds,
-                      Benchmark_Report& report)
+                      Benchmark_Report& report,
+                      const std::string& algo_name)
    {
 #if defined(BOTAN_HAS_NYBERG_RUEPPEL) || defined(BOTAN_HAS_DSA)
    const char* domains[] = { "dsa/jce/512",
@@ -393,8 +394,6 @@ void benchmark_dsa_nr(RandomNumberGenerator& rng,
                              "dsa/botan/2048",
                              "dsa/botan/3072",
                              NULL };
-
-   const std::string algo_name = PRIV_KEY_TYPE().algo_name();
 
    for(size_t j = 0; domains[j]; j++)
       {
@@ -642,7 +641,7 @@ void bench_pk(RandomNumberGenerator& rng,
 
 #if defined(BOTAN_HAS_DSA)
    if(algo == "All" || algo == "DSA")
-      benchmark_dsa_nr<DSA_PrivateKey>(rng, seconds, report);
+      benchmark_dsa_nr<DSA_PrivateKey>(rng, seconds, report, "DSA");
 #endif
 
 #if defined(BOTAN_HAS_ECDSA)
@@ -672,7 +671,7 @@ void bench_pk(RandomNumberGenerator& rng,
 
 #if defined(BOTAN_HAS_NYBERG_RUEPPEL)
    if(algo == "All" || algo == "NR")
-      benchmark_dsa_nr<NR_PrivateKey>(rng, seconds, report);
+      benchmark_dsa_nr<NR_PrivateKey>(rng, seconds, report, "NR");
 #endif
 
    if(algo == "All" || algo == "RW")

@@ -51,11 +51,9 @@ class BOTAN_DLL DH_PrivateKey : public DH_PublicKey,
 
       MemoryVector<byte> public_value() const;
 
-      /**
-      * Construct an uninitialized key. Use this constructor if you wish
-      * to decode an encoded key into the new instance.
-      */
-      DH_PrivateKey() {}
+      DH_PrivateKey(const AlgorithmIdentifier& alg_id,
+                    const MemoryRegion<byte>& key_bits,
+                    RandomNumberGenerator& rng);
 
       /**
       * Construct a private key with predetermined value.
@@ -66,7 +64,6 @@ class BOTAN_DLL DH_PrivateKey : public DH_PublicKey,
       DH_PrivateKey(RandomNumberGenerator& rng, const DL_Group& grp,
                     const BigInt& x = 0);
    private:
-      void PKCS8_load_hook(RandomNumberGenerator& rng, bool = false);
       DH_Core core;
    };
 

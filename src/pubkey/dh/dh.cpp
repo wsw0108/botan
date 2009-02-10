@@ -49,6 +49,24 @@ MemoryVector<byte> DH_PublicKey::public_value() const
 /**
 * Create a DH private key
 */
+DH_PrivateKey::DH_PrivateKey(const AlgorithmIdentifier& alg_id,
+                             const MemoryRegion<byte>& key_bits,
+                             RandomNumberGenerator& rng)
+   {
+   DataSource_Memory source(alg_id.parameters);
+   this->group.BER_decode(source, DL_Group::ANSI_X9_42);
+
+   BER_Decoder(key_bits).decode(this->x);
+   y = power_mod(group_g(), x, group_p());
+
+   core = DH_Core(rng, group, x);
+
+   load_check(rng);
+   }
+
+/**
+* Create a DH private key
+*/
 DH_PrivateKey::DH_PrivateKey(RandomNumberGenerator& rng,
                              const DL_Group& grp,
                              const BigInt& x_arg)
@@ -57,26 +75,13 @@ DH_PrivateKey::DH_PrivateKey(RandomNumberGenerator& rng,
    x = x_arg;
 
    if(x == 0)
-      {
-      const BigInt& p = group_p();
-      x.randomize(rng, 2 * dl_work_factor(p.bits()));
-      PKCS8_load_hook(rng, true);
-      }
-   else
-      PKCS8_load_hook(rng, false);
-   }
+      x.randomize(rng, 2 * dl_work_factor(group_p().bits()));
 
-/**
-* Algorithm Specific PKCS #8 Initialization Code
-*/
-void DH_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
-                                    bool generated)
-   {
-   if(y == 0)
-      y = power_mod(group_g(), x, group_p());
    core = DH_Core(rng, group, x);
 
-   if(generated)
+   y = power_mod(group_g(), x, group_p());
+
+   if(x_arg == 0)
       gen_check(rng);
    else
       load_check(rng);

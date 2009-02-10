@@ -59,6 +59,24 @@ u32bit DSA_PublicKey::message_part_size() const
 /**
 * Create a DSA private key
 */
+DSA_PrivateKey::DSA_PrivateKey(const AlgorithmIdentifier& alg_id,
+                               const MemoryRegion<byte>& key_bits,
+                               RandomNumberGenerator& rng)
+   {
+   DataSource_Memory source(alg_id.parameters);
+   this->group.BER_decode(source, DL_Group::ANSI_X9_57);
+
+   BER_Decoder(key_bits).decode(this->x);
+   y = power_mod(group_g(), x, group_p());
+
+   core = DSA_Core(group, y, x);
+
+   load_check(rng);
+   }
+
+/**
+* Create a DSA private key
+*/
 DSA_PrivateKey::DSA_PrivateKey(RandomNumberGenerator& rng,
                                const DL_Group& grp,
                                const BigInt& x_arg)
@@ -67,24 +85,13 @@ DSA_PrivateKey::DSA_PrivateKey(RandomNumberGenerator& rng,
    x = x_arg;
 
    if(x == 0)
-      {
       x = BigInt::random_integer(rng, 2, group_q() - 1);
-      PKCS8_load_hook(rng, true);
-      }
-   else
-      PKCS8_load_hook(rng, false);
-   }
 
-/**
-* Algorithm Specific PKCS #8 Initialization Code
-*/
-void DSA_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
-                                     bool generated)
-   {
    y = power_mod(group_g(), x, group_p());
+
    core = DSA_Core(group, y, x);
 
-   if(generated)
+   if(x_arg == 0)
       gen_check(rng);
    else
       load_check(rng);

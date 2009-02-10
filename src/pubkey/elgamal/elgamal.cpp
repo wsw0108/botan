@@ -53,6 +53,24 @@ u32bit ElGamal_PublicKey::max_input_bits() const
 /**
 * ElGamal_PrivateKey Constructor
 */
+ElGamal_PrivateKey::ElGamal_PrivateKey(const AlgorithmIdentifier& alg_id,
+                                       const MemoryRegion<byte>& key_bits,
+                                       RandomNumberGenerator& rng)
+   {
+   DataSource_Memory source(alg_id.parameters);
+   this->group.BER_decode(source, DL_Group::ANSI_X9_57);
+
+   BER_Decoder(key_bits).decode(this->x);
+   y = power_mod(group_g(), x, group_p());
+
+   core = ELG_Core(rng, group, y, x);
+
+   load_check(rng);
+   }
+
+/**
+* ElGamal_PrivateKey Constructor
+*/
 ElGamal_PrivateKey::ElGamal_PrivateKey(RandomNumberGenerator& rng,
                                        const DL_Group& grp,
                                        const BigInt& x_arg)
@@ -61,25 +79,12 @@ ElGamal_PrivateKey::ElGamal_PrivateKey(RandomNumberGenerator& rng,
    x = x_arg;
 
    if(x == 0)
-      {
       x.randomize(rng, 2 * dl_work_factor(group_p().bits()));
-      PKCS8_load_hook(rng, true);
-      }
-   else
-      PKCS8_load_hook(rng, false);
-   }
 
-/**
-* Algorithm Specific PKCS #8 Initialization Code
-*/
-void ElGamal_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
-                                         bool generated)
-   {
-   if(y == 0)
-      y = power_mod(group_g(), x, group_p());
+   y = power_mod(group_g(), x, group_p());
    core = ELG_Core(rng, group, y, x);
 
-   if(generated)
+   if(x_arg == 0)
       gen_check(rng);
    else
       load_check(rng);

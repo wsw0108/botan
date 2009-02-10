@@ -99,20 +99,16 @@ class BOTAN_DLL ECDSA_PrivateKey : public ECDSA_PublicKey,
                                    public PK_Signing_Key
    {
    public:
-      //ctors
-
-      /**
-      * Default constructor. Use this one if you want to later fill
-      * this object with data from an encoded key.
-      */
-      ECDSA_PrivateKey() {}
-
       /**
       * Generate a new private key
       * @param the domain parameters to used for this key
       */
       ECDSA_PrivateKey(RandomNumberGenerator& rng,
                        const EC_Domain_Params& domain);
+
+      ECDSA_PrivateKey(const AlgorithmIdentifier& alg_id,
+                       const MemoryRegion<byte>& key_bits,
+                       RandomNumberGenerator& rng);
 
       ECDSA_PrivateKey(const ECDSA_PrivateKey& other);
       ECDSA_PrivateKey const& operator=(const ECDSA_PrivateKey& rhs);

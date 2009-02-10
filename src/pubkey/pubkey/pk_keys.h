@@ -80,14 +80,6 @@ class BOTAN_DLL Private_Key : public virtual Public_Key
    public:
 
       /**
-      * Get an PKCS#8 decoder that can be used to set the values of this key
-      * based on an PKCS#8 encoded key object.
-      * @return an PKCS#8 decoder for this key
-      */
-      virtual class PKCS8_Decoder* pkcs8_decoder(RandomNumberGenerator&)
-         { return 0; }
-
-      /**
       * Return the PKCS #8 algorithm identifier and key data (or throw)
       */
       virtual std::pair<AlgorithmIdentifier, SecureVector<byte> >

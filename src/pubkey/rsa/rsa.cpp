@@ -69,6 +69,36 @@ SecureVector<byte> RSA_PublicKey::verify(const byte in[], u32bit len) const
 /**
 * Create a RSA private key
 */
+RSA_PrivateKey::RSA_PrivateKey(const AlgorithmIdentifier&,
+                               const MemoryRegion<byte>& key_bits,
+                               RandomNumberGenerator& rng)
+   {
+   u32bit version;
+
+   BER_Decoder(key_bits)
+      .start_cons(SEQUENCE)
+      .decode(version)
+      .decode(this->n)
+      .decode(this->e)
+      .decode(this->d)
+      .decode(this->p)
+      .decode(this->q)
+      .decode(this->d1)
+      .decode(this->d2)
+      .decode(this->c)
+      .end_cons();
+
+   if(version != 0)
+      throw Decoding_Error("Unknown PKCS #1 RSA key format version");
+
+   core = IF_Core(rng, e, n, d, p, q, d1, d2, c);
+
+   load_check(rng);
+   }
+
+/**
+* Create a RSA private key
+*/
 RSA_PrivateKey::RSA_PrivateKey(RandomNumberGenerator& rng,
                                u32bit bits, u32bit exp)
    {
@@ -83,7 +113,14 @@ RSA_PrivateKey::RSA_PrivateKey(RandomNumberGenerator& rng,
    q = random_prime(rng, bits - p.bits(), e);
    d = inverse_mod(e, lcm(p - 1, q - 1));
 
-   PKCS8_load_hook(rng, true);
+   n = p * q;
+   d1 = d % (p - 1);
+   d2 = d % (q - 1);
+   c = inverse_mod(q, p);
+
+   core = IF_Core(rng, e, n, d, p, q, d1, d2, c);
+
+   gen_check(rng);
 
    if(n.bits() != bits)
       throw Self_Test_Failure(algo_name() + " private key generation failed");
@@ -106,7 +143,16 @@ RSA_PrivateKey::RSA_PrivateKey(RandomNumberGenerator& rng,
    if(d == 0)
       d = inverse_mod(e, lcm(p - 1, q - 1));
 
-   PKCS8_load_hook(rng);
+   if(n == 0)
+      n = p * q;
+
+   d1 = d % (p - 1);
+   d2 = d % (q - 1);
+   c = inverse_mod(q, p);
+
+   core = IF_Core(rng, e, n, d, p, q, d1, d2, c);
+
+   load_check(rng);
    }
 
 /**
