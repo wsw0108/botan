@@ -24,7 +24,7 @@ RSA_PublicKey::RSA_PublicKey(const AlgorithmIdentifier&,
       .verify_end()
    .end_cons();
 
-   X509_load_hook();
+   core = IF_Core(e, n);
    }
 
 /**
@@ -34,7 +34,7 @@ RSA_PublicKey::RSA_PublicKey(const BigInt& mod, const BigInt& exp)
    {
    n = mod;
    e = exp;
-   X509_load_hook();
+   core = IF_Core(e, n);
    }
 
 /**

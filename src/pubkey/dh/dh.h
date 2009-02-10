@@ -35,8 +35,6 @@ class BOTAN_DLL DH_PublicKey : public virtual DL_Scheme_PublicKey
       * @param y the public value y
       */
       DH_PublicKey(const DL_Group& grp, const BigInt& y);
-   private:
-      void X509_load_hook();
    };
 
 /**

@@ -53,9 +53,9 @@ IF_Scheme_PrivateKey::pkcs8_encoding() const
    return std::make_pair(alg_id, key_bits);
    }
 
-/*************************************************
-* Return the PKCS #8 public key decoder          *
-*************************************************/
+/**
+* Return the PKCS #8 public key decoder
+*/
 PKCS8_Decoder* IF_Scheme_PrivateKey::pkcs8_decoder(RandomNumberGenerator& rng)
    {
    class IF_Scheme_Decoder : public PKCS8_Decoder
@@ -96,17 +96,9 @@ PKCS8_Decoder* IF_Scheme_PrivateKey::pkcs8_decoder(RandomNumberGenerator& rng)
    return new IF_Scheme_Decoder(this, rng);
    }
 
-/*************************************************
-* Algorithm Specific X.509 Initialization Code   *
-*************************************************/
-void IF_Scheme_PublicKey::X509_load_hook()
-   {
-   core = IF_Core(e, n);
-   }
-
-/*************************************************
-* Algorithm Specific PKCS #8 Initialization Code *
-*************************************************/
+/**
+* Algorithm Specific PKCS #8 Initialization Code
+*/
 void IF_Scheme_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
                                            bool generated)
    {
@@ -123,9 +115,9 @@ void IF_Scheme_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
       load_check(rng);
    }
 
-/*************************************************
-* Check IF Scheme Public Parameters              *
-*************************************************/
+/**
+* Check IF Scheme Public Parameters
+*/
 bool IF_Scheme_PublicKey::check_key(RandomNumberGenerator&, bool) const
    {
    if(n < 35 || n.is_even() || e < 2)
@@ -133,9 +125,9 @@ bool IF_Scheme_PublicKey::check_key(RandomNumberGenerator&, bool) const
    return true;
    }
 
-/*************************************************
-* Check IF Scheme Private Parameters             *
-*************************************************/
+/**
+* Check IF Scheme Private Parameters
+*/
 bool IF_Scheme_PrivateKey::check_key(RandomNumberGenerator& rng,
                                      bool strong) const
    {

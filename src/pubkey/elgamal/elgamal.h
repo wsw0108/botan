@@ -33,8 +33,6 @@ class BOTAN_DLL ElGamal_PublicKey : public PK_Encrypting_Key,
       ElGamal_PublicKey(const DL_Group&, const BigInt&);
    protected:
       ELG_Core core;
-   private:
-      void X509_load_hook();
    };
 
 /**

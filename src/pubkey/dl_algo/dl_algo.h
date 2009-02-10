@@ -61,8 +61,6 @@ class BOTAN_DLL DL_Scheme_PublicKey : public virtual Public_Key
    protected:
       BigInt y;
       DL_Group group;
-   private:
-      virtual void X509_load_hook() {}
    };
 
 /**

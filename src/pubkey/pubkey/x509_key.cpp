@@ -1,7 +1,7 @@
-/*************************************************
-* X.509 Public Key Source File                   *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* X.509 Public Key Source File
+* (C) 1999-2009 Jack Lloyd
+*/
 
 #include <botan/x509_key.h>
 #include <botan/filters.h>
@@ -9,7 +9,6 @@
 #include <botan/der_enc.h>
 #include <botan/ber_dec.h>
 #include <botan/pk_algs.h>
-#include <botan/oids.h>
 #include <botan/pem.h>
 #include <memory>
 
@@ -17,9 +16,9 @@ namespace Botan {
 
 namespace X509 {
 
-/*************************************************
-* DER or PEM encode a X.509 public key           *
-*************************************************/
+/**
+* DER or PEM encode a X.509 public key
+*/
 void encode(const Public_Key& key, Pipe& pipe, X509_Encoding encoding)
    {
    std::pair<AlgorithmIdentifier, MemoryVector<byte> > sub_pubkey =
@@ -39,9 +38,9 @@ void encode(const Public_Key& key, Pipe& pipe, X509_Encoding encoding)
       pipe.write(der);
    }
 
-/*************************************************
-* PEM encode a X.509 public key                  *
-*************************************************/
+/**
+* PEM encode a X.509 public key
+*/
 std::string PEM_encode(const Public_Key& key)
    {
    Pipe pem;
@@ -51,9 +50,9 @@ std::string PEM_encode(const Public_Key& key)
    return pem.read_all_as_string();
    }
 
-/*************************************************
-* Extract a public key and return it             *
-*************************************************/
+/**
+* Extract a public key and return it
+*/
 Public_Key* load_key(DataSource& source)
    {
    try {
@@ -94,27 +93,27 @@ Public_Key* load_key(DataSource& source)
       }
    }
 
-/*************************************************
-* Extract a public key and return it             *
-*************************************************/
+/**
+* Extract a public key and return it
+*/
 Public_Key* load_key(const std::string& fsname)
    {
    DataSource_Stream source(fsname, true);
    return X509::load_key(source);
    }
 
-/*************************************************
-* Extract a public key and return it             *
-*************************************************/
+/**
+* Extract a public key and return it
+*/
 Public_Key* load_key(const MemoryRegion<byte>& mem)
    {
    DataSource_Memory source(mem);
    return X509::load_key(source);
    }
 
-/*************************************************
-* Make a copy of this public key                 *
-*************************************************/
+/**
+* Make a copy of this public key
+*/
 Public_Key* copy_key(const Public_Key& key)
    {
    Pipe bits;
@@ -125,9 +124,9 @@ Public_Key* copy_key(const Public_Key& key)
    return X509::load_key(source);
    }
 
-/*************************************************
-* Find the allowable key constraints             *
-*************************************************/
+/**
+* Find the allowable key constraints
+*/
 Key_Constraints find_constraints(const Public_Key& pub_key,
                                  Key_Constraints limits)
    {

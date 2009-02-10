@@ -16,7 +16,8 @@ DSA_PublicKey::DSA_PublicKey(const AlgorithmIdentifier& alg_id,
    DataSource_Memory source(alg_id.parameters);
    this->group.BER_decode(source, DL_Group::ANSI_X9_57);
    BER_Decoder(key_bits).decode(this->y);
-   X509_load_hook();
+
+   core = DSA_Core(group, y);
    }
 
 /**
@@ -26,14 +27,7 @@ DSA_PublicKey::DSA_PublicKey(const DL_Group& grp, const BigInt& y1)
    {
    group = grp;
    y = y1;
-   X509_load_hook();
-   }
 
-/**
-* Algorithm Specific X.509 Initialization Code
-*/
-void DSA_PublicKey::X509_load_hook()
-   {
    core = DSA_Core(group, y);
    }
 

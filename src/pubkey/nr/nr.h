@@ -35,8 +35,6 @@ class BOTAN_DLL NR_PublicKey : public PK_Verifying_with_MR_Key,
       NR_PublicKey(const DL_Group&, const BigInt&);
    protected:
       NR_Core core;
-   private:
-      void X509_load_hook();
    };
 
 /**

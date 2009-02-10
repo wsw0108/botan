@@ -35,8 +35,6 @@ class BOTAN_DLL DSA_PublicKey : public PK_Verifying_wo_MR_Key,
       DSA_PublicKey(const DL_Group&, const BigInt&);
    protected:
       DSA_Core core;
-   private:
-      void X509_load_hook();
    };
 
 /**

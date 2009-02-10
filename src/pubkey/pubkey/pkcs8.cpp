@@ -1,7 +1,7 @@
-/*************************************************
-* PKCS #8 Source File                            *
-* (C) 1999-2008 Jack Lloyd                       *
-*************************************************/
+/*
+* PKCS #8 Source File
+* (C) 1999-2009 Jack Lloyd
+*/
 
 #include <botan/pkcs8.h>
 #include <botan/get_pbe.h>
@@ -19,9 +19,9 @@ namespace PKCS8 {
 
 namespace {
 
-/*************************************************
-* Get info from an EncryptedPrivateKeyInfo       *
-*************************************************/
+/**
+* Get info from an EncryptedPrivateKeyInfo
+*/
 SecureVector<byte> PKCS8_extract(DataSource& source,
                                  AlgorithmIdentifier& pbe_alg_id)
    {
@@ -36,9 +36,9 @@ SecureVector<byte> PKCS8_extract(DataSource& source,
    return key_data;
    }
 
-/*************************************************
-* PEM decode and/or decrypt a private key        *
-*************************************************/
+/**
+* PEM decode and/or decrypt a private key
+*/
 SecureVector<byte> PKCS8_decode(DataSource& source, const User_Interface& ui,
                                 AlgorithmIdentifier& pk_alg_id)
    {
@@ -131,9 +131,9 @@ SecureVector<byte> PKCS8_decode(DataSource& source, const User_Interface& ui,
 
 }
 
-/*************************************************
-* DER or PEM encode a PKCS #8 private key        *
-*************************************************/
+/**
+* DER or PEM encode a PKCS #8 private key
+*/
 void encode(const Private_Key& key, Pipe& pipe, X509_Encoding encoding)
    {
    const u32bit PKCS8_VERSION = 0;
@@ -156,9 +156,9 @@ void encode(const Private_Key& key, Pipe& pipe, X509_Encoding encoding)
       pipe.write(contents);
    }
 
-/*************************************************
-* Encode and encrypt a PKCS #8 private key       *
-*************************************************/
+/**
+* Encode and encrypt a PKCS #8 private key
+*/
 void encrypt_key(const Private_Key& key,
                  Pipe& pipe,
                  RandomNumberGenerator& rng,
@@ -196,9 +196,9 @@ void encrypt_key(const Private_Key& key,
       pipe.write(enc_key);
    }
 
-/*************************************************
-* PEM encode a PKCS #8 private key               *
-*************************************************/
+/**
+* PEM encode a PKCS #8 private key
+*/
 std::string PEM_encode(const Private_Key& key)
    {
    Pipe pem;
@@ -208,9 +208,9 @@ std::string PEM_encode(const Private_Key& key)
    return pem.read_all_as_string();
    }
 
-/*************************************************
-* Encrypt and PEM encode a PKCS #8 private key   *
-*************************************************/
+/**
+* Encrypt and PEM encode a PKCS #8 private key
+*/
 std::string PEM_encode(const Private_Key& key,
                        RandomNumberGenerator& rng,
                        const std::string& pass,
@@ -226,9 +226,9 @@ std::string PEM_encode(const Private_Key& key,
    return pem.read_all_as_string();
    }
 
-/*************************************************
-* Extract a private key and return it            *
-*************************************************/
+/**
+* Extract a private key and return it
+*/
 Private_Key* load_key(DataSource& source,
                       RandomNumberGenerator& rng,
                       const User_Interface& ui)
@@ -258,9 +258,9 @@ Private_Key* load_key(DataSource& source,
    return key.release();
    }
 
-/*************************************************
-* Extract a private key and return it            *
-*************************************************/
+/**
+* Extract a private key and return it
+*/
 Private_Key* load_key(const std::string& fsname,
                       RandomNumberGenerator& rng,
                       const User_Interface& ui)
@@ -269,9 +269,9 @@ Private_Key* load_key(const std::string& fsname,
    return PKCS8::load_key(source, rng, ui);
    }
 
-/*************************************************
-* Extract a private key and return it            *
-*************************************************/
+/**
+* Extract a private key and return it
+*/
 Private_Key* load_key(DataSource& source,
                       RandomNumberGenerator& rng,
                       const std::string& pass)
@@ -279,9 +279,9 @@ Private_Key* load_key(DataSource& source,
    return PKCS8::load_key(source, rng, User_Interface(pass));
    }
 
-/*************************************************
-* Extract a private key and return it            *
-*************************************************/
+/**
+* Extract a private key and return it
+*/
 Private_Key* load_key(const std::string& fsname,
                       RandomNumberGenerator& rng,
                       const std::string& pass)
@@ -289,9 +289,9 @@ Private_Key* load_key(const std::string& fsname,
    return PKCS8::load_key(fsname, rng, User_Interface(pass));
    }
 
-/*************************************************
-* Make a copy of this private key                *
-*************************************************/
+/**
+* Make a copy of this private key
+*/
 Private_Key* copy_key(const Private_Key& key,
                       RandomNumberGenerator& rng)
    {
