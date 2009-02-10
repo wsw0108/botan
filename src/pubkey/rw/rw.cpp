@@ -1,12 +1,14 @@
 /*
 * Rabin-Williams Source File
-* (C) 1999-2008 Jack Lloyd
+* (C) 1999-2009 Jack Lloyd
 */
 
 #include <botan/rw.h>
 #include <botan/numthry.h>
 #include <botan/keypair.h>
 #include <botan/look_pk.h>
+#include <botan/der_enc.h>
+#include <botan/ber_dec.h>
 #include <botan/parsing.h>
 #include <algorithm>
 
@@ -64,6 +66,35 @@ SecureVector<byte> RW_PublicKey::verify(const byte in[], u32bit len) const
    {
    BigInt i(in, len);
    return BigInt::encode(public_op(i));
+   }
+
+/**
+* Return the X.509 subjectPublicKeyInfo for a RW key
+*/
+std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+RW_PublicKey::subject_public_key_info() const
+   {
+   DER_Encoder key_bits;
+
+   key_bits.start_cons(SEQUENCE)
+              .encode(this->get_n())
+              .encode(this->get_e())
+           .end_cons();
+
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              AlgorithmIdentifier::USE_NULL_PARAM);
+
+   return std::make_pair(alg_id, key_bits.get_contents());
+   }
+
+/**
+* Check RW public parameters for consistency
+*/
+bool RW_PublicKey::check_key(RandomNumberGenerator&, bool) const
+   {
+   if(n < 35 || n.is_even() || e < 2 || e.is_odd() || e >= n)
+      return false;
+   return true;
    }
 
 /**
@@ -151,6 +182,33 @@ RW_PrivateKey::RW_PrivateKey(RandomNumberGenerator& rng,
    }
 
 /**
+* Encode RW key in the PKCS #1 v1.5 RSAPrivateKey format
+*/
+std::pair<AlgorithmIdentifier, SecureVector<byte> >
+RW_PrivateKey::pkcs8_encoding() const
+   {
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              AlgorithmIdentifier::USE_NULL_PARAM);
+
+   SecureVector<byte> key_bits =
+      DER_Encoder()
+        .start_cons(SEQUENCE)
+           .encode(static_cast<u32bit>(0))
+           .encode(this->n)
+           .encode(this->e)
+           .encode(this->d)
+           .encode(this->p)
+           .encode(this->q)
+           .encode(this->d1)
+           .encode(this->d2)
+           .encode(this->c)
+        .end_cons()
+        .get_contents();
+
+   return std::make_pair(alg_id, key_bits);
+   }
+
+/**
 * Rabin-Williams Signature Operation
 */
 SecureVector<byte> RW_PrivateKey::sign(const byte in[], u32bit len,
@@ -176,25 +234,33 @@ SecureVector<byte> RW_PrivateKey::sign(const byte in[], u32bit len,
 */
 bool RW_PrivateKey::check_key(RandomNumberGenerator& rng, bool strong) const
    {
-   if(!IF_Scheme_PrivateKey::check_key(rng, strong))
+   if(n < 35 || n.is_even() || e < 2 || n.is_even())
       return false;
 
-   if(!strong)
-      return true;
-
-   if((e * d) % (lcm(p - 1, q - 1) / 2) != 1)
+   if(d < 2 || p < 3 || q < 3 || p*q != n)
       return false;
 
-   try
+   if(strong)
       {
-      KeyPair::check_key(rng,
-                         get_pk_signer(*this, "EMSA2(SHA-1)"),
-                         get_pk_verifier(*this, "EMSA2(SHA-1)")
-         );
-      }
-   catch(Self_Test_Failure)
-      {
-      return false;
+      if(d1 != d % (p - 1) || d2 != d % (q - 1) || c != inverse_mod(q, p))
+         return false;
+      if(!check_prime(p, rng) || !check_prime(q, rng))
+         return false;
+
+      if((e * d) % (lcm(p - 1, q - 1) / 2) != 1)
+         return false;
+
+      try
+         {
+         KeyPair::check_key(rng,
+                            get_pk_signer(*this, "EMSA2(SHA-1)"),
+                            get_pk_verifier(*this, "EMSA2(SHA-1)")
+            );
+         }
+      catch(Self_Test_Failure)
+         {
+         return false;
+         }
       }
 
    return true;
