@@ -4,6 +4,7 @@
 */
 
 #include <botan/elgamal.h>
+#include <botan/ber_dec.h>
 #include <botan/numthry.h>
 #include <botan/keypair.h>
 #include <botan/look_pk.h>

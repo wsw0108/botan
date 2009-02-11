@@ -6,9 +6,8 @@
 #ifndef BOTAN_DL_ALGO_H__
 #define BOTAN_DL_ALGO_H__
 
+#include <botan/pk_keys.h>
 #include <botan/dl_group.h>
-#include <botan/x509_key.h>
-#include <botan/pkcs8.h>
 #include <botan/rng.h>
 
 namespace Botan {

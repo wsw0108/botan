@@ -4,6 +4,7 @@
 */
 
 #include <botan/dh.h>
+#include <botan/ber_dec.h>
 #include <botan/numthry.h>
 #include <botan/util.h>
 
