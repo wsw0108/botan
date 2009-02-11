@@ -17,12 +17,10 @@ namespace Botan {
 class BOTAN_DLL RW_PublicKey : public PK_Verifying_with_MR_Key
    {
    public:
-      RW_PublicKey() {}
-
       RW_PublicKey(const AlgorithmIdentifier& alg_id,
                    const MemoryRegion<byte>& key_bits);
 
-      RW_PublicKey(const BigInt&, const BigInt&);
+      RW_PublicKey(const BigInt& p, const BigInt& e);
 
       std::string algo_name() const { return "RW"; }
 
@@ -47,6 +45,8 @@ class BOTAN_DLL RW_PublicKey : public PK_Verifying_with_MR_Key
       std::pair<AlgorithmIdentifier, MemoryVector<byte> >
          subject_public_key_info() const;
    protected:
+      RW_PublicKey() {}
+
       BigInt public_op(const BigInt&) const;
 
       BigInt n, e;
