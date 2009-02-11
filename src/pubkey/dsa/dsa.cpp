@@ -7,6 +7,8 @@
 #include <botan/numthry.h>
 #include <botan/keypair.h>
 #include <botan/look_pk.h>
+#include <botan/ber_dec.h>
+#include <botan/der_enc.h>
 
 namespace Botan {
 
@@ -40,6 +42,17 @@ bool DSA_PublicKey::verify(const byte msg[], u32bit msg_len,
    return core.verify(msg, msg_len, sig, sig_len);
    }
 
+std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+DSA_PublicKey::subject_public_key_info() const
+   {
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              this->group.DER_encode(DL_Group::ANSI_X9_57));
+
+   MemoryVector<byte> key_bits = DER_Encoder().encode(this->get_y()).get_contents();
+
+   return std::make_pair(alg_id, key_bits);
+   }
+
 /**
 * Return the maximum input size in bits
 */
@@ -54,6 +67,19 @@ u32bit DSA_PublicKey::max_input_bits() const
 u32bit DSA_PublicKey::message_part_size() const
    {
    return group_q().bytes();
+   }
+
+/**
+* Check DSA public key for consistency
+*/
+bool DSA_PublicKey::check_key(RandomNumberGenerator& rng,
+                              bool strong) const
+   {
+   if(y < 2 || y >= group_p())
+      return false;
+   if(!group.verify_group(rng, strong))
+      return false;
+   return true;
    }
 
 /**
@@ -113,27 +139,48 @@ SecureVector<byte> DSA_PrivateKey::sign(const byte in[], u32bit length,
    return core.sign(in, length, k);
    }
 
+std::pair<AlgorithmIdentifier, SecureVector<byte> >
+DSA_PrivateKey::pkcs8_encoding() const
+   {
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              this->group.DER_encode(DL_Group::ANSI_X9_57));
+
+   SecureVector<byte> key_bits =
+      DER_Encoder().encode(this->get_x()).get_contents();
+
+   return std::make_pair(alg_id, key_bits);
+   }
+
 /**
 * Check Private DSA Parameters
 */
 bool DSA_PrivateKey::check_key(RandomNumberGenerator& rng, bool strong) const
    {
-   if(!DL_Scheme_PrivateKey::check_key(rng, strong) || x >= group_q())
+   const BigInt& p = group_p();
+   const BigInt& g = group_g();
+
+   if(y < 2 || y >= p || x < 2 || x >= p)
       return false;
 
-   if(!strong)
-      return true;
-
-   try
-      {
-      KeyPair::check_key(rng,
-                         get_pk_signer(*this, "EMSA1(SHA-1)"),
-                         get_pk_verifier(*this, "EMSA1(SHA-1)")
-         );
-      }
-   catch(Self_Test_Failure)
-      {
+   if(!group.verify_group(rng, strong))
       return false;
+
+   if(strong)
+      {
+      if(y != power_mod(g, x, p))
+         return false;
+
+      try
+         {
+         KeyPair::check_key(rng,
+                            get_pk_signer(*this, "EMSA1(SHA-1)"),
+                            get_pk_verifier(*this, "EMSA1(SHA-1)")
+            );
+         }
+      catch(Self_Test_Failure)
+         {
+         return false;
+         }
       }
 
    return true;

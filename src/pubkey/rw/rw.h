@@ -6,9 +6,8 @@
 #ifndef BOTAN_RABIN_WILLIAMS_H__
 #define BOTAN_RABIN_WILLIAMS_H__
 
+#include <botan/pk_keys.h>
 #include <botan/if_core.h>
-#include <botan/x509_key.h>
-#include <botan/pkcs8.h>
 
 namespace Botan {
 
