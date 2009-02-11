@@ -8,6 +8,7 @@
 #include <botan/numthry.h>
 #include <botan/keypair.h>
 #include <botan/look_pk.h>
+#include <botan/der_enc.h>
 #include <botan/util.h>
 
 namespace Botan {
@@ -43,12 +44,28 @@ ElGamal_PublicKey::encrypt(const byte in[], u32bit length,
    return core.encrypt(in, length, k);
    }
 
-/**
-* Return the maximum input size in bits
-*/
-u32bit ElGamal_PublicKey::max_input_bits() const
+std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+ElGamal_PublicKey::subject_public_key_info() const
    {
-   return (group_p().bits() - 1);
+   AlgorithmIdentifier alg_id(get_oid(),
+                              group.DER_encode(DL_Group::ANSI_X9_42));
+
+   MemoryVector<byte> key_bits = DER_Encoder().encode(get_y()).get_contents();
+
+   return std::make_pair(alg_id, key_bits);
+   }
+
+/**
+* Check ElGamal public key for consistency
+*/
+bool ElGamal_PublicKey::check_key(RandomNumberGenerator& rng,
+                                  bool strong) const
+   {
+   if(y < 2 || y >= group_p())
+      return false;
+   if(!group.verify_group(rng, strong))
+      return false;
+   return true;
    }
 
 /**
@@ -59,9 +76,9 @@ ElGamal_PrivateKey::ElGamal_PrivateKey(const AlgorithmIdentifier& alg_id,
                                        RandomNumberGenerator& rng)
    {
    DataSource_Memory source(alg_id.parameters);
-   this->group.BER_decode(source, DL_Group::ANSI_X9_57);
+   group.BER_decode(source, DL_Group::ANSI_X9_57);
 
-   BER_Decoder(key_bits).decode(this->x);
+   BER_Decoder(key_bits).decode(x);
    y = power_mod(group_g(), x, group_p());
 
    core = ELG_Core(rng, group, y, x);
@@ -101,27 +118,50 @@ SecureVector<byte> ElGamal_PrivateKey::decrypt(const byte in[],
    }
 
 /**
+* Decode ElGamal private key
+*/
+std::pair<AlgorithmIdentifier, SecureVector<byte> >
+ElGamal_PrivateKey::pkcs8_encoding() const
+   {
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              this->group.DER_encode(DL_Group::ANSI_X9_42));
+
+   SecureVector<byte> key_bits =
+      DER_Encoder().encode(this->get_x()).get_contents();
+
+   return std::make_pair(alg_id, key_bits);
+   }
+
+/**
 * Check Private ElGamal Parameters
 */
 bool ElGamal_PrivateKey::check_key(RandomNumberGenerator& rng,
                                    bool strong) const
    {
-   if(!DL_Scheme_PrivateKey::check_key(rng, strong))
+   const BigInt& p = group_p();
+   const BigInt& g = group_g();
+
+   if(y < 2 || y >= p || x < 2 || x >= p)
+      return false;
+   if(!group.verify_group(rng, strong))
       return false;
 
-   if(!strong)
-      return true;
+   if(strong)
+      {
+      if(y != power_mod(g, x, p))
+         return false;
 
-   try
-      {
-      KeyPair::check_key(rng,
-                         get_pk_encryptor(*this, "EME1(SHA-1)"),
-                         get_pk_decryptor(*this, "EME1(SHA-1)")
-         );
-      }
-   catch(Self_Test_Failure)
-      {
-      return false;
+      try
+         {
+         KeyPair::check_key(rng,
+                            get_pk_encryptor(*this, "EME1(SHA-1)"),
+                            get_pk_decryptor(*this, "EME1(SHA-1)")
+            );
+         }
+      catch(Self_Test_Failure)
+         {
+         return false;
+         }
       }
 
    return true;
