@@ -6,10 +6,10 @@
 #ifndef BOTAN_DSA_H__
 #define BOTAN_DSA_H__
 
+#include <botan/pk_keys.h>
 #include <botan/dl_group.h>
 #include <botan/dsa_core.h>
 #include <botan/rng.h>
-#include <botan/pk_keys.h>
 
 namespace Botan {
 
@@ -22,7 +22,7 @@ class BOTAN_DLL DSA_PublicKey : public PK_Verifying_wo_MR_Key
       DSA_PublicKey(const AlgorithmIdentifier& alg_id,
                     const MemoryRegion<byte>& key_bits);
 
-      DSA_PublicKey(const DL_Group& group, const BigInt& x);
+      DSA_PublicKey(const DL_Group& group, const BigInt& y);
 
       /**
       * Get the DL domain parameters of this key.
@@ -58,7 +58,12 @@ class BOTAN_DLL DSA_PublicKey : public PK_Verifying_wo_MR_Key
       std::string algo_name() const { return "DSA"; }
 
       u32bit message_parts() const { return 2; }
+
+      /**
+      * Return the size of each portion of the sig
+      */
       u32bit message_part_size() const;
+
       u32bit max_input_bits() const;
 
       /**
@@ -96,7 +101,7 @@ class BOTAN_DLL DSA_PrivateKey : public DSA_PublicKey,
       DSA_PrivateKey(RandomNumberGenerator& rng, const DL_Group& group,
                      const BigInt& x = 0);
 
-      SecureVector<byte> sign(const byte msg[], u32bi msg_lent,
+      SecureVector<byte> sign(const byte msg[], u32bit msg_lent,
                               RandomNumberGenerator& rng) const;
 
       bool check_key(RandomNumberGenerator& rng, bool) const;
