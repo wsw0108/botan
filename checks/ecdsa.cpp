@@ -16,6 +16,7 @@
 #include <botan/rsa.h>
 #include <botan/x509cert.h>
 #include <botan/oids.h>
+#include <botan/pkcs8.h>
 
 #include <iostream>
 #include <fstream>

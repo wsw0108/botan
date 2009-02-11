@@ -39,6 +39,7 @@
 #include <botan/filters.h>
 #include <botan/look_pk.h>
 #include <botan/numthry.h>
+#include <botan/pkcs8.h>
 using namespace Botan;
 
 #include "common.h"
