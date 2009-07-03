@@ -15,7 +15,7 @@ namespace Botan {
 /*
 * Return the X.509 public key encoder
 */
-X509_Encoder* DL_Scheme_PublicKey::x509_encoder() const
+X509_Encoder* DL_Scheme_PublicKey::x509_encoder(const OID& oid) const
    {
    class DL_Scheme_Encoder : public X509_Encoder
       {
@@ -25,7 +25,7 @@ X509_Encoder* DL_Scheme_PublicKey::x509_encoder() const
             MemoryVector<byte> group =
                key->group.DER_encode(key->group_format());
 
-            return AlgorithmIdentifier(key->get_oid(), group);
+            return AlgorithmIdentifier(oid, group);
             }
 
          MemoryVector<byte> key_bits() const
@@ -33,12 +33,14 @@ X509_Encoder* DL_Scheme_PublicKey::x509_encoder() const
             return DER_Encoder().encode(key->y).get_contents();
             }
 
-         DL_Scheme_Encoder(const DL_Scheme_PublicKey* k) : key(k) {}
+         DL_Scheme_Encoder(const DL_Scheme_PublicKey* k, const OID& o) :
+            key(k), oid(o) {}
       private:
          const DL_Scheme_PublicKey* key;
+         OID oid;
       };
 
-   return new DL_Scheme_Encoder(this);
+   return new DL_Scheme_Encoder(this, oid);
    }
 
 /*
@@ -72,7 +74,7 @@ X509_Decoder* DL_Scheme_PublicKey::x509_decoder()
 /*
 * Return the PKCS #8 private key encoder
 */
-PKCS8_Encoder* DL_Scheme_PrivateKey::pkcs8_encoder() const
+PKCS8_Encoder* DL_Scheme_PrivateKey::pkcs8_encoder(const OID& oid) const
    {
    class DL_Scheme_Encoder : public PKCS8_Encoder
       {
@@ -82,7 +84,7 @@ PKCS8_Encoder* DL_Scheme_PrivateKey::pkcs8_encoder() const
             MemoryVector<byte> group =
                key->group.DER_encode(key->group_format());
 
-            return AlgorithmIdentifier(key->get_oid(), group);
+            return AlgorithmIdentifier(oid, group);
             }
 
          MemoryVector<byte> key_bits() const
@@ -90,12 +92,14 @@ PKCS8_Encoder* DL_Scheme_PrivateKey::pkcs8_encoder() const
             return DER_Encoder().encode(key->x).get_contents();
             }
 
-         DL_Scheme_Encoder(const DL_Scheme_PrivateKey* k) : key(k) {}
+         DL_Scheme_Encoder(const DL_Scheme_PrivateKey* k, const OID& o) :
+            key(k), oid(o) {}
       private:
          const DL_Scheme_PrivateKey* key;
+         OID oid;
       };
 
-   return new DL_Scheme_Encoder(this);
+   return new DL_Scheme_Encoder(this, oid);
    }
 
 /*

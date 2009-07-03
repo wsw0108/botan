@@ -15,9 +15,9 @@ namespace Botan {
 /**
 * RSA Public Key
 */
-class BOTAN_DLL RSA_PublicKey : public PK_Encrypting_Key,
-                                public PK_Verifying_with_MR_Key,
-                                public virtual IF_Scheme_PublicKey
+class BOTAN_DLL RSA_PublicKey : public virtual PK_Encrypting_Key,
+                                public virtual PK_Verifying_with_MR_Key,
+                                public IF_Scheme_PublicKey
    {
    public:
       std::string algo_name() const { return "RSA"; }
@@ -27,8 +27,15 @@ class BOTAN_DLL RSA_PublicKey : public PK_Encrypting_Key,
 
       SecureVector<byte> verify(const byte[], u32bit) const;
 
+      X509_Encoder* x509_encoder() const
+         { return IF_Scheme_PublicKey::x509_encoder(); }
+      X509_Decoder* x509_decoder()
+         { return IF_Scheme_PublicKey::x509_decoder(); }
+
+      u32bit max_input_bits() const { return (n.bits() - 1); }
+
       RSA_PublicKey() {}
-      RSA_PublicKey(const BigInt&, const BigInt&);
+      RSA_PublicKey(const BigInt& n, const BigInt& e);
    protected:
       BigInt public_op(const BigInt&) const;
    };
@@ -36,18 +43,29 @@ class BOTAN_DLL RSA_PublicKey : public PK_Encrypting_Key,
 /**
 * RSA Private Key class.
 */
-class BOTAN_DLL RSA_PrivateKey : public RSA_PublicKey,
-                                 public PK_Decrypting_Key,
-                                 public PK_Signing_Key,
-                                 public IF_Scheme_PrivateKey
+class BOTAN_DLL RSA_PrivateKey : public virtual PK_Decrypting_Key,
+                                 public virtual PK_Signing_Key,
+                                 public virtual IF_Scheme_PrivateKey
    {
    public:
+      std::string algo_name() const { return "RSA"; }
+
+      /**
+        Return a new public key matching this private key
+      */
+      RSA_PublicKey* public_key() const;
+
       SecureVector<byte> sign(const byte[], u32bit,
                               RandomNumberGenerator&) const;
 
       SecureVector<byte> decrypt(const byte[], u32bit) const;
 
       bool check_key(RandomNumberGenerator& rng, bool) const;
+
+      PKCS8_Encoder* pkcs8_encoder() const
+         { return IF_Scheme_PrivateKey::pkcs8_encoder(); }
+      PKCS8_Decoder* pkcs8_decoder(RandomNumberGenerator& rng)
+         { return IF_Scheme_PrivateKey::pkcs8_decoder(rng); }
 
       /**
       * Default constructor, does not set any internal values. Use this

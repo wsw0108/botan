@@ -10,6 +10,7 @@
 #include <botan/numthry.h>
 #include <botan/keypair.h>
 #include <botan/look_pk.h>
+#include <memory>
 
 namespace Botan {
 
@@ -105,7 +106,7 @@ BigInt RSA_PrivateKey::private_op(const byte in[], u32bit length) const
       throw Invalid_Argument(algo_name() + "::private_op: input is too large");
 
    BigInt r = core.private_op(i);
-   if(i != public_op(r))
+   if(i != core.public_op(r))
       throw Self_Test_Failure(algo_name() + " private operation check failed");
    return r;
    }
@@ -127,8 +128,16 @@ SecureVector<byte> RSA_PrivateKey::sign(const byte in[], u32bit len,
    return BigInt::encode_1363(private_op(in, len), n.bytes());
    }
 
-/*
-* Check Private RSA Parameters
+/**
+* Return the cooresponding public key
+*/
+RSA_PublicKey* RSA_PrivateKey::public_key() const
+   {
+   return new RSA_PublicKey(n, e);
+   }
+
+/**
+* Check private RSA key for consistency
 */
 bool RSA_PrivateKey::check_key(RandomNumberGenerator& rng, bool strong) const
    {
@@ -143,14 +152,16 @@ bool RSA_PrivateKey::check_key(RandomNumberGenerator& rng, bool strong) const
 
    try
       {
+      std::auto_ptr<RSA_PublicKey> pubkey(this->public_key());
+
       KeyPair::check_key(rng,
-                         get_pk_encryptor(*this, "EME1(SHA-1)"),
+                         get_pk_encryptor(*pubkey, "EME1(SHA-1)"),
                          get_pk_decryptor(*this, "EME1(SHA-1)")
          );
 
       KeyPair::check_key(rng,
                          get_pk_signer(*this, "EMSA4(SHA-1)"),
-                         get_pk_verifier(*this, "EMSA4(SHA-1)")
+                         get_pk_verifier(*pubkey, "EMSA4(SHA-1)")
          );
       }
    catch(Self_Test_Failure)
