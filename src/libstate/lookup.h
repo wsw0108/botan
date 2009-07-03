@@ -1,7 +1,9 @@
-/*************************************************
-* Algorithm Lookup Header File                   *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* Algorithm Lookup
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #ifndef BOTAN_LOOKUP_H__
 #define BOTAN_LOOKUP_H__
@@ -20,9 +22,9 @@
 
 namespace Botan {
 
-/*************************************************
-* Retrieve an object from the lookup table       *
-*************************************************/
+/*
+* Retrieve an object from the lookup table
+*/
 // NOTE: these functions return internally stored objects, library
 // retains ownership
 
@@ -38,58 +40,58 @@ retrieve_hash(const std::string&);
 BOTAN_DLL const MessageAuthenticationCode*
 retrieve_mac(const std::string&);
 
-/*************************************************
-* Get an algorithm object                        *
-*************************************************/
+/*
+* Get an algorithm object
+*/
 // NOTE: these functions create and return new objects, letting the
 // caller assume ownership of them
 
 /**
 * Block cipher factory method.
-* @param name the name of the desired block cipher
-* @return the block cipher object
+* @param algo_spec the name of the desired block cipher
+* @return a pointer to the block cipher object
 */
 BOTAN_DLL BlockCipher* get_block_cipher(const std::string& name);
 
 
 /**
 * Stream cipher factory method.
-* @param name the name of the desired stream cipher
-* @return the stream cipher object
+* @param algo_spec the name of the desired stream cipher
+* @return a pointer to the stream cipher object
 */
 BOTAN_DLL StreamCipher* get_stream_cipher(const std::string& name);
 
 /**
 * Hash function factory method.
-* @param name the name of the desired hash function
-* @return the hash function object
+* @param algo_spec the name of the desired hash function
+* @return a pointer to the hash function object
 */
 BOTAN_DLL HashFunction* get_hash(const std::string& name);
 
 /**
 * MAC factory method.
-* @param name the name of the desired MAC
-* @return the MAC object
+* @param algo_spec the name of the desired MAC
+* @return a pointer to the MAC object
 */
 BOTAN_DLL MessageAuthenticationCode* get_mac(const std::string& name);
 
 /**
 * String to key algorithm factory method.
 * @param name the name of the desired string to key (S2K) algorithm
-* @return the string to key algorithm object
+* @return a pointer to the string to key algorithm object
 */
 BOTAN_DLL S2K* get_s2k(const std::string& name);
 
-/*************************************************
-* Get an EMSA/EME/KDF/MGF function               *
-*************************************************/
+/*
+* Get an EMSA/EME/KDF/MGF function
+*/
 // NOTE: these functions create and return new objects, letting the
 // caller assume ownership of them
 
 /**
 * Factory method for EME (message-encoding methods for encryption) objects
 * @param name the name of the EME to create
-* @return the desired EME object
+* @return a pointer to the desired EME object
 */
 BOTAN_DLL EME*  get_eme(const std::string& name);
 
@@ -97,30 +99,30 @@ BOTAN_DLL EME*  get_eme(const std::string& name);
 * Factory method for EMSA (message-encoding methods for signatures
 * with appendix) objects
 * @param name the name of the EME to create
-* @return the desired EME object
+* @return a pointer to the desired EME object
 */
 BOTAN_DLL EMSA* get_emsa(const std::string& name);
 
 /**
 * Factory method for KDF (key derivation function)
 * @param name the name of the KDF to create
-* @return the desired KDF object
+* @return a pointer to the desired KDF object
 */
 BOTAN_DLL KDF*  get_kdf(const std::string& name);
 
-/*************************************************
-* Get a cipher object                            *
-*************************************************/
+/*
+* Get a cipher object
+*/
 
 /**
 * Factory method for general symmetric cipher filters.
-* @param name the name of the desired cipher
+* @param algo_spec the name of the desired cipher
 * @param key the key to be used for encryption/decryption performed by
 * the filter
 * @param iv the initialization vector to be used
-* @param dir determines whether the filter will be an encrypting or decrypting
+* @param direction determines whether the filter will be an encrypting or decrypting
 * filter
-* @return the encryption or decryption filter
+* @return a pointer to the encryption or decryption filter
 */
 BOTAN_DLL Keyed_Filter* get_cipher(const std::string& name,
                                    const SymmetricKey& key,
@@ -128,12 +130,12 @@ BOTAN_DLL Keyed_Filter* get_cipher(const std::string& name,
                                    Cipher_Dir dir);
 /**
 * Factory method for general symmetric cipher filters.
-* @param name the name of the desired cipher
+* @param algo_spec the name of the desired cipher
 * @param key the key to be used for encryption/decryption performed by
 * the filter
-* @param dir determines whether the filter will be an encrypting or decrypting
+* @param direction determines whether the filter will be an encrypting or decrypting
 * filter
-* @return the encryption or decryption filter
+* @return a pointer to the encryption or decryption filter
 */
 BOTAN_DLL Keyed_Filter* get_cipher(const std::string& name,
                                    const SymmetricKey& key,
@@ -141,11 +143,11 @@ BOTAN_DLL Keyed_Filter* get_cipher(const std::string& name,
 
 /** Factory method for general symmetric cipher filters. No key will
 * be set in the filter.
-* @param name the name of the desired cipher
+* @param algo_spec the name of the desired cipher
 
-* @param dir determines whether the filter will be an encrypting or
+* @param direction determines whether the filter will be an encrypting or
 * decrypting filter
-* @return the encryption or decryption filter
+* @return a pointer to the encryption or decryption filter
 */
 BOTAN_DLL Keyed_Filter* get_cipher(const std::string& name, Cipher_Dir dir);
 
@@ -172,21 +174,21 @@ BOTAN_DLL bool have_stream_cipher(const std::string& name);
 
 /**
 * Check if a hash algorithm exists.
-* @param name the name of the algorithm to check for
+* @param algo_spec the name of the algorithm to check for
 * @return true if the algorithm exists, false otherwise
 */
 BOTAN_DLL bool have_hash(const std::string& name);
 
 /**
 * Check if a MAC algorithm exists.
-* @param name the name of the algorithm to check for
+* @param algo_spec the name of the algorithm to check for
 * @return true if the algorithm exists, false otherwise
 */
 BOTAN_DLL bool have_mac(const std::string& name);
 
-/*************************************************
-* Query information about an algorithm           *
-*************************************************/
+/*
+* Query information about an algorithm
+*/
 
 /**
 * Find out the block size of a certain symmetric algorithm.
@@ -205,7 +207,7 @@ BOTAN_DLL u32bit output_length_of(const std::string& name);
 /**
 * Find out the whether a certain key length is allowd for a given
 * symmetric algorithm.
-* @param keylen the key length in question
+* @param key_len the key length in question
 * @param name the name of the algorithm
 * @return true if the key length is valid for that algorithm, false otherwise
 */

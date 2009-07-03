@@ -1,6 +1,8 @@
 /*
-* PK Key Source File
-* (C) 1999-2009 Jack Lloyd
+* PK Key
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #include <botan/pk_algs.h>

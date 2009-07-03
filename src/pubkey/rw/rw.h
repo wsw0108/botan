@@ -1,6 +1,8 @@
 /*
-* Rabin-Williams Header File
-* (C) 1999-2009 Jack Lloyd
+* Rabin-Williams
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #ifndef BOTAN_RABIN_WILLIAMS_H__

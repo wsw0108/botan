@@ -1,7 +1,20 @@
 
-* 1.8.2-pre, 2009-??-??
+* 1.8.3-pre, 2009-??-??
+ - Add a new Python configuration script
+ - Add the Skein-512 SHA-3 candidate hash function
+ - Add the XTS block cipher mode from IEEE P1619
+ - Improve handling of low-entropy situations during PRNG seeding
+ - Change random device polling to prefer /dev/urandom over /dev/random
+ - Use an input insensitive implementation of same_mem instead of memcmp
+ - Correct DataSource::discard_next to return the number of discarded bytes
+ - Provide a default value for AutoSeeded_RNG::reseed
+ - Fix Gentoo bug 272242
+
+* 1.8.2, 2009-04-07
  - Make entropy polling more flexible and in most cases faster
- - Another atempt at fixing botan-config on MacOS X
+ - GOST 28147 now supports multiple sbox parameters
+ - Added the GOST 34.11 hash function
+ - Fix botan-config problems on MacOS X
 
 * 1.8.1, 2009-01-20
  - Avoid a valgrind warning in es_unix.cpp on 32-bit Linux

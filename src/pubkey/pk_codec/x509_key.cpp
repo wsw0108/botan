@@ -1,6 +1,8 @@
 /*
-* X.509 Public Key Source File
-* (C) 1999-2009 Jack Lloyd
+* X.509 Public Key
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #include <botan/x509_key.h>

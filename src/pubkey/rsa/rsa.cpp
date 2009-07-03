@@ -1,6 +1,8 @@
 /*
-* RSA Source File
-* (C) 1999-2009 Jack Lloyd
+* RSA
+* (C) 1999-2008 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #include <botan/rsa.h>

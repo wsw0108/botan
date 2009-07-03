@@ -1,7 +1,9 @@
-/*************************************************
-* Block Cipher Lookup                            *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* Block Cipher Lookup
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #include <botan/def_eng.h>
 #include <botan/scan_name.h>
@@ -25,8 +27,8 @@
   #include <botan/desx.h>
 #endif
 
-#if defined(BOTAN_HAS_GOST)
-  #include <botan/gost.h>
+#if defined(BOTAN_HAS_GOST_28147_89)
+  #include <botan/gost_28147.h>
 #endif
 
 #if defined(BOTAN_HAS_IDEA)
@@ -103,9 +105,9 @@
 
 namespace Botan {
 
-/*************************************************
-* Look for an algorithm with this name           *
-*************************************************/
+/*
+* Look for an algorithm with this name
+*/
 BlockCipher*
 Default_Engine::find_block_cipher(const SCAN_Name& request,
                                   Algorithm_Factory& af) const
@@ -143,9 +145,9 @@ Default_Engine::find_block_cipher(const SCAN_Name& request,
       return new TripleDES;
 #endif
 
-#if defined(BOTAN_HAS_GOST)
-   if(request.algo_name() == "GOST")
-      return new GOST;
+#if defined(BOTAN_HAS_GOST_28147_89)
+   if(request.algo_name() == "GOST-28147-89")
+      return new GOST_28147_89(request.arg(0, "R3411_94_TestParam"));
 #endif
 
 #if defined(BOTAN_HAS_IDEA)

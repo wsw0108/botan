@@ -1,6 +1,8 @@
 /*
-* Diffie-Hellman Header File
+* Diffie-Hellman
 * (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #ifndef BOTAN_DIFFIE_HELLMAN_H__
@@ -24,6 +26,10 @@ class BOTAN_DLL DH_PublicKey : public virtual DL_Scheme_PublicKey
 
       DL_Group::Format group_format() const { return DL_Group::ANSI_X9_42; }
 
+      /**
+      * Construct an uninitialized key. Use this constructor if you wish
+      * to decode an encoded key into the new instance.
+      */
       DH_PublicKey() {}
 
       DH_PublicKey(const AlgorithmIdentifier& alg_id,

@@ -1,7 +1,9 @@
-/*************************************************
-* Memory Mapping Allocator Source File           *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* Memory Mapping Allocator
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #include <botan/mmap_mem.h>
 #include <cstring>
@@ -21,9 +23,9 @@ namespace Botan {
 
 namespace {
 
-/*************************************************
-* MemoryMapping_Allocator Exception              *
-*************************************************/
+/*
+* MemoryMapping_Allocator Exception
+*/
 class MemoryMapping_Failed : public Exception
    {
    public:
@@ -33,9 +35,9 @@ class MemoryMapping_Failed : public Exception
 
 }
 
-/*************************************************
-* Memory Map a File into Memory                  *
-*************************************************/
+/*
+* Memory Map a File into Memory
+*/
 void* MemoryMapping_Allocator::alloc_block(u32bit n)
    {
    class TemporaryFile
@@ -75,7 +77,9 @@ void* MemoryMapping_Allocator::alloc_block(u32bit n)
    if(::unlink(file.path().c_str()))
       throw MemoryMapping_Failed("Could not unlink file '" + file.path() + "'");
 
-   ::lseek(file.get_fd(), n-1, SEEK_SET);
+   if(::lseek(file.get_fd(), n-1, SEEK_SET) < 0)
+      throw MemoryMapping_Failed("Could not seek file");
+
    if(::write(file.get_fd(), "\0", 1) != 1)
       throw MemoryMapping_Failed("Could not write to file");
 
@@ -94,9 +98,9 @@ void* MemoryMapping_Allocator::alloc_block(u32bit n)
    return ptr;
    }
 
-/*************************************************
-* Remove a Memory Mapping                        *
-*************************************************/
+/*
+* Remove a Memory Mapping
+*/
 void MemoryMapping_Allocator::dealloc_block(void* ptr, u32bit n)
    {
    if(ptr == 0)

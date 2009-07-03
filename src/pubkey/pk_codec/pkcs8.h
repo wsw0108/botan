@@ -1,7 +1,9 @@
-/*************************************************
-* PKCS #8 Header File                            *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* PKCS #8
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #ifndef BOTAN_PKCS8_H__
 #define BOTAN_PKCS8_H__

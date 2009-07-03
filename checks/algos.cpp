@@ -24,7 +24,7 @@ std::vector<algorithm> get_algos()
    algos.push_back(algorithm("Block Cipher", "KASUMI", "KASUMI/ECB", 16));
 
    algos.push_back(algorithm("Block Cipher",
-                             "Lion(SHA-256,Turing)",
+                             "Lion",
                              "Lion(SHA-256,Turing,8192)/ECB", 32));
 
    algos.push_back(algorithm("Block Cipher", "Luby-Rackoff(SHA-512)",
@@ -61,6 +61,7 @@ std::vector<algorithm> get_algos()
    algos.push_back(algorithm("Cipher Mode", "AES-128/CTR",
                              "AES-128/CTR-BE", 16, 16));
    algos.push_back(algorithm("Cipher Mode", "AES-128/EAX", 16, 16));
+   algos.push_back(algorithm("Cipher Mode", "AES-128/XTS", 32, 16));
 
    algos.push_back(algorithm("Stream Cipher", "ARC4", 16));
    algos.push_back(algorithm("Stream Cipher", "Salsa20", 32));
@@ -72,6 +73,7 @@ std::vector<algorithm> get_algos()
    algos.push_back(algorithm("Hash", "CRC24"));
    algos.push_back(algorithm("Hash", "CRC32"));
    algos.push_back(algorithm("Hash", "FORK-256"));
+   algos.push_back(algorithm("Hash", "GOST-34.11"));
    algos.push_back(algorithm("Hash", "HAS-160"));
    algos.push_back(algorithm("Hash", "HAS-V"));
    algos.push_back(algorithm("Hash", "MD2"));
@@ -83,6 +85,7 @@ std::vector<algorithm> get_algos()
    algos.push_back(algorithm("Hash", "SHA-256"));
    algos.push_back(algorithm("Hash", "SHA-384"));
    algos.push_back(algorithm("Hash", "SHA-512"));
+   algos.push_back(algorithm("Hash", "Skein-512"));
    algos.push_back(algorithm("Hash", "Tiger"));
    algos.push_back(algorithm("Hash", "Whirlpool"));
 

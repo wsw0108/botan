@@ -1,7 +1,9 @@
-/*************************************************
-* Auto Seeded RNG Header File                    *
-* (C) 2008 Jack Lloyd                            *
-*************************************************/
+/*
+* Auto Seeded RNG
+* (C) 2008 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #ifndef BOTAN_AUTO_SEEDING_RNG_H__
 #define BOTAN_AUTO_SEEDING_RNG_H__
@@ -25,7 +27,7 @@ class BOTAN_DLL AutoSeeded_RNG : public RandomNumberGenerator
       std::string name() const
          { return "AutoSeeded(" + rng->name() + ")"; }
 
-      void reseed(u32bit poll_bits) { rng->reseed(poll_bits); }
+      void reseed(u32bit poll_bits = 256) { rng->reseed(poll_bits); }
       void add_entropy_source(EntropySource* es)
          { rng->add_entropy_source(es); }
       void add_entropy(const byte in[], u32bit len)

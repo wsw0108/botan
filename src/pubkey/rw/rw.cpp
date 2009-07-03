@@ -1,6 +1,8 @@
 /*
-* Rabin-Williams Source File
-* (C) 1999-2009 Jack Lloyd
+* Rabin-Williams
+* (C) 1999-2008 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #include <botan/rw.h>

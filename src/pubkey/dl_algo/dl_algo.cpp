@@ -1,7 +1,9 @@
-/*************************************************
-* DL Scheme Source File                          *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* DL Scheme
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #include <botan/dl_algo.h>
 #include <botan/numthry.h>
@@ -33,9 +35,9 @@ DL_Scheme_PrivateKey::pkcs8_encoding() const
    return std::make_pair(alg_id, key_bits);
    }
 
-/*************************************************
-* Check Public DL Parameters                     *
-*************************************************/
+/*
+* Check Public DL Parameters
+*/
 bool DL_Scheme_PublicKey::check_key(RandomNumberGenerator& rng,
                                     bool strong) const
    {
@@ -46,9 +48,9 @@ bool DL_Scheme_PublicKey::check_key(RandomNumberGenerator& rng,
    return true;
    }
 
-/*************************************************
-* Check DL Scheme Private Parameters             *
-*************************************************/
+/*
+* Check DL Scheme Private Parameters
+*/
 bool DL_Scheme_PrivateKey::check_key(RandomNumberGenerator& rng,
                                      bool strong) const
    {

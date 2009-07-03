@@ -1,7 +1,9 @@
-/*************************************************
-* X.509 Public Key Header File                   *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* X.509 Public Key
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #ifndef BOTAN_X509_PUBLIC_KEY_H__
 #define BOTAN_X509_PUBLIC_KEY_H__
@@ -18,9 +20,9 @@ namespace Botan {
 */
 namespace X509 {
 
-/*************************************************
-* X.509 Public Key Encoding/Decoding             *
-*************************************************/
+/*
+* X.509 Public Key Encoding/Decoding
+*/
 
 /**
 * Encode a key into a pipe.

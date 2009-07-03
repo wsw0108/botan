@@ -1,6 +1,8 @@
 /**
 * Algorithm Factory
 * (C) 2008 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #ifndef BOTAN_ALGORITHM_FACTORY_H__
@@ -31,11 +33,11 @@ class BOTAN_DLL Algorithm_Factory
    {
    public:
       /**
-      * Contructor
-      * @param engines the list of engines to use
+      * Constructor
+      * @param engines_in the list of engines to use
       * @param mf a mutex factory
       */
-      Algorithm_Factory(const std::vector<Engine*>& engines,
+      Algorithm_Factory(const std::vector<Engine*>& engines_in,
                         Mutex_Factory& mf);
 
       /**

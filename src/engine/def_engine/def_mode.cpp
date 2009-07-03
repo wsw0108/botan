@@ -1,7 +1,9 @@
-/*************************************************
-* Default Engine Source File                     *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* Default Engine
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #include <botan/def_eng.h>
 #include <botan/parsing.h>
@@ -38,6 +40,10 @@
   #include <botan/eax.h>
 #endif
 
+#if defined(BOTAN_HAS_XTS)
+  #include <botan/xts.h>
+#endif
+
 namespace Botan {
 
 namespace {
@@ -68,9 +74,9 @@ BlockCipherModePaddingMethod* get_bc_pad(const std::string& algo_spec)
 
 }
 
-/*************************************************
-* Get a cipher object                            *
-*************************************************/
+/*
+* Get a cipher object
+*/
 Keyed_Filter* Default_Engine::get_cipher(const std::string& algo_spec,
                                          Cipher_Dir direction,
                                          Algorithm_Factory& af)
@@ -183,6 +189,16 @@ Keyed_Filter* Default_Engine::get_cipher(const std::string& algo_spec,
          return new EAX_Encryption(block_cipher->clone(), bits);
       else
          return new EAX_Decryption(block_cipher->clone(), bits);
+      }
+#endif
+
+#if defined(BOTAN_HAS_XTS)
+   if(mode == "XTS")
+      {
+      if(direction == ENCRYPTION)
+         return new XTS_Encryption(block_cipher->clone());
+      else
+         return new XTS_Decryption(block_cipher->clone());
       }
 #endif
 

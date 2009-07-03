@@ -1,8 +1,10 @@
-/**
-* ECKAEG Header File
+/*
+* ECKAEG
 * (C) 2007 Falko Strenzke, FlexSecure GmbH
 *          Manuel Hartl, FlexSecure GmbH
 * (C) 2008 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #ifndef BOTAN_ECKAEG_KEY_H__

@@ -1,7 +1,9 @@
-/*************************************************
-* Auto Seeded RNG Source File                    *
-* (C) 2008 Jack Lloyd                            *
-*************************************************/
+/*
+* Auto Seeded RNG
+* (C) 2008 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #include <botan/auto_rng.h>
 #include <botan/parsing.h>
@@ -91,7 +93,7 @@ void add_entropy_sources(RandomNumberGenerator* rng)
 #if defined(BOTAN_HAS_ENTROPY_SRC_DEVICE)
    rng->add_entropy_source(
       new Device_EntropySource(
-         split_on("/dev/random:/dev/srandom:/dev/urandom", ':')
+         split_on("/dev/urandom:/dev/random:/dev/srandom", ':')
          )
       );
 #endif

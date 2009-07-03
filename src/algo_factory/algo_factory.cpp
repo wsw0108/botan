@@ -1,6 +1,8 @@
 /*
 Algorithm Factory
 (C) 2008 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #include <botan/algo_factory.h>
@@ -153,7 +155,7 @@ Algorithm_Factory::providers_of(const std::string& algo_spec)
    }
 
 /**
-* Return the prototypical block cipher cooresponding to this request
+* Return the prototypical block cipher corresponding to this request
 */
 const BlockCipher*
 Algorithm_Factory::prototype_block_cipher(const std::string& algo_spec,
@@ -164,7 +166,7 @@ Algorithm_Factory::prototype_block_cipher(const std::string& algo_spec,
    }
 
 /**
-* Return the prototypical stream cipher cooresponding to this request
+* Return the prototypical stream cipher corresponding to this request
 */
 const StreamCipher*
 Algorithm_Factory::prototype_stream_cipher(const std::string& algo_spec,
@@ -175,7 +177,7 @@ Algorithm_Factory::prototype_stream_cipher(const std::string& algo_spec,
    }
 
 /**
-* Return the prototypical object cooresponding to this request (if found)
+* Return the prototypical object corresponding to this request (if found)
 */
 const HashFunction*
 Algorithm_Factory::prototype_hash_function(const std::string& algo_spec,
@@ -186,18 +188,19 @@ Algorithm_Factory::prototype_hash_function(const std::string& algo_spec,
    }
 
 /**
-* Return the prototypical object cooresponding to this request
+* Return the prototypical object corresponding to this request
 */
 const MessageAuthenticationCode*
 Algorithm_Factory::prototype_mac(const std::string& algo_spec,
                                  const std::string& provider)
    {
-   return factory_prototype<MessageAuthenticationCode>(algo_spec, provider, engines,
+   return factory_prototype<MessageAuthenticationCode>(algo_spec, provider,
+                                                       engines,
                                                        *this, mac_cache);
    }
 
 /**
-* Return a new block cipher cooresponding to this request
+* Return a new block cipher corresponding to this request
 */
 BlockCipher*
 Algorithm_Factory::make_block_cipher(const std::string& algo_spec,
@@ -209,7 +212,7 @@ Algorithm_Factory::make_block_cipher(const std::string& algo_spec,
    }
 
 /**
-* Return a new stream cipher cooresponding to this request
+* Return a new stream cipher corresponding to this request
 */
 StreamCipher*
 Algorithm_Factory::make_stream_cipher(const std::string& algo_spec,
@@ -221,7 +224,7 @@ Algorithm_Factory::make_stream_cipher(const std::string& algo_spec,
    }
 
 /**
-* Return a new object cooresponding to this request
+* Return a new object corresponding to this request
 */
 HashFunction*
 Algorithm_Factory::make_hash_function(const std::string& algo_spec,
@@ -233,7 +236,7 @@ Algorithm_Factory::make_hash_function(const std::string& algo_spec,
    }
 
 /**
-* Return a new object cooresponding to this request
+* Return a new object corresponding to this request
 */
 MessageAuthenticationCode*
 Algorithm_Factory::make_mac(const std::string& algo_spec,

@@ -1,13 +1,14 @@
 /*
 * HMAC_RNG
 * (C) 2008-2009 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #include <botan/hmac_rng.h>
 #include <botan/loadstor.h>
 #include <botan/xor_buf.h>
 #include <botan/util.h>
-#include <botan/bit_ops.h>
 #include <botan/stl_util.h>
 #include <algorithm>
 
@@ -71,12 +72,15 @@ void HMAC_RNG::reseed_with_input(u32bit poll_bits,
 
    Entropy_Accumulator_BufferedComputation accum(*extractor, poll_bits);
 
-   for(u32bit i = 0; i < entropy_sources.size(); ++i)
+   if(!entropy_sources.empty())
       {
-      if(accum.polling_goal_achieved())
-         break;
+      u32bit poll_attempt = 0;
 
-      entropy_sources[i]->poll(accum);
+      while(!accum.polling_goal_achieved() && poll_attempt < poll_bits)
+         {
+         entropy_sources[poll_attempt % entropy_sources.size()]->poll(accum);
+         ++poll_attempt;
+         }
       }
 
    // And now add the user-provided input, if any

@@ -1,6 +1,8 @@
 /**
 * Merkle-Damgard Hash Function
 * (C) 1999-2008 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
 */
 
 #include <botan/mdx_hash.h>
@@ -35,28 +37,6 @@ void MDx_HashFunction::clear() throw()
 /**
 * Update the hash
 */
-/*
-void MDx_HashFunction::compress_n(const byte block[], u32bit block_n)
-   {
-   for(u32bit j = 0; j != block_n; ++j)
-      {
-      hash(block);
-      block += HASH_BLOCK_SIZE;
-      }
-   }
-*/
-/**
-* Update the hash
-*/
-/*
-void MDx_HashFunction::hash(const byte block[])
-   {
-   compress_n(block, 1);
-   }
-*/
-/**
-* Update the hash
-*/
 void MDx_HashFunction::add_data(const byte input[], u32bit length)
    {
    count += length;
@@ -77,7 +57,8 @@ void MDx_HashFunction::add_data(const byte input[], u32bit length)
    const u32bit full_blocks = length / HASH_BLOCK_SIZE;
    const u32bit remaining   = length % HASH_BLOCK_SIZE;
 
-   compress_n(input, full_blocks);
+   if(full_blocks)
+      compress_n(input, full_blocks);
 
    buffer.copy(position, input + full_blocks * HASH_BLOCK_SIZE, remaining);
    position += remaining;
@@ -88,7 +69,6 @@ void MDx_HashFunction::add_data(const byte input[], u32bit length)
 */
 void MDx_HashFunction::final_result(byte output[])
    {
-
    buffer[position] = (BIG_BIT_ENDIAN ? 0x80 : 0x01);
    for(u32bit j = position+1; j != HASH_BLOCK_SIZE; ++j)
       buffer[j] = 0;

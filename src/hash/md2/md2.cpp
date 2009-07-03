@@ -1,16 +1,18 @@
-/*************************************************
-* MD2 Source File                                *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* MD2
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #include <botan/md2.h>
 #include <botan/xor_buf.h>
 
 namespace Botan {
 
-/*************************************************
-* MD2 Compression Function                       *
-*************************************************/
+/**
+* MD2 Compression Function
+*/
 void MD2::hash(const byte input[])
    {
    static const byte SBOX[256] = {
@@ -56,9 +58,9 @@ void MD2::hash(const byte input[])
       T = checksum[j] ^= SBOX[input[j] ^ T];
    }
 
-/*************************************************
-* Update the hash                                *
-*************************************************/
+/**
+* Update the hash
+*/
 void MD2::add_data(const byte input[], u32bit length)
    {
    buffer.copy(position, input, length);
@@ -79,9 +81,9 @@ void MD2::add_data(const byte input[], u32bit length)
    position += length;
    }
 
-/*************************************************
-* Finalize a MD2 Hash                            *
-*************************************************/
+/**
+* Finalize a MD2 Hash
+*/
 void MD2::final_result(byte output[])
    {
    for(u32bit j = position; j != HASH_BLOCK_SIZE; ++j)
@@ -92,9 +94,9 @@ void MD2::final_result(byte output[])
    clear();
    }
 
-/*************************************************
-* Clear memory of sensitive data                 *
-*************************************************/
+/**
+* Clear memory of sensitive data
+*/
 void MD2::clear() throw()
    {
    X.clear();

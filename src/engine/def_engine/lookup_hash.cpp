@@ -1,7 +1,9 @@
-/*************************************************
-* Hash Algorithms Lookup                         *
-* (C) 1999-2007 Jack Lloyd                       *
-*************************************************/
+/*
+* Hash Algorithms Lookup
+* (C) 1999-2007 Jack Lloyd
+*
+* Distributed under the terms of the Botan license
+*/
 
 #include <botan/def_eng.h>
 #include <botan/scan_name.h>
@@ -22,6 +24,10 @@
 
 #if defined(BOTAN_HAS_FORK_256)
   #include <botan/fork256.h>
+#endif
+
+#if defined(BOTAN_HAS_GOST_34_11)
+  #include <botan/gost_3411.h>
 #endif
 
 #if defined(BOTAN_HAS_HAS_160)
@@ -57,6 +63,10 @@
   #include <botan/sha2_64.h>
 #endif
 
+#if defined(BOTAN_HAS_SKEIN_512)
+  #include <botan/skein_512.h>
+#endif
+
 #if defined(BOTAN_HAS_TIGER)
   #include <botan/tiger.h>
 #endif
@@ -71,9 +81,9 @@
 
 namespace Botan {
 
-/*************************************************
-* Look for an algorithm with this name           *
-*************************************************/
+/*
+* Look for an algorithm with this name
+*/
 HashFunction*
 Default_Engine::find_hash(const SCAN_Name& request,
                           Algorithm_Factory& af) const
@@ -96,6 +106,11 @@ Default_Engine::find_hash(const SCAN_Name& request,
 #if defined(BOTAN_HAS_FORK_256)
    if(request.algo_name() == "FORK-256")
       return new FORK_256;
+#endif
+
+#if defined(BOTAN_HAS_GOST_34_11)
+   if(request.algo_name() == "GOST-34.11")
+      return new GOST_34_11;
 #endif
 
 #if defined(BOTAN_HAS_HAS_160)
@@ -148,6 +163,12 @@ Default_Engine::find_hash(const SCAN_Name& request,
    if(request.algo_name() == "Tiger")
       return new Tiger(request.arg_as_u32bit(0, 24), // hash output
                        request.arg_as_u32bit(1, 3)); // # passes
+#endif
+
+#if defined(BOTAN_HAS_SKEIN_512)
+   if(request.algo_name() == "Skein-512")
+      return new Skein_512(request.arg_as_u32bit(0, 512),
+                           request.arg(1, ""));
 #endif
 
 #if defined(BOTAN_HAS_WHIRLPOOL)
