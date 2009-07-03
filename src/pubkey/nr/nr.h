@@ -15,20 +15,10 @@
 
 namespace Botan {
 
-/**
-* Nyberg-Rueppel Public Key
-*/
-class BOTAN_DLL NR_PublicKey : public PK_Verifying_with_MR_Key
+class BOTAN_DLL Nyberg_Rueppel_Key : public virtual Public_Key
    {
    public:
-      NR_PublicKey(const DL_Group& group, const BigInt& y);
-
-      NR_PublicKey(const AlgorithmIdentifier& alg_id,
-                   const MemoryRegion<byte>& key_bits);
-
       std::string algo_name() const { return "NR"; }
-
-      SecureVector<byte> verify(const byte[], u32bit) const;
 
       /**
       * Get the DL domain parameters of this key.
@@ -59,8 +49,6 @@ class BOTAN_DLL NR_PublicKey : public PK_Verifying_with_MR_Key
       */
       const BigInt& group_g() const { return group.get_g(); }
 
-      bool check_key(RandomNumberGenerator& rng, bool) const;
-
       u32bit message_parts() const { return 2; }
 
       /**
@@ -75,19 +63,34 @@ class BOTAN_DLL NR_PublicKey : public PK_Verifying_with_MR_Key
 
       std::pair<AlgorithmIdentifier, MemoryVector<byte> >
          subject_public_key_info() const;
-
    protected:
-      NR_PublicKey() {}
-
-      NR_Core core;
       DL_Group group;
       BigInt y;
    };
 
 /**
+* Nyberg-Rueppel Public Key
+*/
+class BOTAN_DLL NR_PublicKey : public Nyberg_Rueppel_Key,
+                               public PK_Verifying_with_MR_Key
+   {
+   public:
+      NR_PublicKey(const DL_Group& group, const BigInt& y);
+
+      NR_PublicKey(const AlgorithmIdentifier& alg_id,
+                   const MemoryRegion<byte>& key_bits);
+
+      SecureVector<byte> verify(const byte[], u32bit) const;
+
+      bool check_key(RandomNumberGenerator& rng, bool) const;
+   private:
+      NR_Core core;
+   };
+
+/**
 * Nyberg-Rueppel Private Key
 */
-class BOTAN_DLL NR_PrivateKey : public NR_PublicKey,
+class BOTAN_DLL NR_PrivateKey : public Nyberg_Rueppel_Key,
                                 public PK_Signing_Key
    {
    public:
@@ -101,6 +104,8 @@ class BOTAN_DLL NR_PrivateKey : public NR_PublicKey,
       NR_PrivateKey(RandomNumberGenerator& rng, const DL_Group& group,
                     const BigInt& x = 0);
 
+      NR_PublicKey public_key() const { return NR_PublicKey(group, y); }
+
       bool check_key(RandomNumberGenerator& rng, bool strong) const;
 
       /**
@@ -112,6 +117,7 @@ class BOTAN_DLL NR_PrivateKey : public NR_PublicKey,
       std::pair<AlgorithmIdentifier, SecureVector<byte> >
          pkcs8_encoding() const;
    private:
+      NR_Core core;
       BigInt x;
    };
 

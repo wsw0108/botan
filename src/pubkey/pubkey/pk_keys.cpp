@@ -13,7 +13,7 @@ namespace Botan {
 /*
 * Default OID access
 */
-OID Public_Key::get_oid() const
+OID Public_Key_Algorithm::get_oid() const
    {
    try {
       return OIDS::lookup(algo_name());
@@ -27,7 +27,7 @@ OID Public_Key::get_oid() const
 /*
 * Run checks on a loaded public key
 */
-void Public_Key::load_check(RandomNumberGenerator& rng) const
+void Public_Key_Algorithm::load_check(RandomNumberGenerator& rng) const
    {
    if(!check_key(rng, BOTAN_PUBLIC_KEY_STRONG_CHECKS_ON_LOAD))
       throw Invalid_Argument(algo_name() + ": Invalid public key");

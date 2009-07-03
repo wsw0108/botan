@@ -18,13 +18,22 @@ namespace Botan {
 /**
 * DSA Public Key
 */
-class BOTAN_DLL DSA_PublicKey : public PK_Verifying_wo_MR_Key
+class BOTAN_DLL DSA_Key : public virtual Public_Key_Algorithm
    {
    public:
-      DSA_PublicKey(const AlgorithmIdentifier& alg_id,
-                    const MemoryRegion<byte>& key_bits);
+      std::string algo_name() const { return "DSA"; }
 
-      DSA_PublicKey(const DL_Group& group, const BigInt& y);
+      u32bit message_parts() const { return 2; }
+
+      /**
+      * Return the size of each portion of the sig
+      */
+      u32bit message_part_size() const { return group_q().bytes(); }
+
+      /**
+      * Return the maximum input size in bits
+      */
+      u32bit max_input_bits() const { return group_q().bits(); }
 
       /**
       * Get the DL domain parameters of this key.
@@ -54,19 +63,27 @@ class BOTAN_DLL DSA_PublicKey : public PK_Verifying_wo_MR_Key
       * @return the generator g
       */
       const BigInt& group_g() const { return group.get_g(); }
+   protected:
+      DL_Group group;
+      BigInt y;
+   };
+
+/**
+* DSA Public Key
+*/
+class BOTAN_DLL DSA_PublicKey : public DSA_Key,
+                                public PK_Verifying_wo_MR_Key
+   {
+   public:
+      DSA_PublicKey(const AlgorithmIdentifier& alg_id,
+                    const MemoryRegion<byte>& key_bits);
+
+      DSA_PublicKey(const DL_Group& group, const BigInt& y);
 
       bool check_key(RandomNumberGenerator& rng, bool) const;
 
-      std::string algo_name() const { return "DSA"; }
-
-      u32bit message_parts() const { return 2; }
-
-      /**
-      * Return the size of each portion of the sig
-      */
-      u32bit message_part_size() const;
-
-      u32bit max_input_bits() const;
+      std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+         subject_public_key_info() const;
 
       /**
       * Verify a DSA signature
@@ -79,20 +96,14 @@ class BOTAN_DLL DSA_PublicKey : public PK_Verifying_wo_MR_Key
       bool verify(const byte msg[], u32bit msg_len,
                   const byte sig[], u32bit sig_len) const;
 
-      std::pair<AlgorithmIdentifier, MemoryVector<byte> >
-         subject_public_key_info() const;
-   protected:
-      DSA_PublicKey() {}
-
+   private:
       DSA_Core core;
-      DL_Group group;
-      BigInt y;
    };
 
 /**
 * DSA Private Key
 */
-class BOTAN_DLL DSA_PrivateKey : public DSA_PublicKey,
+class BOTAN_DLL DSA_PrivateKey : public DSA_Key,
                                  public PK_Signing_Key
    {
    public:
@@ -102,6 +113,8 @@ class BOTAN_DLL DSA_PrivateKey : public DSA_PublicKey,
 
       DSA_PrivateKey(RandomNumberGenerator& rng, const DL_Group& group,
                      const BigInt& x = 0);
+
+      DSA_PublicKey public_key() const { return DSA_PublicKey(group, y); }
 
       SecureVector<byte> sign(const byte msg[], u32bit msg_lent,
                               RandomNumberGenerator& rng) const;
@@ -117,6 +130,7 @@ class BOTAN_DLL DSA_PrivateKey : public DSA_PublicKey,
       std::pair<AlgorithmIdentifier, SecureVector<byte> >
          pkcs8_encoding() const;
    private:
+      DSA_Core core;
       BigInt x;
    };
 

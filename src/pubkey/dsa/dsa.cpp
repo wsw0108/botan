@@ -56,22 +56,6 @@ DSA_PublicKey::subject_public_key_info() const
    }
 
 /**
-* Return the maximum input size in bits
-*/
-u32bit DSA_PublicKey::max_input_bits() const
-   {
-   return group_q().bits();
-   }
-
-/**
-* Return the size of each portion of the sig
-*/
-u32bit DSA_PublicKey::message_part_size() const
-   {
-   return group_q().bytes();
-   }
-
-/**
 * Check DSA public key for consistency
 */
 bool DSA_PublicKey::check_key(RandomNumberGenerator& rng,
@@ -174,9 +158,10 @@ bool DSA_PrivateKey::check_key(RandomNumberGenerator& rng, bool strong) const
 
       try
          {
+         DSA_PublicKey pub = public_key();
          KeyPair::check_key(rng,
                             get_pk_signer(*this, "EMSA1(SHA-1)"),
-                            get_pk_verifier(*this, "EMSA1(SHA-1)")
+                            get_pk_verifier(pub, "EMSA1(SHA-1)")
             );
          }
       catch(Self_Test_Failure)

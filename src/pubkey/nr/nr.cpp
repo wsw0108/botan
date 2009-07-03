@@ -51,7 +51,7 @@ bool NR_PublicKey::check_key(RandomNumberGenerator& rng,
    }
 
 std::pair<AlgorithmIdentifier, MemoryVector<byte> >
-NR_PublicKey::subject_public_key_info() const
+Nyberg_Rueppel_Key::subject_public_key_info() const
    {
    AlgorithmIdentifier alg_id(this->get_oid(),
                               this->group.DER_encode(DL_Group::ANSI_X9_57));
@@ -162,9 +162,10 @@ bool NR_PrivateKey::check_key(RandomNumberGenerator& rng, bool strong) const
 
       try
          {
+         NR_PublicKey pub = public_key();
          KeyPair::check_key(rng,
                             get_pk_signer(*this, "EMSA1(SHA-1)"),
-                            get_pk_verifier(*this, "EMSA1(SHA-1)")
+                            get_pk_verifier(pub, "EMSA1(SHA-1)")
             );
          }
       catch(Self_Test_Failure)

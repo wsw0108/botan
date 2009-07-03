@@ -19,7 +19,7 @@ namespace Botan {
 /**
 * Public Key Base Class.
 */
-class BOTAN_DLL Public_Key
+class BOTAN_DLL Public_Key_Algorithm
    {
    public:
       /**
@@ -62,22 +62,26 @@ class BOTAN_DLL Public_Key
       */
       virtual u32bit max_input_bits() const = 0;
 
+      virtual ~Public_Key_Algorithm() {}
+   protected:
+      virtual void load_check(RandomNumberGenerator&) const;
+   };
+
+class Public_Key : public virtual Public_Key_Algorithm
+   {
+   public:
       /**
       * Return data needed to encode as a subjectPublicKeyInfo
       * @return algorithm identifier and key bits
       */
       virtual std::pair<AlgorithmIdentifier, MemoryVector<byte> >
          subject_public_key_info() const = 0;
-
-      virtual ~Public_Key() {}
-   protected:
-      virtual void load_check(RandomNumberGenerator&) const;
    };
 
 /**
 * Private Key Base Class
 */
-class BOTAN_DLL Private_Key : public virtual Public_Key
+class BOTAN_DLL Private_Key : public virtual Public_Key_Algorithm
    {
    public:
 
