@@ -13,9 +13,9 @@ use Sys::Hostname;
 
 my $MAJOR_VERSION = 1;
 my $MINOR_VERSION = 8;
-my $PATCH_VERSION = 3;
+my $PATCH_VERSION = 5;
 
-my $SO_PATCH_VERSION = 2;
+my $SO_PATCH_VERSION = 5;
 
 my $VERSION_STRING = "$MAJOR_VERSION.$MINOR_VERSION.$PATCH_VERSION";
 my $SO_VERSION_STRING = "$MAJOR_VERSION.$MINOR_VERSION.$SO_PATCH_VERSION";
@@ -426,9 +426,9 @@ sub choose_target {
             $gcc_version = '' if not defined $gcc_version;
 
             my $has_ll_bug = 0;
-            $has_ll_bug = 1 if($gcc_version =~ /4\.[0123]/);
+            $has_ll_bug = 1 if($gcc_version =~ /4\.[01234]/);
             $has_ll_bug = 1 if($gcc_version =~ /3\.[34]/);
-            $has_ll_bug = 1 if($gcc_version =~ /2\.25\.[0-4]/);
+            $has_ll_bug = 1 if($gcc_version =~ /2\.95\.[0-4]/);
             $has_ll_bug = 1 if($gcc_version eq '');
 
             $has_ll_bug = 0 if($arch eq 'alpha' or $arch =~ /.*64$/);
