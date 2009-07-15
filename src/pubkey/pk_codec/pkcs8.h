@@ -14,49 +14,6 @@
 namespace Botan {
 
 /**
-* PKCS #8 Private Key Encoder.
-*/
-class BOTAN_DLL PKCS8_Encoder
-   {
-   public:
-     /**
-     * Get the algorithm identifier associated with the scheme
-     * this encoders key is part of.
-     * @return the algorithm identifier
-     */
-      virtual AlgorithmIdentifier alg_id() const = 0;
-
-      /**
-      * Get the DER encoded key.
-      * @return the DER encoded key
-      */
-      // XXX: Why not SecureVector?
-      virtual MemoryVector<byte> key_bits() const = 0;
-      virtual ~PKCS8_Encoder() {}
-   };
-
-/*
-* PKCS #8 Private Key Decoder
-*/
-class BOTAN_DLL PKCS8_Decoder
-   {
-   public:
-      /**
-      * Set the algorithm identifier associated with the scheme
-      * this decoders key is part of.
-      * @param alg_id the algorithm identifier
-      */
-      virtual void alg_id(const AlgorithmIdentifier&) = 0;
-
-      /**
-      * Set the DER encoded key.
-      * @param key the DER encoded key
-      */
-      virtual void key_bits(const MemoryRegion<byte>&) = 0;
-      virtual ~PKCS8_Decoder() {}
-   };
-
-/**
 * PKCS #8 General Exception
 */
 struct BOTAN_DLL PKCS8_Exception : public Decoding_Error

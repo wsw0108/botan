@@ -8,9 +8,8 @@
 #ifndef BOTAN_IF_ALGO_H__
 #define BOTAN_IF_ALGO_H__
 
+#include <botan/pk_keys.h>
 #include <botan/if_core.h>
-#include <botan/x509_key.h>
-#include <botan/pkcs8.h>
 
 namespace Botan {
 
@@ -37,10 +36,9 @@ class BOTAN_DLL IF_Scheme_PublicKey : public virtual Public_Key
 
       u32bit max_input_bits() const { return (n.bits() - 1); }
 
-      X509_Encoder* x509_encoder() const;
-      X509_Decoder* x509_decoder();
+      std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+         subject_public_key_info() const;
    protected:
-      virtual void X509_load_hook();
       BigInt n, e;
       IF_Core core;
    };
@@ -73,10 +71,10 @@ class BOTAN_DLL IF_Scheme_PrivateKey : public virtual IF_Scheme_PublicKey,
       */
       const BigInt& get_d() const { return d; }
 
-      PKCS8_Encoder* pkcs8_encoder() const;
-      PKCS8_Decoder* pkcs8_decoder(RandomNumberGenerator&);
+      std::pair<AlgorithmIdentifier, SecureVector<byte> >
+         pkcs8_encoding() const;
+
    protected:
-      virtual void PKCS8_load_hook(RandomNumberGenerator&, bool = false);
       BigInt d, p, q, d1, d2, c;
    };
 

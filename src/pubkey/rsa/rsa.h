@@ -8,7 +8,8 @@
 #ifndef BOTAN_RSA_H__
 #define BOTAN_RSA_H__
 
-#include <botan/if_algo.h>
+#include <botan/pk_keys.h>
+#include <botan/if_core.h>
 
 namespace Botan {
 
@@ -16,21 +17,46 @@ namespace Botan {
 * RSA Public Key
 */
 class BOTAN_DLL RSA_PublicKey : public PK_Encrypting_Key,
-                                public PK_Verifying_with_MR_Key,
-                                public virtual IF_Scheme_PublicKey
+                                public PK_Verifying_with_MR_Key
    {
    public:
+      RSA_PublicKey(const AlgorithmIdentifier& alg_id,
+                    const MemoryRegion<byte>& key_bits);
+
+      RSA_PublicKey(const BigInt& n, const BigInt& e);
+
       std::string algo_name() const { return "RSA"; }
 
-      SecureVector<byte> encrypt(const byte[], u32bit,
+      bool check_key(RandomNumberGenerator& rng, bool) const;
+
+      SecureVector<byte> encrypt(const byte msg[], u32bit msg_len,
                                  RandomNumberGenerator& rng) const;
 
-      SecureVector<byte> verify(const byte[], u32bit) const;
+      SecureVector<byte> verify(const byte sig[], u32bit sig_len) const;
 
-      RSA_PublicKey() {}
-      RSA_PublicKey(const BigInt&, const BigInt&);
+      /**
+      * Get n = p * q.
+      * @return n
+      */
+      const BigInt& get_n() const { return n; }
+
+      /**
+      * Get the public exponent used by the key.
+      * @return the public exponent
+      */
+      const BigInt& get_e() const { return e; }
+
+      u32bit max_input_bits() const { return (n.bits() - 1); }
+
+      std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+         subject_public_key_info() const;
    protected:
+      RSA_PublicKey() {}
+
       BigInt public_op(const BigInt&) const;
+
+      BigInt n, e;
+      IF_Core core;
    };
 
 /**
@@ -38,22 +64,9 @@ class BOTAN_DLL RSA_PublicKey : public PK_Encrypting_Key,
 */
 class BOTAN_DLL RSA_PrivateKey : public RSA_PublicKey,
                                  public PK_Decrypting_Key,
-                                 public PK_Signing_Key,
-                                 public IF_Scheme_PrivateKey
+                                 public PK_Signing_Key
    {
    public:
-      SecureVector<byte> sign(const byte[], u32bit,
-                              RandomNumberGenerator&) const;
-
-      SecureVector<byte> decrypt(const byte[], u32bit) const;
-
-      bool check_key(RandomNumberGenerator& rng, bool) const;
-
-      /**
-      * Default constructor, does not set any internal values. Use this
-      * constructor if you wish to decode a DER or PEM encoded key.
-      */
-      RSA_PrivateKey() {}
 
       /**
       * Construct a private key from the specified parameters.
@@ -79,8 +92,42 @@ class BOTAN_DLL RSA_PrivateKey : public RSA_PublicKey,
       */
       RSA_PrivateKey(RandomNumberGenerator& rng,
                      u32bit bits, u32bit exp = 65537);
+
+      RSA_PrivateKey(const AlgorithmIdentifier& alg_id,
+                     const MemoryRegion<byte>& key_bits,
+                     RandomNumberGenerator& rng);
+
+      SecureVector<byte> sign(const byte msg[], u32bit msg_len,
+                              RandomNumberGenerator& rng) const;
+
+      SecureVector<byte> decrypt(const byte ciphertext[], u32bit len) const;
+
+      bool check_key(RandomNumberGenerator& rng, bool strong_checks) const;
+
+      /**
+      * Get the first prime p.
+      * @return the prime p
+      */
+      const BigInt& get_p() const { return p; }
+
+      /**
+      * Get the second prime q.
+      * @return the prime q
+      */
+      const BigInt& get_q() const { return q; }
+
+      /**
+      * Get d with exp * d = 1 mod (p - 1, q - 1).
+      * @return d
+      */
+      const BigInt& get_d() const { return d; }
+
+      std::pair<AlgorithmIdentifier, SecureVector<byte> >
+         pkcs8_encoding() const;
    private:
       BigInt private_op(const byte[], u32bit) const;
+
+      BigInt d, p, q, d1, d2, c;
    };
 
 }

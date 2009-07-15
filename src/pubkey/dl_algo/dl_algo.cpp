@@ -12,120 +12,27 @@
 
 namespace Botan {
 
-/*
-* Return the X.509 public key encoder
-*/
-X509_Encoder* DL_Scheme_PublicKey::x509_encoder() const
+std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+DL_Scheme_PublicKey::subject_public_key_info() const
    {
-   class DL_Scheme_Encoder : public X509_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            MemoryVector<byte> group =
-               key->group.DER_encode(key->group_format());
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              this->group.DER_encode(this->group_format()));
 
-            return AlgorithmIdentifier(key->get_oid(), group);
-            }
+   MemoryVector<byte> key_bits = DER_Encoder().encode(this->get_y()).get_contents();
 
-         MemoryVector<byte> key_bits() const
-            {
-            return DER_Encoder().encode(key->y).get_contents();
-            }
-
-         DL_Scheme_Encoder(const DL_Scheme_PublicKey* k) : key(k) {}
-      private:
-         const DL_Scheme_PublicKey* key;
-      };
-
-   return new DL_Scheme_Encoder(this);
+   return std::make_pair(alg_id, key_bits);
    }
 
-/*
-* Return the X.509 public key decoder
-*/
-X509_Decoder* DL_Scheme_PublicKey::x509_decoder()
+std::pair<AlgorithmIdentifier, SecureVector<byte> >
+DL_Scheme_PrivateKey::pkcs8_encoding() const
    {
-   class DL_Scheme_Decoder : public X509_Decoder
-      {
-      public:
-         void alg_id(const AlgorithmIdentifier& alg_id)
-            {
-            DataSource_Memory source(alg_id.parameters);
-            key->group.BER_decode(source, key->group_format());
-            }
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              this->group.DER_encode(this->group_format()));
 
-         void key_bits(const MemoryRegion<byte>& bits)
-            {
-            BER_Decoder(bits).decode(key->y);
-            key->X509_load_hook();
-            }
+   SecureVector<byte> key_bits =
+      DER_Encoder().encode(this->get_x()).get_contents();
 
-         DL_Scheme_Decoder(DL_Scheme_PublicKey* k) : key(k) {}
-      private:
-         DL_Scheme_PublicKey* key;
-      };
-
-   return new DL_Scheme_Decoder(this);
-   }
-
-/*
-* Return the PKCS #8 private key encoder
-*/
-PKCS8_Encoder* DL_Scheme_PrivateKey::pkcs8_encoder() const
-   {
-   class DL_Scheme_Encoder : public PKCS8_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            MemoryVector<byte> group =
-               key->group.DER_encode(key->group_format());
-
-            return AlgorithmIdentifier(key->get_oid(), group);
-            }
-
-         MemoryVector<byte> key_bits() const
-            {
-            return DER_Encoder().encode(key->x).get_contents();
-            }
-
-         DL_Scheme_Encoder(const DL_Scheme_PrivateKey* k) : key(k) {}
-      private:
-         const DL_Scheme_PrivateKey* key;
-      };
-
-   return new DL_Scheme_Encoder(this);
-   }
-
-/*
-* Return the PKCS #8 private key decoder
-*/
-PKCS8_Decoder* DL_Scheme_PrivateKey::pkcs8_decoder(RandomNumberGenerator& rng)
-   {
-   class DL_Scheme_Decoder : public PKCS8_Decoder
-      {
-      public:
-         void alg_id(const AlgorithmIdentifier& alg_id)
-            {
-            DataSource_Memory source(alg_id.parameters);
-            key->group.BER_decode(source, key->group_format());
-            }
-
-         void key_bits(const MemoryRegion<byte>& bits)
-            {
-            BER_Decoder(bits).decode(key->x);
-            key->PKCS8_load_hook(rng);
-            }
-
-         DL_Scheme_Decoder(DL_Scheme_PrivateKey* k, RandomNumberGenerator& r) :
-            key(k), rng(r) {}
-      private:
-         DL_Scheme_PrivateKey* key;
-         RandomNumberGenerator& rng;
-      };
-
-   return new DL_Scheme_Decoder(this, rng);
+   return std::make_pair(alg_id, key_bits);
    }
 
 /*

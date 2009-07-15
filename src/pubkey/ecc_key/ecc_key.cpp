@@ -63,61 +63,18 @@ void EC_PublicKey::X509_load_hook()
       }
    }
 
-X509_Encoder* EC_PublicKey::x509_encoder() const
+std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+EC_PublicKey::subject_public_key_info() const
    {
-   class EC_Key_Encoder : public X509_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            key->affirm_init();
+   this->affirm_init();
 
-            SecureVector<byte> params =
-               encode_der_ec_dompar(key->domain_parameters(), key->m_param_enc);
+   SecureVector<byte> params =
+      encode_der_ec_dompar(this->domain_parameters(), this->m_param_enc);
 
-            return AlgorithmIdentifier(key->get_oid(), params);
-            }
+   AlgorithmIdentifier alg_id(this->get_oid(), params);
+   MemoryVector<byte> key_bits = EC2OSP(*(this->mp_public_point), PointGFp::COMPRESSED);
 
-         MemoryVector<byte> key_bits() const
-            {
-            key->affirm_init();
-            return EC2OSP(*(key->mp_public_point), PointGFp::COMPRESSED);
-            }
-
-         EC_Key_Encoder(const EC_PublicKey* k): key(k) {}
-      private:
-         const EC_PublicKey* key;
-      };
-
-   return new EC_Key_Encoder(this);
-   }
-
-X509_Decoder* EC_PublicKey::x509_decoder()
-   {
-   class EC_Key_Decoder : public X509_Decoder
-      {
-      public:
-         void alg_id(const AlgorithmIdentifier& alg_id)
-            {
-            key->mp_dom_pars.reset(new EC_Domain_Params(decode_ber_ec_dompar(alg_id.parameters)));
-            }
-
-         void key_bits(const MemoryRegion<byte>& bits)
-            {
-            key->mp_public_point.reset(
-               new PointGFp(
-                  OS2ECP(bits, key->domain_parameters().get_curve())
-                  ));
-
-            key->X509_load_hook();
-            }
-
-         EC_Key_Decoder(EC_PublicKey* k): key(k) {}
-      private:
-         EC_PublicKey* key;
-      };
-
-   return new EC_Key_Decoder(this);
+   return std::make_pair(alg_id, key_bits);
    }
 
 void EC_PublicKey::set_parameter_encoding(EC_dompar_enc type)
@@ -175,85 +132,28 @@ void EC_PrivateKey::generate_private_key(RandomNumberGenerator& rng)
    tmp_private_value.swap(m_private_value);
    }
 
-/**
-* Return the PKCS #8 public key encoder
-**/
-PKCS8_Encoder* EC_PrivateKey::pkcs8_encoder() const
+std::pair<AlgorithmIdentifier, SecureVector<byte> >
+EC_PrivateKey::pkcs8_encoding() const
    {
-   class EC_Key_Encoder : public PKCS8_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            key->affirm_init();
+   this->affirm_init();
 
-            SecureVector<byte> params =
-               encode_der_ec_dompar(key->domain_parameters(), ENC_EXPLICIT);
+   MemoryVector<byte> params =
+      encode_der_ec_dompar(this->domain_parameters(), ENC_EXPLICIT);
 
-            return AlgorithmIdentifier(key->get_oid(), params);
-            }
+   AlgorithmIdentifier alg_id(this->get_oid(), params);
 
-         MemoryVector<byte> key_bits() const
-            {
-            key->affirm_init();
-            SecureVector<byte> octstr_secret =
-               BigInt::encode_1363(key->m_private_value, key->m_private_value.bytes());
+   SecureVector<byte> octstr_secret =
+      BigInt::encode_1363(this->m_private_value, this->m_private_value.bytes());
 
-            return DER_Encoder()
-               .start_cons(SEQUENCE)
-               .encode(BigInt(1))
-               .encode(octstr_secret, OCTET_STRING)
-               .end_cons()
-               .get_contents();
-            }
+   SecureVector<byte> key_bits =
+      DER_Encoder()
+      .start_cons(SEQUENCE)
+         .encode(BigInt(1))
+         .encode(octstr_secret, OCTET_STRING)
+      .end_cons()
+      .get_contents();
 
-         EC_Key_Encoder(const EC_PrivateKey* k): key(k) {}
-      private:
-         const EC_PrivateKey* key;
-      };
-
-   return new EC_Key_Encoder(this);
-   }
-
-/**
-* Return the PKCS #8 public key decoder
-*/
-PKCS8_Decoder* EC_PrivateKey::pkcs8_decoder(RandomNumberGenerator&)
-   {
-   class EC_Key_Decoder : public PKCS8_Decoder
-      {
-      public:
-         void alg_id(const AlgorithmIdentifier& alg_id)
-            {
-            key->mp_dom_pars.reset(new EC_Domain_Params(decode_ber_ec_dompar(alg_id.parameters)));
-            }
-
-         void key_bits(const MemoryRegion<byte>& bits)
-            {
-            u32bit version;
-            SecureVector<byte> octstr_secret;
-
-            BER_Decoder(bits)
-               .start_cons(SEQUENCE)
-               .decode(version)
-               .decode(octstr_secret, OCTET_STRING)
-               .verify_end()
-               .end_cons();
-
-            key->m_private_value = BigInt::decode(octstr_secret, octstr_secret.size());
-
-            if(version != 1)
-               throw Decoding_Error("Wrong PKCS #1 key format version for EC key");
-
-            key->PKCS8_load_hook();
-            }
-
-         EC_Key_Decoder(EC_PrivateKey* k): key(k) {}
-      private:
-         EC_PrivateKey* key;
-      };
-
-   return new EC_Key_Decoder(this);
+   return std::make_pair(alg_id, key_bits);
    }
 
 void EC_PrivateKey::PKCS8_load_hook(bool)
