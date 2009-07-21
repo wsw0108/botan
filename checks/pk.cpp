@@ -39,6 +39,7 @@
 #include <botan/filters.h>
 #include <botan/look_pk.h>
 #include <botan/numthry.h>
+#include <botan/pkcs8.h>
 using namespace Botan;
 
 #include "common.h"
@@ -417,11 +418,11 @@ u32bit validate_dsa_sig(const std::string& algo,
    if(!dsapriv)
       throw Invalid_Argument("Bad key load for DSA private key");
 
-   DSA_PublicKey* dsapub = dynamic_cast<DSA_PublicKey*>(dsapriv);
+   DSA_PublicKey dsapub = dsapriv->public_key();
 
    std::string emsa = algo.substr(4, std::string::npos);
 
-   PK_Verifier* v = get_pk_verifier(*dsapub, emsa);
+   PK_Verifier* v = get_pk_verifier(dsapub, emsa);
    PK_Signer* s = get_pk_signer(*dsapriv, emsa);
 
    bool failure = false;
@@ -477,7 +478,7 @@ u32bit validate_nr_sig(const std::string& algo,
 
    DL_Group domain(to_bigint(str[0]), to_bigint(str[1]), to_bigint(str[2]));
    NR_PrivateKey privkey(rng, domain, to_bigint(str[4]));
-   NR_PublicKey pubkey = privkey;
+   NR_PublicKey pubkey = privkey.public_key();
 
    std::string emsa = algo.substr(3, std::string::npos);
 

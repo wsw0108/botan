@@ -381,20 +381,17 @@ void benchmark_eckaeg(RandomNumberGenerator& rng,
 
 #endif
 
-template<typename PRIV_KEY_TYPE>
-void benchmark_dsa_nr(RandomNumberGenerator& rng,
-                      double seconds,
-                      Benchmark_Report& report)
+#if defined(BOTAN_HAS_NYBERG_RUEPPEL)
+void benchmark_nr(RandomNumberGenerator& rng,
+                  double seconds,
+                  Benchmark_Report& report)
    {
-#if defined(BOTAN_HAS_NYBERG_RUEPPEL) || defined(BOTAN_HAS_DSA)
    const char* domains[] = { "dsa/jce/512",
                              "dsa/jce/768",
                              "dsa/jce/1024",
                              "dsa/botan/2048",
                              "dsa/botan/3072",
                              NULL };
-
-   const std::string algo_name = PRIV_KEY_TYPE().algo_name();
 
    for(size_t j = 0; domains[j]; j++)
       {
@@ -413,17 +410,68 @@ void benchmark_dsa_nr(RandomNumberGenerator& rng,
          DL_Group group(domains[j]);
 
          keygen_timer.start();
-         PRIV_KEY_TYPE key(rng, group);
+         NR_PrivateKey key(rng, group);
          keygen_timer.stop();
 
+         NR_PublicKey pub_key = key.public_key();
+
          std::auto_ptr<PK_Signer> sig(get_pk_signer(key, padding));
-         std::auto_ptr<PK_Verifier> ver(get_pk_verifier(key, padding));
+         std::auto_ptr<PK_Verifier> ver(get_pk_verifier(pub_key, padding));
 
          benchmark_sig_ver(*ver, *sig, verify_timer,
                            sig_timer, rng, 1000, seconds);
          }
 
-      const std::string nm = algo_name + "-" + to_string(pbits);
+      const std::string nm = "NR-" + to_string(pbits);
+      report.report(nm, keygen_timer);
+      report.report(nm, verify_timer);
+      report.report(nm, sig_timer);
+      }
+   }
+#endif
+
+#if defined(BOTAN_HAS_DSA)
+void benchmark_dsa(RandomNumberGenerator& rng,
+                   double seconds,
+                   Benchmark_Report& report)
+   {
+   const char* domains[] = { "dsa/jce/512",
+                             "dsa/jce/768",
+                             "dsa/jce/1024",
+                             "dsa/botan/2048",
+                             "dsa/botan/3072",
+                             NULL };
+
+   for(size_t j = 0; domains[j]; j++)
+      {
+      u32bit pbits = to_u32bit(split_on(domains[j], '/')[2]);
+      u32bit qbits = (pbits <= 1024) ? 160 : 256;
+
+      const std::string padding = "EMSA1(SHA-" + to_string(qbits) + ")";
+
+      Timer keygen_timer("keygen");
+      Timer verify_timer(padding + " verify");
+      Timer sig_timer(padding + " signature");
+
+      while(verify_timer.seconds() < seconds ||
+            sig_timer.seconds() < seconds)
+         {
+         DL_Group group(domains[j]);
+
+         keygen_timer.start();
+         DSA_PrivateKey key(rng, group);
+         keygen_timer.stop();
+
+         DSA_PublicKey pub_key = key.public_key();
+
+         std::auto_ptr<PK_Signer> sig(get_pk_signer(key, padding));
+         std::auto_ptr<PK_Verifier> ver(get_pk_verifier(pub_key, padding));
+
+         benchmark_sig_ver(*ver, *sig, verify_timer,
+                           sig_timer, rng, 1000, seconds);
+         }
+
+      const std::string nm = "DSA-" + to_string(pbits);
       report.report(nm, keygen_timer);
       report.report(nm, verify_timer);
       report.report(nm, sig_timer);
@@ -642,7 +690,7 @@ void bench_pk(RandomNumberGenerator& rng,
 
 #if defined(BOTAN_HAS_DSA)
    if(algo == "All" || algo == "DSA")
-      benchmark_dsa_nr<DSA_PrivateKey>(rng, seconds, report);
+      benchmark_dsa(rng, seconds, report);
 #endif
 
 #if defined(BOTAN_HAS_ECDSA)
@@ -672,9 +720,11 @@ void bench_pk(RandomNumberGenerator& rng,
 
 #if defined(BOTAN_HAS_NYBERG_RUEPPEL)
    if(algo == "All" || algo == "NR")
-      benchmark_dsa_nr<NR_PrivateKey>(rng, seconds, report);
+      benchmark_nr(rng, seconds, report);
 #endif
 
+#if defined(BOTAN_HAS_RABIN_WILLIAMS)
    if(algo == "All" || algo == "RW")
       benchmark_rw(rng, seconds, report);
+#endif
    }

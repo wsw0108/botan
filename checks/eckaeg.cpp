@@ -180,9 +180,6 @@ void test_eckaeg_cp_ctor_as_op(RandomNumberGenerator& rng)
    Botan::ECKAEG_PrivateKey private_a3;
    private_a3 = private_a2;
 
-   Botan::DH_PrivateKey dh_pr_empty;
-   Botan::DH_PublicKey dh_pub_empty;
-
    Botan::ECKAEG_PublicKey public_a = private_a; // Bob gets this
    Botan::ECKAEG_PublicKey public_a2(public_a);
    Botan::ECKAEG_PublicKey public_a3;
