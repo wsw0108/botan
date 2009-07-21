@@ -8,9 +8,8 @@
 #ifndef BOTAN_DL_ALGO_H__
 #define BOTAN_DL_ALGO_H__
 
+#include <botan/pk_keys.h>
 #include <botan/dl_group.h>
-#include <botan/x509_key.h>
-#include <botan/pkcs8.h>
 #include <botan/rng.h>
 
 namespace Botan {
@@ -58,23 +57,11 @@ class BOTAN_DLL DL_Scheme_PublicKey : public virtual Public_Key
       */
       virtual DL_Group::Format group_format() const = 0;
 
-      /**
-      * Get an X509 encoder for this key.
-      * @return an encoder usable to encode this key.
-      */
-      X509_Encoder* x509_encoder() const;
-
-      /**
-      * Get an X509 decoder for this key.
-      * @return an decoder usable to decode a DL key and store the
-      * values in this instance.
-      */
-      X509_Decoder* x509_decoder();
+      std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+         subject_public_key_info() const;
    protected:
       BigInt y;
       DL_Group group;
-   private:
-      virtual void X509_load_hook() {}
    };
 
 /**
@@ -92,23 +79,11 @@ class BOTAN_DLL DL_Scheme_PrivateKey : public virtual DL_Scheme_PublicKey,
       */
       const BigInt& get_x() const { return x; }
 
-      /**
-      * Get an PKCS#8 encoder for this key.
-      * @return an encoder usable to encode this key.
-      */
-      PKCS8_Encoder* pkcs8_encoder() const;
+      std::pair<AlgorithmIdentifier, SecureVector<byte> >
+         pkcs8_encoding() const;
 
-      /**
-      * Get an PKCS#8 decoder for this key.
-      * @param rng the rng to use
-      * @return an decoder usable to decode a DL key and store the
-      * values in this instance.
-      */
-      PKCS8_Decoder* pkcs8_decoder(RandomNumberGenerator& rng);
    protected:
       BigInt x;
-   private:
-      virtual void PKCS8_load_hook(RandomNumberGenerator&, bool = false) {}
    };
 
 }

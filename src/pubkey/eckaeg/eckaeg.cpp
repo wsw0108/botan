@@ -41,6 +41,19 @@ void ECKAEG_PublicKey::set_all_values(ECKAEG_PublicKey const& other)
       }
    }
 
+ECKAEG_PublicKey::ECKAEG_PublicKey(const AlgorithmIdentifier& alg_id,
+                                   const MemoryRegion<byte>& key_bits)
+   {
+   mp_dom_pars.reset(new EC_Domain_Params(
+                        decode_ber_ec_dompar(alg_id.parameters)));
+
+   mp_public_point.reset(new PointGFp(
+                            OS2ECP(key_bits, domain_parameters().get_curve())
+                            ));
+
+   X509_load_hook();
+   }
+
 ECKAEG_PublicKey::ECKAEG_PublicKey(ECKAEG_PublicKey const& other)
    : Public_Key(),
      EC_PublicKey()

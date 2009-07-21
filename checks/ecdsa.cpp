@@ -16,6 +16,7 @@
 #include <botan/rsa.h>
 #include <botan/x509cert.h>
 #include <botan/oids.h>
+#include <botan/pkcs8.h>
 
 #include <iostream>
 #include <fstream>
@@ -489,44 +490,6 @@ void test_cp_and_as_ctors(RandomNumberGenerator& rng)
    CHECK_MESSAGE((ver_success_1 && ver_success_2 && ver_success_3), "different results for copied keys");
    }
 
-/**
-* The following test tests whether ECDSA keys exhibit correct behaviour when it is
-* attempted to use them in an uninitialized state
-*/
-void test_non_init_ecdsa_keys(RandomNumberGenerator& rng)
-   {
-   std::cout << "." << std::flush;
-
-   std::auto_ptr<PKCS8_PrivateKey> loaded_key(PKCS8::load_key(TEST_DATA_DIR "/wo_dompar_private.pkcs8.pem", rng));
-   //ECDSA_PrivateKey* loaded_ec_key = dynamic_cast<ECDSA_PrivateKey*>(loaded_key.get());
-   //CHECK_MESSAGE(loaded_ec_key, "the loaded key could not be converted into an ECDSA_PrivateKey");
-   std::string str_message = ("12345678901234567890abcdef12");
-   ECDSA_PrivateKey empty_priv;
-   ECDSA_PublicKey empty_pub;
-   SecureVector<byte> sv_message = decode_hex(str_message);
-   bool exc1 = false;
-   try
-      {
-      SecureVector<byte> signature_1 = empty_priv.sign(sv_message.begin(), sv_message.size(), rng);
-      }
-   catch (std::exception e)
-      {
-      exc1 = true;
-      }
-   CHECK_MESSAGE(exc1, "there was no exception thrown when attempting to use an uninitialized ECDSA key");
-
-   bool exc2 = false;
-   try
-      {
-      empty_pub.verify(sv_message.begin(), sv_message.size(), sv_message.begin(), sv_message.size());
-      }
-   catch (std::exception e)
-      {
-      exc2 = true;
-      }
-   CHECK_MESSAGE(exc2, "there was no exception thrown when attempting to use an uninitialized ECDSA key");
-   }
-
 }
 
 u32bit do_ecdsa_tests(Botan::RandomNumberGenerator& rng)
@@ -545,7 +508,6 @@ u32bit do_ecdsa_tests(Botan::RandomNumberGenerator& rng)
    test_curve_registry(rng);
    test_read_pkcs8(rng);
    test_cp_and_as_ctors(rng);
-   test_non_init_ecdsa_keys(rng);
 
    std::cout << std::endl;
 

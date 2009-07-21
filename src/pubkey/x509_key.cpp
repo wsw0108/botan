@@ -11,7 +11,6 @@
 #include <botan/der_enc.h>
 #include <botan/ber_dec.h>
 #include <botan/pk_algs.h>
-#include <botan/oids.h>
 #include <botan/pem.h>
 #include <memory>
 
@@ -19,20 +18,19 @@ namespace Botan {
 
 namespace X509 {
 
-/*
+/**
 * DER or PEM encode a X.509 public key
 */
 void encode(const Public_Key& key, Pipe& pipe, X509_Encoding encoding)
    {
-   std::auto_ptr<X509_Encoder> encoder(key.x509_encoder());
-   if(!encoder.get())
-      throw Encoding_Error("X509::encode: Key does not support encoding");
+   std::pair<AlgorithmIdentifier, MemoryVector<byte> > sub_pubkey =
+      key.subject_public_key_info();
 
    MemoryVector<byte> der =
       DER_Encoder()
          .start_cons(SEQUENCE)
-            .encode(encoder->alg_id())
-            .encode(encoder->key_bits(), BIT_STRING)
+            .encode(sub_pubkey.first)
+            .encode(sub_pubkey.second, BIT_STRING)
          .end_cons()
       .get_contents();
 
@@ -42,7 +40,7 @@ void encode(const Public_Key& key, Pipe& pipe, X509_Encoding encoding)
       pipe.write(der);
    }
 
-/*
+/**
 * PEM encode a X.509 public key
 */
 std::string PEM_encode(const Public_Key& key)
@@ -54,7 +52,7 @@ std::string PEM_encode(const Public_Key& key)
    return pem.read_all_as_string();
    }
 
-/*
+/**
 * Extract a public key and return it
 */
 Public_Key* load_key(DataSource& source)
@@ -89,25 +87,7 @@ Public_Key* load_key(DataSource& source)
       if(key_bits.is_empty())
          throw Decoding_Error("X.509 public key decoding failed");
 
-      const std::string alg_name = OIDS::lookup(alg_id.oid);
-      if(alg_name == "")
-         throw Decoding_Error("Unknown algorithm OID: " +
-                              alg_id.oid.as_string());
-
-      std::auto_ptr<Public_Key> key_obj(get_public_key(alg_name));
-      if(!key_obj.get())
-         throw Decoding_Error("Unknown PK algorithm/OID: " + alg_name + ", " +
-                              alg_id.oid.as_string());
-
-      std::auto_ptr<X509_Decoder> decoder(key_obj->x509_decoder());
-
-      if(!decoder.get())
-         throw Decoding_Error("Key does not support X.509 decoding");
-
-      decoder->alg_id(alg_id);
-      decoder->key_bits(key_bits);
-
-      return key_obj.release();
+      return get_public_key(alg_id, key_bits);
       }
    catch(Decoding_Error)
       {
@@ -115,7 +95,7 @@ Public_Key* load_key(DataSource& source)
       }
    }
 
-/*
+/**
 * Extract a public key and return it
 */
 Public_Key* load_key(const std::string& fsname)
@@ -124,7 +104,7 @@ Public_Key* load_key(const std::string& fsname)
    return X509::load_key(source);
    }
 
-/*
+/**
 * Extract a public key and return it
 */
 Public_Key* load_key(const MemoryRegion<byte>& mem)
@@ -133,7 +113,7 @@ Public_Key* load_key(const MemoryRegion<byte>& mem)
    return X509::load_key(source);
    }
 
-/*
+/**
 * Make a copy of this public key
 */
 Public_Key* copy_key(const Public_Key& key)
@@ -146,7 +126,7 @@ Public_Key* copy_key(const Public_Key& key)
    return X509::load_key(source);
    }
 
-/*
+/**
 * Find the allowable key constraints
 */
 Key_Constraints find_constraints(const Public_Key& pub_key,

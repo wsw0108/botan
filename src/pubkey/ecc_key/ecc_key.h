@@ -10,12 +10,11 @@
 #ifndef BOTAN_ECC_PUBLIC_KEY_BASE_H__
 #define BOTAN_ECC_PUBLIC_KEY_BASE_H__
 
+#include <botan/pk_keys.h>
 #include <botan/bigint.h>
 #include <botan/curve_gfp.h>
 #include <botan/pk_keys.h>
 #include <botan/ec_dompar.h>
-#include <botan/x509_key.h>
-#include <botan/pkcs8.h>
 
 namespace Botan {
 
@@ -78,18 +77,8 @@ class BOTAN_DLL EC_PublicKey : public virtual Public_Key
          //assert(mp_public_point.get() == 0);
          }
 
-      /**
-      * Get an x509_encoder that can be used to encode this key.
-      * @result an x509_encoder for this key
-      */
-      X509_Encoder* x509_encoder() const;
-
-      /**
-      * Get an x509_decoder that can be used to decode a stored key into
-      * this key.
-      * @result an x509_decoder for this key
-      */
-      X509_Decoder* x509_decoder();
+      std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+         subject_public_key_info() const;
 
       /**
       * Make sure that the public point and domain parameters of this key are set.
@@ -115,18 +104,8 @@ class BOTAN_DLL EC_PrivateKey : public virtual EC_PublicKey, public virtual Priv
    {
    public:
 
-      /**
-      * Get an PKCS#8 encoder that can be used to encoded this key.
-      * @result an PKCS#8 encoder for this key
-      */
-      PKCS8_Encoder* pkcs8_encoder() const;
-
-      /**
-      * Get an PKCS#8 decoder that can be used to decoded a stored key into
-      * this key.
-      * @result an PKCS#8 decoder for this key
-      */
-      PKCS8_Decoder* pkcs8_decoder(RandomNumberGenerator&);
+      std::pair<AlgorithmIdentifier, SecureVector<byte> >
+         pkcs8_encoding() const;
 
       /**
       * Get the private key value of this key object.
