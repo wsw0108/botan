@@ -35,7 +35,7 @@ SecureVector<byte> Default_NR_Op::verify(const byte in[], u32bit length) const
    BigInt d(in + q.bytes(), q.bytes());
 
    if(c.is_zero() || c >= q || d >= q)
-      throw Invalid_Argument("Default_NR_Op::verify: Invalid signature");
+      throw std::invalid_argument("Default_NR_Op::verify: Invalid signature");
 
    BigInt i = mod_p.multiply(powermod_g_p(d), powermod_y_p(c));
    return BigInt::encode(mod_q.reduce(c - i));
@@ -55,7 +55,7 @@ SecureVector<byte> Default_NR_Op::sign(const byte in[], u32bit length,
    BigInt f(in, length);
 
    if(f >= q)
-      throw Invalid_Argument("Default_NR_Op::sign: Input is out of range");
+      throw std::invalid_argument("Default_NR_Op::sign: Input is out of range");
 
    BigInt c = mod_q.reduce(powermod_g_p(k) + f);
    if(c.is_zero())

@@ -216,9 +216,9 @@ DataSource_Command::DataSource_Command(const std::string& prog_and_args,
    arg_list = split_on(prog_and_args, ' ');
 
    if(arg_list.size() == 0)
-      throw Invalid_Argument("DataSource_Command: No command given");
+      throw std::invalid_argument("DataSource_Command: No command given");
    if(arg_list.size() > 5)
-      throw Invalid_Argument("DataSource_Command: Too many args");
+      throw std::invalid_argument("DataSource_Command: Too many args");
 
    pipe = 0;
    create_pipe(paths);

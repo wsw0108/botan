@@ -96,7 +96,7 @@ bool EMSA1::verify(const MemoryRegion<byte>& coded,
 
       return true;
       }
-   catch(Invalid_Argument)
+   catch(std::invalid_argument)
       {
       return false;
       }

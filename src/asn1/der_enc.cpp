@@ -310,7 +310,7 @@ DER_Encoder& DER_Encoder::encode(const byte bytes[], u32bit length,
                                  ASN1_Tag type_tag, ASN1_Tag class_tag)
    {
    if(real_type != OCTET_STRING && real_type != BIT_STRING)
-      throw Invalid_Argument("DER_Encoder: Invalid tag for byte/bit string");
+      throw std::invalid_argument("DER_Encoder: Invalid tag for byte/bit string");
 
    if(real_type == BIT_STRING)
       {

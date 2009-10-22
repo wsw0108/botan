@@ -90,7 +90,7 @@ HMAC::HMAC(HashFunction* hash_in) :
    hash(hash_in)
    {
    if(hash->HASH_BLOCK_SIZE == 0)
-      throw Invalid_Argument("HMAC cannot be used with " + hash->name());
+      throw std::invalid_argument("HMAC cannot be used with " + hash->name());
 
    i_key.create(hash->HASH_BLOCK_SIZE);
    o_key.create(hash->HASH_BLOCK_SIZE);

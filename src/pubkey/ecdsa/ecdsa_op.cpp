@@ -15,7 +15,7 @@ bool Default_ECDSA_Op::verify(const byte signature[], u32bit sig_len,
                               const byte message[], u32bit mess_len) const
    {
    if(sig_len % 2 != 0)
-      throw Invalid_Argument("Erroneous length of signature");
+      throw std::invalid_argument("Erroneous length of signature");
 
    //NOTE: it is not checked whether the public point is set
    if(m_dom_pars.get_curve().get_p() == 0)
@@ -32,10 +32,10 @@ bool Default_ECDSA_Op::verify(const byte signature[], u32bit sig_len,
    BigInt s = BigInt::decode (sv_s, sv_s.size());
 
    if(r < 0 || r >= m_dom_pars.get_order())
-      throw Invalid_Argument("r in ECDSA signature has an illegal value");
+      throw std::invalid_argument("r in ECDSA signature has an illegal value");
 
    if(s < 0 || s >= m_dom_pars.get_order())
-      throw Invalid_Argument("s in ECDSA signature has an illegal value");
+      throw std::invalid_argument("s in ECDSA signature has an illegal value");
 
    BigInt w = inverse_mod(s, m_dom_pars.get_order());
 

@@ -28,10 +28,13 @@ class BOTAN_DLL Pipe : public DataSource
    public:
       typedef u32bit message_id;
 
-      class Invalid_Message_Number : public Invalid_Argument
+      struct Invalid_Message_Number : public std::invalid_argument
          {
-         public:
-            Invalid_Message_Number(const std::string&, message_id);
+         Invalid_Message_Number(const std::string& where, message_id msg) :
+            std::invalid_argument("Pipe::" + where +
+                                  ": Invalid message number " +
+                                  to_string(msg))
+            {}
          };
 
       static const message_id LAST_MESSAGE;

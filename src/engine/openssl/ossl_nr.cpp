@@ -54,7 +54,7 @@ SecureVector<byte> OpenSSL_NR_Op::verify(const byte sig[],
 
    if(BN_is_zero(c.value) || BN_cmp(c.value, q.value) >= 0 ||
                              BN_cmp(d.value, q.value) >= 0)
-      throw Invalid_Argument("OpenSSL_NR_Op::verify: Invalid signature");
+      throw std::invalid_argument("OpenSSL_NR_Op::verify: Invalid signature");
 
    OSSL_BN i1, i2;
    BN_mod_exp(i1.value, g.value, d.value, p.value, ctx.value);
@@ -78,7 +78,7 @@ SecureVector<byte> OpenSSL_NR_Op::sign(const byte in[], u32bit length,
    OSSL_BN k(k_bn);
 
    if(BN_cmp(f.value, q.value) >= 0)
-      throw Invalid_Argument("OpenSSL_NR_Op::sign: Input is out of range");
+      throw std::invalid_argument("OpenSSL_NR_Op::sign: Input is out of range");
 
    OSSL_BN c, d;
    BN_mod_exp(c.value, g.value, k.value, p.value, ctx.value);

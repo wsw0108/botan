@@ -119,7 +119,7 @@ bool operator<(const OID& a, const OID& b)
 void OID::encode_into(DER_Encoder& der) const
    {
    if(id.size() < 2)
-      throw Invalid_Argument("OID::encode_into: OID is invalid");
+      throw std::invalid_argument("OID::encode_into: OID is invalid");
 
    MemoryVector<byte> encoding;
    encoding.append(40 * id[0] + id[1]);

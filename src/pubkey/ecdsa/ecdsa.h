@@ -70,7 +70,7 @@ class BOTAN_DLL ECDSA_PublicKey : public virtual EC_PublicKey,
       * used when a key encoded without domain parameters was decoded into
       * this key. Otherwise it will not be able to verify a signature.
       * @param dom_pars the domain_parameters associated with this key
-      * @throw Invalid_Argument if the point was found not to be satisfying the
+      * @throw std::invalid_argument if the point was found not to be satisfying the
       * curve equation of the provided domain parameters
       * or if this key already has domain parameters set
       * and these are differing from those given as the parameter

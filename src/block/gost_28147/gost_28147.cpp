@@ -44,7 +44,7 @@ GOST_28147_89_Params::GOST_28147_89_Params(const std::string& n) : name(n)
    else if(name == "R3411_CryptoPro")
       sboxes = GOST_R_3411_CRYPTOPRO_PARAMS;
    else
-      throw Invalid_Argument("GOST_28147_89_Params: Unknown " + name);
+      throw std::invalid_argument("GOST_28147_89_Params: Unknown " + name);
    }
 
 /*

@@ -95,7 +95,7 @@ X509_Cert_Options::X509_Cert_Options(const std::string& initial_opts,
    std::vector<std::string> parsed = split_on(initial_opts, '/');
 
    if(parsed.size() > 4)
-      throw Invalid_Argument("X.509 cert options: Too many names: "
+      throw std::invalid_argument("X.509 cert options: Too many names: "
                              + initial_opts);
 
    if(parsed.size() >= 1) common_name  = parsed[0];

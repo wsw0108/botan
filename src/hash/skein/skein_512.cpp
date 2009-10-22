@@ -147,7 +147,7 @@ void initial_block(u64bit H[9], u64bit T[3], u32bit output_bits,
         doesn't seem worth the trouble.
       */
       if(personalization.length() > 64)
-         throw Invalid_Argument("Skein personalization must be <= 64 bytes");
+         throw std::invalid_argument("Skein personalization must be <= 64 bytes");
 
       const byte* bits = reinterpret_cast<const byte*>(personalization.data());
 
@@ -167,7 +167,7 @@ Skein_512::Skein_512(u32bit arg_output_bits,
    output_bits(arg_output_bits)
    {
    if(output_bits == 0 || output_bits % 8 != 0)
-      throw Invalid_Argument("Bad output bits size for Skein-512");
+      throw std::invalid_argument("Bad output bits size for Skein-512");
 
    buf_pos = 0;
    initial_block(H, T, output_bits, personalization);

@@ -22,7 +22,7 @@ void package(RandomNumberGenerator& rng,
              byte output[])
    {
    if(!cipher->valid_keylength(cipher->BLOCK_SIZE))
-      throw Invalid_Argument("AONT::package: Invalid cipher");
+      throw std::invalid_argument("AONT::package: Invalid cipher");
 
    // The all-zero string which is used both as the CTR IV and as K0
    const std::string all_zeros(cipher->BLOCK_SIZE*2, '0');
@@ -71,10 +71,10 @@ void unpackage(BlockCipher* cipher,
                byte output[])
    {
    if(!cipher->valid_keylength(cipher->BLOCK_SIZE))
-      throw Invalid_Argument("AONT::unpackage: Invalid cipher");
+      throw std::invalid_argument("AONT::unpackage: Invalid cipher");
 
    if(input_len < cipher->BLOCK_SIZE)
-      throw Invalid_Argument("AONT::unpackage: Input too short");
+      throw std::invalid_argument("AONT::unpackage: Input too short");
 
    // The all-zero string which is used both as the CTR IV and as K0
    const std::string all_zeros(cipher->BLOCK_SIZE*2, '0');

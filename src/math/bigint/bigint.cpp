@@ -184,7 +184,7 @@ bool BigInt::get_bit(u32bit n) const
 u32bit BigInt::get_substring(u32bit offset, u32bit length) const
    {
    if(length > 32)
-      throw Invalid_Argument("BigInt::get_substring: Substring size too big");
+      throw std::invalid_argument("BigInt::get_substring: Substring size too big");
 
    u64bit piece = 0;
    for(u32bit j = 0; j != 8; ++j)
@@ -277,7 +277,7 @@ u32bit BigInt::encoded_size(Base base) const
    else if(base == Decimal)
       return static_cast<u32bit>((bits() * LOG_2_BASE_10) + 1);
    else
-      throw Invalid_Argument("Unknown base for BigInt encoding");
+      throw std::invalid_argument("Unknown base for BigInt encoding");
    }
 
 /*

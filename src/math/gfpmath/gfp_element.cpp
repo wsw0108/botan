@@ -115,7 +115,7 @@ void inner_montg_mult_sos(word result[], const word* a_bar, const word* b_bar, c
 void montg_mult(BigInt& result, BigInt& a_bar, BigInt& b_bar, const BigInt& m, const BigInt& m_dash, const BigInt)
    {
    if(m.is_zero() || m_dash.is_zero())
-      throw Invalid_Argument("montg_mult(): neither modulus nor m_dash may be zero (and one of them was)");
+      throw std::invalid_argument("montg_mult(): neither modulus nor m_dash may be zero (and one of them was)");
 
    if(a_bar.is_zero() || b_bar.is_zero())
       result = 0;

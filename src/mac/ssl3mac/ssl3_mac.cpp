@@ -78,7 +78,7 @@ SSL3_MAC::SSL3_MAC(HashFunction* hash_in) :
    hash(hash_in)
    {
    if(hash->HASH_BLOCK_SIZE == 0)
-      throw Invalid_Argument("SSL3-MAC cannot be used with " + hash->name());
+      throw std::invalid_argument("SSL3-MAC cannot be used with " + hash->name());
 
    u32bit INNER_HASH_LENGTH =
       (hash->name() == "SHA-160") ? 60 : hash->HASH_BLOCK_SIZE;

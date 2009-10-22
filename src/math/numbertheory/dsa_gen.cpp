@@ -45,12 +45,12 @@ bool generate_dsa_primes(RandomNumberGenerator& rng,
                          const MemoryRegion<byte>& seed_c)
    {
    if(!fips186_3_valid_size(pbits, qbits))
-      throw Invalid_Argument(
+      throw std::invalid_argument(
          "FIPS 186-3 does not allow DSA domain parameters of " +
          to_string(pbits) + "/" + to_string(qbits) + " bits long");
 
    if(seed_c.size() * 8 < qbits)
-      throw Invalid_Argument(
+      throw std::invalid_argument(
          "Generating a DSA parameter set with a " + to_string(qbits) +
          "long q requires a seed at least as many bits long");
 

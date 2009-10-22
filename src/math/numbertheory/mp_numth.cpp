@@ -33,7 +33,7 @@ BigInt square(const BigInt& x)
 BigInt mul_add(const BigInt& a, const BigInt& b, const BigInt& c)
    {
    if(c.is_negative() || c.is_zero())
-      throw Invalid_Argument("mul_add: Third argument must be > 0");
+      throw std::invalid_argument("mul_add: Third argument must be > 0");
 
    BigInt::Sign sign = BigInt::Positive;
    if(a.sign() != b.sign())
@@ -60,7 +60,7 @@ BigInt mul_add(const BigInt& a, const BigInt& b, const BigInt& c)
 BigInt sub_mul(const BigInt& a, const BigInt& b, const BigInt& c)
    {
    if(a.is_negative() || b.is_negative())
-      throw Invalid_Argument("sub_mul: First two arguments must be >= 0");
+      throw std::invalid_argument("sub_mul: First two arguments must be >= 0");
 
    BigInt r = a;
    r -= b;

@@ -50,7 +50,7 @@ void bzip_free(void* info_ptr, void* ptr)
    Bzip_Alloc_Info* info = static_cast<Bzip_Alloc_Info*>(info_ptr);
    std::map<void*, u32bit>::const_iterator i = info->current_allocs.find(ptr);
    if(i == info->current_allocs.end())
-      throw Invalid_Argument("bzip_free: Got pointer not allocated by us");
+      throw std::invalid_argument("bzip_free: Got pointer not allocated by us");
    info->alloc->deallocate(ptr, i->second);
    }
 

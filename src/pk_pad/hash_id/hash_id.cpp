@@ -90,7 +90,7 @@ MemoryVector<byte> pkcs_hash_id(const std::string& name)
    if(out.size())
       return out;
 
-   throw Invalid_Argument("No PKCS #1 identifier for " + name);
+   throw std::invalid_argument("No PKCS #1 identifier for " + name);
    }
 
 /**

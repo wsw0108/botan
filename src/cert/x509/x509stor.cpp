@@ -507,7 +507,7 @@ void X509_Store::add_new_certstore(Certificate_Store* certstore)
 void X509_Store::add_cert(const X509_Certificate& cert, bool trusted)
    {
    if(trusted && !cert.is_self_signed())
-      throw Invalid_Argument("X509_Store: Trusted certs must be self-signed");
+      throw std::invalid_argument("X509_Store: Trusted certs must be self-signed");
 
    if(find_cert(cert.subject_dn(), cert.subject_key_id()) == NO_CERT_FOUND)
       {
@@ -538,7 +538,7 @@ void X509_Store::do_add_certs(DataSource& source, bool trusted)
          add_cert(cert, trusted);
          }
       catch(Decoding_Error) {}
-      catch(Invalid_Argument) {}
+      catch(std::invalid_argument) {}
       }
    }
 

@@ -133,7 +133,7 @@ ANSI_X931_RNG::ANSI_X931_RNG(BlockCipher* cipher_in,
                              RandomNumberGenerator* prng_in)
    {
    if(!prng_in || !cipher_in)
-      throw Invalid_Argument("ANSI_X931_RNG constructor: NULL arguments");
+      throw std::invalid_argument("ANSI_X931_RNG constructor: NULL arguments");
 
    cipher = cipher_in;
    prng = prng_in;

@@ -41,7 +41,7 @@ u32bit dec_two_digit(byte b1, byte b2)
    u32bit lower = (u32bit)b2;
 
    if(upper > 9 || lower > 9)
-      throw Invalid_Argument("CVC dec_two_digit value too large");
+      throw std::invalid_argument("CVC dec_two_digit value too large");
 
    return upper*10 + lower;
    }
@@ -108,14 +108,14 @@ void EAC_Time::set_to(const std::string& time_str)
       params.push_back(current);
 
    if (params.size() != 3)
-      throw Invalid_Argument("Invalid time specification " + time_str);
+      throw std::invalid_argument("Invalid time specification " + time_str);
 
    year   = to_u32bit(params[0]);
    month  = to_u32bit(params[1]);
    day    = to_u32bit(params[2]);
 
    if (!passes_sanity_check())
-      throw Invalid_Argument("Invalid time specification " + time_str);
+      throw std::invalid_argument("Invalid time specification " + time_str);
    }
 
 
@@ -275,7 +275,7 @@ void EAC_Time::decode_from(BER_Decoder& source)
       month = tmp_mon;
       day = tmp_day;
       }
-   catch (Invalid_Argument)
+   catch (std::invalid_argument)
       {
       throw Decoding_Error("EAC_Time decoding failed");
       }

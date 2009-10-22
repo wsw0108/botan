@@ -92,7 +92,7 @@ ANSI_X919_MAC::ANSI_X919_MAC(BlockCipher* e_in) :
    e(e_in), d(e->clone()), position(0)
    {
    if(e->name() != "DES")
-      throw Invalid_Argument("ANSI X9.19 MAC only supports DES");
+      throw std::invalid_argument("ANSI X9.19 MAC only supports DES");
    }
 
 /*

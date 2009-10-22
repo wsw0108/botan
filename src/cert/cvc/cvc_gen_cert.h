@@ -148,7 +148,7 @@ template<typename Derived> void EAC1_1_gen_CVC<Derived>::encode(Pipe& out, X509_
       .get_contents();
 
    if (encoding == PEM)
-      throw Invalid_Argument("EAC1_1_gen_CVC::encode() cannot PEM encode an EAC object");
+      throw std::invalid_argument("EAC1_1_gen_CVC::encode() cannot PEM encode an EAC object");
    else
       out.write(der);
    }

@@ -104,7 +104,7 @@ SecureVector<byte> CMS_Encoder::wrap_key(RandomNumberGenerator& rng,
       }
 #endif
 
-   throw Invalid_Argument("CMS_Encoder::wrap: Unknown cipher " + cipher);
+   throw std::invalid_argument("CMS_Encoder::wrap: Unknown cipher " + cipher);
    }
 
 /*
@@ -153,7 +153,7 @@ SymmetricKey CMS_Encoder::setup_key(RandomNumberGenerator& rng,
    if(cipher == "CAST-128")  keysize = 16;
 
    if(keysize == 0)
-      throw Invalid_Argument("CMS: Cannot encrypt with cipher " + cipher);
+      throw std::invalid_argument("CMS: Cannot encrypt with cipher " + cipher);
 
    SymmetricKey key(rng, keysize);
    if(cipher == "DES" || cipher == "TripleDES")

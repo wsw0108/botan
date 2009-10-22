@@ -12,16 +12,6 @@
 
 namespace Botan {
 
-/*
-* Constructor for Invalid_Message_Number
-*/
-Pipe::Invalid_Message_Number::Invalid_Message_Number(const std::string& where,
-                                                     message_id msg)
-   {
-   set_msg("Pipe::" + where + ": Invalid message number " +
-           to_string(msg));
-   }
-
 namespace {
 
 /*
@@ -116,7 +106,7 @@ bool Pipe::end_of_data() const
 void Pipe::set_default_msg(message_id msg)
    {
    if(msg >= message_count())
-      throw Invalid_Argument("Pipe::set_default_msg: msg number is too high");
+      throw std::invalid_argument("Pipe::set_default_msg: msg number is too high");
    default_read = msg;
    }
 
@@ -229,9 +219,9 @@ void Pipe::append(Filter* filter)
    if(!filter)
       return;
    if(dynamic_cast<SecureQueue*>(filter))
-      throw Invalid_Argument("Pipe::append: SecureQueue cannot be used");
+      throw std::invalid_argument("Pipe::append: SecureQueue cannot be used");
    if(filter->owned)
-      throw Invalid_Argument("Filters cannot be shared among multiple Pipes");
+      throw std::invalid_argument("Filters cannot be shared among multiple Pipes");
 
    filter->owned = true;
 
@@ -249,9 +239,9 @@ void Pipe::prepend(Filter* filter)
    if(!filter)
       return;
    if(dynamic_cast<SecureQueue*>(filter))
-      throw Invalid_Argument("Pipe::prepend: SecureQueue cannot be used");
+      throw std::invalid_argument("Pipe::prepend: SecureQueue cannot be used");
    if(filter->owned)
-      throw Invalid_Argument("Filters cannot be shared among multiple Pipes");
+      throw std::invalid_argument("Filters cannot be shared among multiple Pipes");
 
    filter->owned = true;
 

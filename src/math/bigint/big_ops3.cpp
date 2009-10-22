@@ -121,7 +121,7 @@ BigInt operator%(const BigInt& n, const BigInt& mod)
    if(mod.is_zero())
       throw BigInt::DivideByZero();
    if(mod.is_negative())
-      throw Invalid_Argument("BigInt::operator%: modulus must be > 0");
+      throw std::invalid_argument("BigInt::operator%: modulus must be > 0");
    if(n.is_positive() && mod.is_positive() && n < mod)
       return n;
 

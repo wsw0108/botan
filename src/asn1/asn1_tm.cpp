@@ -79,7 +79,7 @@ void X509_Time::set_to(const std::string& time_str)
       params.push_back(current);
 
    if(params.size() < 3 || params.size() > 6)
-      throw Invalid_Argument("Invalid time specification " + time_str);
+      throw std::invalid_argument("Invalid time specification " + time_str);
 
    year   = to_u32bit(params[0]);
    month  = to_u32bit(params[1]);
@@ -94,7 +94,7 @@ void X509_Time::set_to(const std::string& time_str)
       tag = UTC_TIME;
 
    if(!passes_sanity_check())
-      throw Invalid_Argument("Invalid time specification " + time_str);
+      throw std::invalid_argument("Invalid time specification " + time_str);
    }
 
 /*
@@ -103,13 +103,13 @@ void X509_Time::set_to(const std::string& time_str)
 void X509_Time::set_to(const std::string& t_spec, ASN1_Tag tag)
    {
    if(tag != GENERALIZED_TIME && tag != UTC_TIME)
-      throw Invalid_Argument("X509_Time: Invalid tag " + to_string(tag));
+      throw std::invalid_argument("X509_Time: Invalid tag " + to_string(tag));
    if(tag == GENERALIZED_TIME && t_spec.size() != 13 && t_spec.size() != 15)
-      throw Invalid_Argument("Invalid GeneralizedTime: " + t_spec);
+      throw std::invalid_argument("Invalid GeneralizedTime: " + t_spec);
    if(tag == UTC_TIME && t_spec.size() != 11 && t_spec.size() != 13)
-      throw Invalid_Argument("Invalid UTCTime: " + t_spec);
+      throw std::invalid_argument("Invalid UTCTime: " + t_spec);
    if(t_spec[t_spec.size()-1] != 'Z')
-      throw Invalid_Argument("Invalid time encoding: " + t_spec);
+      throw std::invalid_argument("Invalid time encoding: " + t_spec);
 
    const u32bit YEAR_SIZE = (tag == UTC_TIME) ? 2 : 4;
 
@@ -145,7 +145,7 @@ void X509_Time::set_to(const std::string& t_spec, ASN1_Tag tag)
       }
 
    if(!passes_sanity_check())
-      throw Invalid_Argument("Invalid time specification " + t_spec);
+      throw std::invalid_argument("Invalid time specification " + t_spec);
    }
 
 /*
@@ -154,7 +154,7 @@ void X509_Time::set_to(const std::string& t_spec, ASN1_Tag tag)
 void X509_Time::encode_into(DER_Encoder& der) const
    {
    if(tag != GENERALIZED_TIME && tag != UTC_TIME)
-      throw Invalid_Argument("X509_Time: Bad encoding tag");
+      throw std::invalid_argument("X509_Time: Bad encoding tag");
    der.add_object(tag, UNIVERSAL,
                   Charset::transcode(as_string(),
                                      LOCAL_CHARSET, LATIN1_CHARSET));

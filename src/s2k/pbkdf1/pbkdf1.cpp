@@ -18,7 +18,7 @@ OctetString PKCS5_PBKDF1::derive(u32bit key_len,
                                  u32bit iterations) const
    {
    if(iterations == 0)
-      throw Invalid_Argument("PKCS#5 PBKDF1: Invalid iteration count");
+      throw std::invalid_argument("PKCS#5 PBKDF1: Invalid iteration count");
 
    if(key_len > hash->OUTPUT_LENGTH)
       throw Exception("PKCS#5 PBKDF1: Requested output length too long");

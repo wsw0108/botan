@@ -15,9 +15,9 @@ namespace Botan {
 s32bit jacobi(const BigInt& a, const BigInt& n)
    {
    if(a.is_negative())
-      throw Invalid_Argument("jacobi: first argument must be non-negative");
+      throw std::invalid_argument("jacobi: first argument must be non-negative");
    if(n.is_even() || n < 2)
-      throw Invalid_Argument("jacobi: second argument must be odd and > 1");
+      throw std::invalid_argument("jacobi: second argument must be odd and > 1");
 
    BigInt x = a, y = n;
    s32bit J = 1;

@@ -77,7 +77,7 @@ DN_Check::DN_Check(const std::string& dn_entry, const std::string& looking_for,
    else if(method == IGNORE_CASE)
       compare = &ignore_case;
    else
-      throw Invalid_Argument("Unknown method argument to DN_Check()");
+      throw std::invalid_argument("Unknown method argument to DN_Check()");
    }
 
 /*

@@ -58,7 +58,7 @@ Filter* return_or_raise(Filter* filter, const std::string& name)
    {
    if(filter)
       return filter;
-   throw Invalid_Argument("Filter " + name + " could not be found");
+   throw std::invalid_argument("Filter " + name + " could not be found");
    }
 
 Filter* make_filter1(const std::string& name)

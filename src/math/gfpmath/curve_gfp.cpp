@@ -32,7 +32,7 @@ CurveGFp::CurveGFp(const GFpElement& a, const GFpElement& b,
    {
    if(!((p == mA.get_p()) && (p == mB.get_p())))
       {
-      throw Invalid_Argument("could not construct curve: moduli of arguments differ");
+      throw std::invalid_argument("could not construct curve: moduli of arguments differ");
       }
    std::tr1::shared_ptr<GFpModulus> p_mod = std::tr1::shared_ptr<GFpModulus>(new GFpModulus(p));
    // the above is the creation of the GFpModuls object which will be shared point-wide

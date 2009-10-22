@@ -64,7 +64,7 @@ void Power_Mod::set_modulus(const BigInt& n, Usage_Hints hints) const
 void Power_Mod::set_base(const BigInt& b) const
    {
    if(b.is_zero() || b.is_negative())
-      throw Invalid_Argument("Power_Mod::set_base: arg must be > 0");
+      throw std::invalid_argument("Power_Mod::set_base: arg must be > 0");
 
    if(!core)
       throw Internal_Error("Power_Mod::set_base: core was NULL");
@@ -77,7 +77,7 @@ void Power_Mod::set_base(const BigInt& b) const
 void Power_Mod::set_exponent(const BigInt& e) const
    {
    if(e.is_negative())
-      throw Invalid_Argument("Power_Mod::set_exponent: arg must be > 0");
+      throw std::invalid_argument("Power_Mod::set_exponent: arg must be > 0");
 
    if(!core)
       throw Internal_Error("Power_Mod::set_exponent: core was NULL");

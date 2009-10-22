@@ -49,7 +49,7 @@ ECDSA_Signature const decode_seq(MemoryRegion<byte> const& seq)
 ECDSA_Signature const decode_concatenation(MemoryRegion<byte> const& concat)
    {
    if(concat.size() % 2 != 0)
-      throw Invalid_Argument("Erroneous length of signature");
+      throw std::invalid_argument("Erroneous length of signature");
 
    u32bit rs_len = concat.size()/2;
    SecureVector<byte> sv_r;

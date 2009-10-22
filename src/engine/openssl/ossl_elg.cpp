@@ -46,7 +46,7 @@ SecureVector<byte> OpenSSL_ELG_Op::encrypt(const byte in[], u32bit length,
    OSSL_BN i(in, length);
 
    if(BN_cmp(i.value, p.value) >= 0)
-      throw Invalid_Argument("OpenSSL_ELG_Op: Input is too large");
+      throw std::invalid_argument("OpenSSL_ELG_Op: Input is too large");
 
    OSSL_BN a, b, k(k_bn);
 
@@ -72,7 +72,7 @@ BigInt OpenSSL_ELG_Op::decrypt(const BigInt& a_bn, const BigInt& b_bn) const
    OSSL_BN a(a_bn), b(b_bn), t;
 
    if(BN_cmp(a.value, p.value) >= 0 || BN_cmp(b.value, p.value) >= 0)
-      throw Invalid_Argument("OpenSSL_ELG_Op: Invalid message");
+      throw std::invalid_argument("OpenSSL_ELG_Op: Invalid message");
 
    BN_mod_exp(t.value, a.value, x.value, p.value, ctx.value);
    BN_mod_inverse(a.value, t.value, p.value, ctx.value);

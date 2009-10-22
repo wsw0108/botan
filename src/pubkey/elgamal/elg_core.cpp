@@ -86,7 +86,7 @@ SecureVector<byte> ELG_Core::encrypt(const byte in[], u32bit length,
 SecureVector<byte> ELG_Core::decrypt(const byte in[], u32bit length) const
    {
    if(length != 2*p_bytes)
-      throw Invalid_Argument("ELG_Core::decrypt: Invalid message");
+      throw std::invalid_argument("ELG_Core::decrypt: Invalid message");
 
    BigInt a(in, p_bytes);
    BigInt b(in + p_bytes, p_bytes);

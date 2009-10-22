@@ -21,7 +21,7 @@ MDx_HashFunction::MDx_HashFunction(u32bit hash_len, u32bit block_len,
    BIG_BYTE_ENDIAN(byte_end), BIG_BIT_ENDIAN(bit_end), COUNT_SIZE(cnt_size)
    {
    if(COUNT_SIZE >= OUTPUT_LENGTH || COUNT_SIZE >= HASH_BLOCK_SIZE)
-      throw Invalid_Argument("MDx_HashFunction: COUNT_SIZE is too big");
+      throw std::invalid_argument("MDx_HashFunction: COUNT_SIZE is too big");
    count = position = 0;
    }
 

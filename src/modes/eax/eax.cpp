@@ -43,7 +43,7 @@ EAX_Base::EAX_Base(BlockCipher* ciph,
    mac = new CMAC(cipher->clone());
 
    if(tag_size % 8 != 0 || TAG_SIZE == 0 || TAG_SIZE > mac->OUTPUT_LENGTH)
-      throw Invalid_Argument(name() + ": Bad tag size " + to_string(tag_size));
+      throw std::invalid_argument(name() + ": Bad tag size " + to_string(tag_size));
 
    state.create(BLOCK_SIZE);
    buffer.create(BLOCK_SIZE);

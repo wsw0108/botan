@@ -215,9 +215,9 @@ PBE_PKCS5v20::PBE_PKCS5v20(BlockCipher* cipher,
    direction(ENCRYPTION), block_cipher(cipher), hash_function(digest)
    {
    if(!known_cipher(block_cipher->name()))
-      throw Invalid_Argument("PBE-PKCS5 v2.0: Invalid cipher " + cipher->name());
+      throw std::invalid_argument("PBE-PKCS5 v2.0: Invalid cipher " + cipher->name());
    if(hash_function->name() != "SHA-160")
-      throw Invalid_Argument("PBE-PKCS5 v2.0: Invalid digest " + digest->name());
+      throw std::invalid_argument("PBE-PKCS5 v2.0: Invalid digest " + digest->name());
    }
 
 /**

@@ -42,7 +42,7 @@ class BOTAN_DLL Mutex_Holder
       Mutex_Holder(Mutex* m) : mux(m)
          {
          if(!mux)
-            throw Invalid_Argument("Mutex_Holder: Argument was NULL");
+            throw std::invalid_argument("Mutex_Holder: Argument was NULL");
          mux->lock();
          }
 

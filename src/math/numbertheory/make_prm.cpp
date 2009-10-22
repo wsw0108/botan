@@ -19,7 +19,7 @@ BigInt random_prime(RandomNumberGenerator& rng,
                     u32bit equiv, u32bit modulo)
    {
    if(bits <= 1)
-      throw Invalid_Argument("random_prime: Can't make a prime of " +
+      throw std::invalid_argument("random_prime: Can't make a prime of " +
                              to_string(bits) + " bits");
    else if(bits == 2)
       return ((rng.next_byte() % 2) ? 2 : 3);
@@ -29,11 +29,11 @@ BigInt random_prime(RandomNumberGenerator& rng,
       return ((rng.next_byte() % 2) ? 11 : 13);
 
    if(coprime <= 0)
-      throw Invalid_Argument("random_prime: coprime must be > 0");
+      throw std::invalid_argument("random_prime: coprime must be > 0");
    if(modulo % 2 == 1 || modulo == 0)
-      throw Invalid_Argument("random_prime: Invalid modulo value");
+      throw std::invalid_argument("random_prime: Invalid modulo value");
    if(equiv >= modulo || equiv % 2 == 0)
-      throw Invalid_Argument("random_prime: equiv must be < modulo, and odd");
+      throw std::invalid_argument("random_prime: equiv must be < modulo, and odd");
 
    while(true)
       {
@@ -84,7 +84,7 @@ BigInt random_prime(RandomNumberGenerator& rng,
 BigInt random_safe_prime(RandomNumberGenerator& rng, u32bit bits)
    {
    if(bits <= 64)
-      throw Invalid_Argument("random_safe_prime: Can't make a prime of " +
+      throw std::invalid_argument("random_safe_prime: Can't make a prime of " +
                              to_string(bits) + " bits");
 
    BigInt p;

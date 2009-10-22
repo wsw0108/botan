@@ -130,7 +130,7 @@ SAFER_SK::SAFER_SK(u32bit rounds) : BlockCipher(8, 16),
                                     EK(16 * rounds + 8), ROUNDS(rounds)
    {
    if(ROUNDS > 13 || ROUNDS == 0)
-      throw Invalid_Argument(name() + ": Invalid number of rounds");
+      throw std::invalid_argument(name() + ": Invalid number of rounds");
    }
 
 }

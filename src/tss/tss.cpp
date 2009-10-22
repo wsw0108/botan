@@ -89,7 +89,7 @@ byte rtss_hash_id(const std::string& hash_name)
    else if(hash_name == "SHA-256")
       return 2;
    else
-      throw Invalid_Argument("RTSS only supports SHA-1 and SHA-256");
+      throw std::invalid_argument("RTSS only supports SHA-1 and SHA-256");
    }
 
 HashFunction* get_rtss_hash_by_id(byte id)

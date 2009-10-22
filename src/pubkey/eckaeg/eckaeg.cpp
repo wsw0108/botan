@@ -66,7 +66,7 @@ ECKAEG_PublicKey::ECKAEG_PublicKey(EC_Domain_Params const& dom_par, PointGFp con
    mp_public_point = std::auto_ptr<PointGFp>(new PointGFp(public_point));
    if(mp_public_point->get_curve() != mp_dom_pars->get_curve())
       {
-      throw Invalid_Argument("ECKAEG_PublicKey(): curve of arg. point and curve of arg. domain parameters are different");
+      throw std::invalid_argument("ECKAEG_PublicKey(): curve of arg. point and curve of arg. domain parameters are different");
       }
    EC_PublicKey::affirm_init();
    m_eckaeg_core = ECKAEG_Core(*mp_dom_pars, BigInt(0), *mp_public_point);

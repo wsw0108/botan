@@ -30,10 +30,10 @@ X509_CA::X509_CA(const X509_Certificate& c,
    {
    const Private_Key* key_pointer = &key;
    if(!dynamic_cast<const PK_Signing_Key*>(key_pointer))
-      throw Invalid_Argument("X509_CA: " + key.algo_name() + " cannot sign");
+      throw std::invalid_argument("X509_CA: " + key.algo_name() + " cannot sign");
 
    if(!cert.is_CA_cert())
-      throw Invalid_Argument("X509_CA: This certificate is not for a CA");
+      throw std::invalid_argument("X509_CA: This certificate is not for a CA");
 
    signer = choose_sig_format(key, ca_sig_algo);
    }
@@ -149,7 +149,7 @@ X509_CRL X509_CA::update_crl(const X509_CRL& crl,
    X509_Store store;
    store.add_cert(cert, true);
    if(store.add_crl(crl) != VERIFIED)
-      throw Invalid_Argument("X509_CA::update_crl: Invalid CRL provided");
+      throw std::invalid_argument("X509_CA::update_crl: Invalid CRL provided");
 
    std::set<SecureVector<byte> > removed_from_crl;
    for(u32bit j = 0; j != new_revoked.size(); ++j)
@@ -265,7 +265,7 @@ PK_Signer* choose_sig_format(const Private_Key& key,
       format = IEEE_1363;
       }
    else
-      throw Invalid_Argument("Unknown X.509 signing key type: " + algo_name);
+      throw std::invalid_argument("Unknown X.509 signing key type: " + algo_name);
 
    sig_algo.oid = OIDS::lookup(algo_name + "/" + padding);
 

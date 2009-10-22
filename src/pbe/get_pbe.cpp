@@ -34,13 +34,13 @@ PBE* get_pbe(const std::string& algo_spec)
 
    std::vector<std::string> cipher_spec = split_on(cipher, '/');
    if(cipher_spec.size() != 2)
-      throw Invalid_Argument("PBE: Invalid cipher spec " + cipher);
+      throw std::invalid_argument("PBE: Invalid cipher spec " + cipher);
 
    const std::string cipher_algo = global_state().deref_alias(cipher_spec[0]);
    const std::string cipher_mode = cipher_spec[1];
 
    if(cipher_mode != "CBC")
-      throw Invalid_Argument("PBE: Invalid cipher mode " + cipher);
+      throw std::invalid_argument("PBE: Invalid cipher mode " + cipher);
 
    Algorithm_Factory& af = global_state().algorithm_factory();
 
@@ -91,13 +91,13 @@ PBE* get_pbe(const OID& pbe_oid, DataSource& params)
 
       std::vector<std::string> cipher_spec = split_on(cipher, '/');
       if(cipher_spec.size() != 2)
-         throw Invalid_Argument("PBE: Invalid cipher spec " + cipher);
+         throw std::invalid_argument("PBE: Invalid cipher spec " + cipher);
 
       const std::string cipher_algo = global_state().deref_alias(cipher_spec[0]);
       const std::string cipher_mode = cipher_spec[1];
 
       if(cipher_mode != "CBC")
-         throw Invalid_Argument("PBE: Invalid cipher mode " + cipher);
+         throw std::invalid_argument("PBE: Invalid cipher mode " + cipher);
 
       Algorithm_Factory& af = global_state().algorithm_factory();
 

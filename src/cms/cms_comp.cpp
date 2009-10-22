@@ -24,7 +24,7 @@ namespace Botan {
 void CMS_Encoder::compress(const std::string& algo)
    {
    if(!CMS_Encoder::can_compress_with(algo))
-      throw Invalid_Argument("CMS_Encoder: Cannot compress with " + algo);
+      throw std::invalid_argument("CMS_Encoder: Cannot compress with " + algo);
 
    Filter* compressor = 0;
 

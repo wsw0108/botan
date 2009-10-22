@@ -6,34 +6,8 @@
 */
 
 #include <botan/exceptn.h>
-#include <botan/parsing.h>
 
 namespace Botan {
-
-/*
-* Constructor for Invalid_Key_Length
-*/
-Invalid_Key_Length::Invalid_Key_Length(const std::string& name, u32bit length)
-   {
-   set_msg(name + " cannot accept a key of length " + to_string(length));
-   }
-
-/*
-* Constructor for Invalid_Block_Size
-*/
-Invalid_Block_Size::Invalid_Block_Size(const std::string& mode,
-                                       const std::string& pad)
-   {
-   set_msg("Padding method " + pad + " cannot be used with " + mode);
-   }
-
-/*
-* Constructor for Invalid_IV_Length
-*/
-Invalid_IV_Length::Invalid_IV_Length(const std::string& mode, u32bit bad_len)
-   {
-   set_msg("IV length " + to_string(bad_len) + " is invalid for " + mode);
-   }
 
 /*
 * Constructor for Algorithm_Not_Found

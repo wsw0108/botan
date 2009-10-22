@@ -52,7 +52,7 @@ void BigInt::encode(byte output[], const BigInt& n, Base base)
          }
       }
    else
-      throw Invalid_Argument("Unknown BigInt encoding method");
+      throw std::invalid_argument("Unknown BigInt encoding method");
    }
 
 /*
@@ -130,16 +130,16 @@ BigInt BigInt::decode(const byte buf[], u32bit length, Base base)
             continue;
 
          if(!Charset::is_digit(buf[j]))
-            throw Invalid_Argument("BigInt::decode: "
+            throw std::invalid_argument("BigInt::decode: "
                                    "Invalid character in decimal input");
 
          byte x = Charset::char2digit(buf[j]);
          if(x >= RADIX)
             {
             if(RADIX == 10)
-               throw Invalid_Argument("BigInt: Invalid decimal string");
+               throw std::invalid_argument("BigInt: Invalid decimal string");
             else
-               throw Invalid_Argument("BigInt: Invalid octal string");
+               throw std::invalid_argument("BigInt: Invalid octal string");
             }
 
          r *= RADIX;
@@ -147,7 +147,7 @@ BigInt BigInt::decode(const byte buf[], u32bit length, Base base)
          }
       }
    else
-      throw Invalid_Argument("Unknown BigInt decoding method");
+      throw std::invalid_argument("Unknown BigInt decoding method");
    return r;
    }
 

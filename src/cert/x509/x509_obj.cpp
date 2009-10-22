@@ -42,7 +42,7 @@ void X509_Object::init(DataSource& in, const std::string& labels)
    {
    PEM_labels_allowed = split_on(labels, '/');
    if(PEM_labels_allowed.size() < 1)
-      throw Invalid_Argument("Bad labels argument to X509_Object");
+      throw std::invalid_argument("Bad labels argument to X509_Object");
 
    PEM_label_pref = PEM_labels_allowed[0];
    std::sort(PEM_labels_allowed.begin(), PEM_labels_allowed.end());
@@ -224,7 +224,7 @@ void X509_Object::do_decode()
       throw Decoding_Error(PEM_label_pref + " decoding failed (" +
                            what.substr(23, std::string::npos) + ")");
       }
-   catch(Invalid_Argument& e)
+   catch(std::invalid_argument& e)
       {
       const std::string what = e.what();
       throw Decoding_Error(PEM_label_pref + " decoding failed (" +

@@ -111,7 +111,7 @@ SecureVector<byte> PK_Decryptor_MR_with_EME::dec(const byte msg[],
       else
          return decrypted;
       }
-   catch(Invalid_Argument)
+   catch(std::invalid_argument)
       {
       throw Exception("PK_Decryptor_MR_with_EME: Input is invalid");
       }
@@ -330,7 +330,7 @@ bool PK_Verifier::check_signature(const byte sig[], u32bit length)
          throw Decoding_Error("PK_Verifier: Unknown signature format " +
                               to_string(sig_format));
       }
-   catch(Invalid_Argument) { return false; }
+   catch(std::invalid_argument) { return false; }
    catch(Decoding_Error) { return false; }
    }
 

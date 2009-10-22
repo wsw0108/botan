@@ -88,7 +88,7 @@ void Extensions::encode_into(DER_Encoder& to_object) const
          setting = "yes";
 
       if(setting != "yes" && setting != "no" && setting != "critical")
-         throw Invalid_Argument("X509_CA:: Invalid value for option "
+         throw std::invalid_argument("X509_CA:: Invalid value for option "
                                 "x509/exts/" + ext->config_id() + " of " +
                                 setting);
 

@@ -9,7 +9,10 @@
 #define BOTAN_EXCEPTION_H__
 
 #include <botan/types.h>
+#include <botan/parsing.h>
+
 #include <exception>
+#include <stdexcept>
 #include <string>
 
 namespace Botan {
@@ -30,35 +33,37 @@ class BOTAN_DLL Exception : public std::exception
    };
 
 /*
-* Invalid_Argument Exception
-*/
-struct BOTAN_DLL Invalid_Argument : public Exception
-   {
-   Invalid_Argument(const std::string& err = "") : Exception(err) {}
-   };
-
-/*
 * Invalid_Key_Length Exception
 */
-struct BOTAN_DLL Invalid_Key_Length : public Invalid_Argument
+struct BOTAN_DLL Invalid_Key_Length : public std::invalid_argument
    {
-   Invalid_Key_Length(const std::string&, u32bit);
+   Invalid_Key_Length(const std::string& name, u32bit length) :
+      std::invalid_argument(name + " cannot accept a key of length " +
+                            to_string(length))
+      {}
    };
 
 /*
 * Invalid_Block_Size Exception
 */
-struct BOTAN_DLL Invalid_Block_Size : public Invalid_Argument
+struct BOTAN_DLL Invalid_Block_Size : public std::invalid_argument
    {
-   Invalid_Block_Size(const std::string&, const std::string&);
+   Invalid_Block_Size(const std::string& mode,
+                      const std::string& pad) :
+      std::invalid_argument("Padding method " + pad +
+                            " cannot be used with " + mode)
+      {}
    };
 
 /*
 * Invalid_IV_Length Exception
 */
-struct BOTAN_DLL Invalid_IV_Length : public Invalid_Argument
+struct BOTAN_DLL Invalid_IV_Length : public std::invalid_argument
    {
-   Invalid_IV_Length(const std::string&, u32bit);
+   Invalid_IV_Length(const std::string& mode, u32bit bad_len) :
+      std::invalid_argument("IV length " + to_string(bad_len) +
+                            " is invalid for " + mode)
+      {}
    };
 
 /*

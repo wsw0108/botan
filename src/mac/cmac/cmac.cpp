@@ -142,7 +142,7 @@ CMAC::CMAC(BlockCipher* e_in) :
    else if(e->BLOCK_SIZE == 8)
       polynomial = 0x1B;
    else
-      throw Invalid_Argument("CMAC cannot use the cipher " + e->name());
+      throw std::invalid_argument("CMAC cannot use the cipher " + e->name());
 
    state.create(OUTPUT_LENGTH);
    buffer.create(OUTPUT_LENGTH);

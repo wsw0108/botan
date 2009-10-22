@@ -16,7 +16,7 @@ namespace Botan {
 Blinder::Blinder(const BigInt& e, const BigInt& d, const BigInt& n)
    {
    if(e < 1 || d < 1 || n < 1)
-      throw Invalid_Argument("Blinder: Arguments too small");
+      throw std::invalid_argument("Blinder: Arguments too small");
 
    reducer = Modular_Reducer(n);
    this->e = e;

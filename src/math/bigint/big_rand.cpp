@@ -20,7 +20,7 @@ BigInt::BigInt(NumberType type, u32bit bits)
    if(type == Power2)
       set_bit(bits);
    else
-      throw Invalid_Argument("BigInt(NumberType): Unknown type");
+      throw std::invalid_argument("BigInt(NumberType): Unknown type");
    }
 
 /*
@@ -53,7 +53,7 @@ BigInt BigInt::random_integer(RandomNumberGenerator& rng,
    BigInt range = max - min;
 
    if(range <= 0)
-      throw Invalid_Argument("random_integer: invalid min/max values");
+      throw std::invalid_argument("random_integer: invalid min/max values");
 
    return (min + (BigInt(rng, range.bits() + 2) % range));
    }

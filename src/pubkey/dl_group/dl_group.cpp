@@ -33,7 +33,7 @@ DL_Group::DL_Group(const std::string& type)
    std::string grp_contents = global_state().get("dl", type);
 
    if(grp_contents == "")
-      throw Invalid_Argument("DL_Group: Unknown group " + type);
+      throw std::invalid_argument("DL_Group: Unknown group " + type);
 
    DataSource_Memory pem(grp_contents);
    PEM_decode(pem);
@@ -46,7 +46,7 @@ DL_Group::DL_Group(RandomNumberGenerator& rng,
                    PrimeType type, u32bit pbits, u32bit qbits)
    {
    if(pbits < 512)
-      throw Invalid_Argument("DL_Group: prime size " + to_string(pbits) +
+      throw std::invalid_argument("DL_Group: prime size " + to_string(pbits) +
                              " is too small");
 
    if(type == Strong)
@@ -93,7 +93,7 @@ DL_Group::DL_Group(RandomNumberGenerator& rng,
    if(!generate_dsa_primes(rng,
                            global_state().algorithm_factory(),
                            p, q, pbits, qbits, seed))
-      throw Invalid_Argument("DL_Group: The seed given does not "
+      throw std::invalid_argument("DL_Group: The seed given does not "
                              "generate a DSA group");
 
    g = make_dsa_generator(p, q);
@@ -123,11 +123,11 @@ DL_Group::DL_Group(const BigInt& p1, const BigInt& q1, const BigInt& g1)
 void DL_Group::initialize(const BigInt& p1, const BigInt& q1, const BigInt& g1)
    {
    if(p1 < 3)
-      throw Invalid_Argument("DL_Group: Prime invalid");
+      throw std::invalid_argument("DL_Group: Prime invalid");
    if(g1 < 2 || g1 >= p1)
-      throw Invalid_Argument("DL_Group: Generator invalid");
+      throw std::invalid_argument("DL_Group: Generator invalid");
    if(q1 < 0 || q1 >= p1)
-      throw Invalid_Argument("DL_Group: Subgroup invalid");
+      throw std::invalid_argument("DL_Group: Subgroup invalid");
 
    p = p1;
    g = g1;
@@ -237,7 +237,7 @@ SecureVector<byte> DL_Group::DER_encode(Format format) const
       .get_contents();
       }
 
-   throw Invalid_Argument("Unknown DL_Group encoding " + to_string(format));
+   throw std::invalid_argument("Unknown DL_Group encoding " + to_string(format));
    }
 
 /*
@@ -253,7 +253,7 @@ std::string DL_Group::PEM_encode(Format format) const
    else if(format == ANSI_X9_42)
       return PEM_Code::encode(encoding, "X942 DH PARAMETERS");
    else
-      throw Invalid_Argument("Unknown DL_Group encoding " + to_string(format));
+      throw std::invalid_argument("Unknown DL_Group encoding " + to_string(format));
    }
 
 /*
@@ -287,7 +287,7 @@ void DL_Group::BER_decode(DataSource& source, Format format)
          .discard_remaining();
       }
    else
-      throw Invalid_Argument("Unknown DL_Group encoding " + to_string(format));
+      throw std::invalid_argument("Unknown DL_Group encoding " + to_string(format));
 
    initialize(new_p, new_q, new_g);
    }

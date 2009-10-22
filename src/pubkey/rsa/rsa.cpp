@@ -29,7 +29,7 @@ RSA_PublicKey::RSA_PublicKey(const BigInt& mod, const BigInt& exp)
 BigInt RSA_PublicKey::public_op(const BigInt& i) const
    {
    if(i >= n)
-      throw Invalid_Argument(algo_name() + "::public_op: input is too large");
+      throw std::invalid_argument(algo_name() + "::public_op: input is too large");
    return core.public_op(i);
    }
 
@@ -59,10 +59,10 @@ RSA_PrivateKey::RSA_PrivateKey(RandomNumberGenerator& rng,
                                u32bit bits, u32bit exp)
    {
    if(bits < 512)
-      throw Invalid_Argument(algo_name() + ": Can't make a key that is only " +
+      throw std::invalid_argument(algo_name() + ": Can't make a key that is only " +
                              to_string(bits) + " bits long");
    if(exp < 3 || exp % 2 == 0)
-      throw Invalid_Argument(algo_name() + ": Invalid encryption exponent");
+      throw std::invalid_argument(algo_name() + ": Invalid encryption exponent");
 
    e = exp;
    p = random_prime(rng, (bits + 1) / 2, e);
@@ -102,7 +102,7 @@ BigInt RSA_PrivateKey::private_op(const byte in[], u32bit length) const
    {
    BigInt i(in, length);
    if(i >= n)
-      throw Invalid_Argument(algo_name() + "::private_op: input is too large");
+      throw std::invalid_argument(algo_name() + "::private_op: input is too large");
 
    BigInt r = core.private_op(i);
    if(i != public_op(r))

@@ -43,7 +43,7 @@ EVP_BlockCipher::EVP_BlockCipher(const EVP_CIPHER* algo,
    cipher_name(algo_name)
    {
    if(EVP_CIPHER_mode(algo) != EVP_CIPH_ECB_MODE)
-      throw Invalid_Argument("EVP_BlockCipher: Non-ECB EVP was passed in");
+      throw std::invalid_argument("EVP_BlockCipher: Non-ECB EVP was passed in");
 
    EVP_CIPHER_CTX_init(&encrypt);
    EVP_CIPHER_CTX_init(&decrypt);
@@ -66,7 +66,7 @@ EVP_BlockCipher::EVP_BlockCipher(const EVP_CIPHER* algo,
    cipher_name(algo_name)
    {
    if(EVP_CIPHER_mode(algo) != EVP_CIPH_ECB_MODE)
-      throw Invalid_Argument("EVP_BlockCipher: Non-ECB EVP was passed in");
+      throw std::invalid_argument("EVP_BlockCipher: Non-ECB EVP was passed in");
 
    EVP_CIPHER_CTX_init(&encrypt);
    EVP_CIPHER_CTX_init(&decrypt);
@@ -119,7 +119,7 @@ void EVP_BlockCipher::key_schedule(const byte key[], u32bit length)
    else
       if(EVP_CIPHER_CTX_set_key_length(&encrypt, length) == 0 ||
          EVP_CIPHER_CTX_set_key_length(&decrypt, length) == 0)
-         throw Invalid_Argument("EVP_BlockCipher: Bad key length for " +
+         throw std::invalid_argument("EVP_BlockCipher: Bad key length for " +
                                 cipher_name);
 
    if(cipher_name == "RC2")

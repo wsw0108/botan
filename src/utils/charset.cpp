@@ -118,7 +118,7 @@ std::string transcode(const std::string& str,
    if(from == UCS2_CHARSET && to == LATIN1_CHARSET)
       return ucs2_to_latin1(str);
 
-   throw Invalid_Argument("Unknown transcoding operation from " +
+   throw std::invalid_argument("Unknown transcoding operation from " +
                           to_string(from) + " to " + to_string(to));
    }
 
@@ -162,7 +162,7 @@ byte char2digit(char c)
       case '9': return 9;
       }
 
-   throw Invalid_Argument("char2digit: Input is not a digit character");
+   throw std::invalid_argument("char2digit: Input is not a digit character");
    }
 
 /*
@@ -184,7 +184,7 @@ char digit2char(byte b)
       case 9: return '9';
       }
 
-   throw Invalid_Argument("digit2char: Input is not a digit");
+   throw std::invalid_argument("digit2char: Input is not a digit");
    }
 
 /*

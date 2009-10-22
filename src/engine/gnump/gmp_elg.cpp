@@ -41,7 +41,7 @@ SecureVector<byte> GMP_ELG_Op::encrypt(const byte in[], u32bit length,
    GMP_MPZ i(in, length);
 
    if(mpz_cmp(i.value, p.value) >= 0)
-      throw Invalid_Argument("GMP_ELG_Op: Input is too large");
+      throw std::invalid_argument("GMP_ELG_Op: Input is too large");
 
    GMP_MPZ a, b, k(k_bn);
 
@@ -68,7 +68,7 @@ BigInt GMP_ELG_Op::decrypt(const BigInt& a_bn, const BigInt& b_bn) const
    GMP_MPZ a(a_bn), b(b_bn);
 
    if(mpz_cmp(a.value, p.value) >= 0 || mpz_cmp(b.value, p.value) >= 0)
-      throw Invalid_Argument("GMP_ELG_Op: Invalid message");
+      throw std::invalid_argument("GMP_ELG_Op: Invalid message");
 
    mpz_powm(a.value, a.value, x.value, p.value);
    mpz_invert(a.value, a.value, p.value);

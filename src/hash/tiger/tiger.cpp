@@ -153,10 +153,10 @@ Tiger::Tiger(u32bit hashlen, u32bit pass) :
    MDx_HashFunction(hashlen, 64, false, false), PASS(pass)
    {
    if(OUTPUT_LENGTH != 16 && OUTPUT_LENGTH != 20 && OUTPUT_LENGTH != 24)
-      throw Invalid_Argument("Tiger: Illegal hash output size: " +
+      throw std::invalid_argument("Tiger: Illegal hash output size: " +
                              to_string(OUTPUT_LENGTH));
    if(PASS < 3)
-      throw Invalid_Argument("Tiger: Invalid number of passes: "
+      throw std::invalid_argument("Tiger: Invalid number of passes: "
                              + to_string(PASS));
    clear();
    }

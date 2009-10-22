@@ -56,7 +56,7 @@ void EAC_Signed_Object::do_decode()
       throw Decoding_Error(PEM_label_pref + " decoding failed (" +
                            what.substr(23, std::string::npos) + ")");
       }
-   catch(Invalid_Argument& e)
+   catch(std::invalid_argument& e)
       {
       const std::string what = e.what();
       throw Decoding_Error(PEM_label_pref + " decoding failed (" +

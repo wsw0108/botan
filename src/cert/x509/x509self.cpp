@@ -26,7 +26,7 @@ MemoryVector<byte> shared_setup(const X509_Cert_Options& opts,
    {
    const Private_Key* key_pointer = &key;
    if(!dynamic_cast<const PK_Signing_Key*>(key_pointer))
-      throw Invalid_Argument("Key type " + key.algo_name() + " cannot sign");
+      throw std::invalid_argument("Key type " + key.algo_name() + " cannot sign");
 
    opts.sanity_check();
 

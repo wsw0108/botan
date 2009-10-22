@@ -84,7 +84,7 @@ void Filter::attach(Filter* new_filter)
 void Filter::set_port(u32bit new_port)
    {
    if(new_port >= total_ports())
-      throw Invalid_Argument("Filter: Invalid port number");
+      throw std::invalid_argument("Filter: Invalid port number");
    port_num = new_port;
    }
 

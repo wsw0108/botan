@@ -409,7 +409,7 @@ std::vector<std::string> get_standard_domain_parameter(const std::string& oid)
       return dom_par;
       }
 
-   throw Invalid_Argument("No such ECC curve " + oid);
+   throw std::invalid_argument("No such ECC curve " + oid);
    }
 
 EC_Domain_Params get_ec_dompar(const std::string& oid)

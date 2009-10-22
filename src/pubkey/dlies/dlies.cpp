@@ -35,7 +35,7 @@ SecureVector<byte> DLIES_Encryptor::enc(const byte in[], u32bit length,
                                         RandomNumberGenerator&) const
    {
    if(length > maximum_input_size())
-      throw Invalid_Argument("DLIES: Plaintext too large");
+      throw std::invalid_argument("DLIES: Plaintext too large");
    if(other_key.is_empty())
       throw Invalid_State("DLIES: The other key was never set");
 

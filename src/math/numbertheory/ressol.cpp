@@ -17,9 +17,9 @@ namespace Botan {
 BigInt ressol(const BigInt& a, const BigInt& p)
    {
    if(a < 0)
-      throw Invalid_Argument("ressol(): a to solve for must be positive");
+      throw std::invalid_argument("ressol(): a to solve for must be positive");
    if(p <= 1)
-      throw Invalid_Argument("ressol(): prime must be > 1");
+      throw std::invalid_argument("ressol(): prime must be > 1");
 
    if(a == 0)
       return 0;

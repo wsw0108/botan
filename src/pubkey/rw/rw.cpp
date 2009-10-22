@@ -30,7 +30,7 @@ RW_PublicKey::RW_PublicKey(const BigInt& mod, const BigInt& exp)
 BigInt RW_PublicKey::public_op(const BigInt& i) const
    {
    if((i > (n >> 1)) || i.is_negative())
-      throw Invalid_Argument(algo_name() + "::public_op: i > n / 2 || i < 0");
+      throw std::invalid_argument(algo_name() + "::public_op: i > n / 2 || i < 0");
 
    BigInt r = core.public_op(i);
    if(r % 16 == 12) return r;
@@ -40,7 +40,7 @@ BigInt RW_PublicKey::public_op(const BigInt& i) const
    if(r % 16 == 12) return r;
    if(r % 8 == 6)   return 2*r;
 
-   throw Invalid_Argument(algo_name() + "::public_op: Invalid input");
+   throw std::invalid_argument(algo_name() + "::public_op: Invalid input");
    }
 
 /*
@@ -59,10 +59,10 @@ RW_PrivateKey::RW_PrivateKey(RandomNumberGenerator& rng,
                              u32bit bits, u32bit exp)
    {
    if(bits < 512)
-      throw Invalid_Argument(algo_name() + ": Can't make a key that is only " +
+      throw std::invalid_argument(algo_name() + ": Can't make a key that is only " +
                              to_string(bits) + " bits long");
    if(exp < 2 || exp % 2 == 1)
-      throw Invalid_Argument(algo_name() + ": Invalid encryption exponent");
+      throw std::invalid_argument(algo_name() + ": Invalid encryption exponent");
 
    e = exp;
    p = random_prime(rng, (bits + 1) / 2, e / 2, 3, 4);
@@ -103,7 +103,7 @@ SecureVector<byte> RW_PrivateKey::sign(const byte in[], u32bit len,
    {
    BigInt i(in, len);
    if(i >= n || i % 16 != 12)
-      throw Invalid_Argument(algo_name() + "::sign: Invalid input");
+      throw std::invalid_argument(algo_name() + "::sign: Invalid input");
 
    BigInt r;
    if(jacobi(i, n) == 1) r = core.private_op(i);

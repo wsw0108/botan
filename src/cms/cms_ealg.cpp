@@ -105,7 +105,7 @@ void CMS_Encoder::encrypt(RandomNumberGenerator& rng,
    if(algo == "RSA")
       {
       if(constraints != NO_CONSTRAINTS && !(constraints & KEY_ENCIPHERMENT))
-         throw Invalid_Argument("CMS: Constraints not set for encryption");
+         throw std::invalid_argument("CMS: Constraints not set for encryption");
 
       PK_Encrypting_Key* enc_key = dynamic_cast<PK_Encrypting_Key*>(key.get());
       if(enc_key == 0)
@@ -117,12 +117,12 @@ void CMS_Encoder::encrypt(RandomNumberGenerator& rng,
    else if(algo == "DH")
       {
       if(constraints != NO_CONSTRAINTS && !(constraints & KEY_AGREEMENT))
-         throw Invalid_Argument("CMS: Constraints not set for key agreement");
+         throw std::invalid_argument("CMS: Constraints not set for key agreement");
 
       encrypt_kari(rng, to, key.get(), cipher);
       }
    else
-      throw Invalid_Argument("Unknown CMS PK encryption algorithm " + algo);
+      throw std::invalid_argument("Unknown CMS PK encryption algorithm " + algo);
    }
 
 /*
@@ -258,7 +258,7 @@ SecureVector<byte> CMS_Encoder::do_encrypt(RandomNumberGenerator& rng,
    const BlockCipher* cipher = af.prototype_block_cipher(cipher_name);
 
    if(!cipher)
-      throw Invalid_Argument("CMS: Can't encrypt with non-existent cipher " + cipher_name);
+      throw std::invalid_argument("CMS: Can't encrypt with non-existent cipher " + cipher_name);
 
    if(!OIDS::have_oid(cipher->name() + "/CBC"))
       throw Encoding_Error("CMS: No OID assigned for " + cipher_name + "/CBC");

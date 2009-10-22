@@ -163,14 +163,14 @@ PBE_PKCS5v15::PBE_PKCS5v15(BlockCipher* cipher,
    {
    if(cipher->name() != "DES" && cipher->name() != "RC2")
       {
-      throw Invalid_Argument("PBE_PKCS5v1.5: Unknown cipher " +
+      throw std::invalid_argument("PBE_PKCS5v1.5: Unknown cipher " +
                              cipher->name());
       }
 
    if(hash->name() != "MD2" && hash->name() != "MD5" &&
       hash->name() != "SHA-160")
       {
-      throw Invalid_Argument("PBE_PKCS5v1.5: Unknown hash " +
+      throw std::invalid_argument("PBE_PKCS5v1.5: Unknown hash " +
                              hash->name());
       }
    }

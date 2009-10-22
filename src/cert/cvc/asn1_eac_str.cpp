@@ -23,7 +23,7 @@ ASN1_EAC_String::ASN1_EAC_String(const std::string& str, ASN1_Tag t) : tag(t)
    iso_8859_str = Charset::transcode(str, LOCAL_CHARSET, LATIN1_CHARSET);
    if (!sanity_check())
       {
-      throw Invalid_Argument("attempted to construct ASN1_EAC_String with illegal characters");
+      throw std::invalid_argument("attempted to construct ASN1_EAC_String with illegal characters");
       }
    }
 
@@ -92,7 +92,7 @@ void ASN1_EAC_String::decode_from(BER_Decoder& source)
          Charset::transcode(ASN1::to_string(obj), charset_is, LOCAL_CHARSET),
          obj.type_tag);
       }
-   catch (Invalid_Argument inv_arg)
+   catch (std::invalid_argument inv_arg)
       {
       throw Decoding_Error(std::string("error while decoding ASN1_EAC_String: ") + std::string(inv_arg.what()));
       }

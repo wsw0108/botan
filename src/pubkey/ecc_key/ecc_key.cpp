@@ -122,12 +122,12 @@ X509_Decoder* EC_PublicKey::x509_decoder()
 void EC_PublicKey::set_parameter_encoding(EC_dompar_enc type)
    {
    if((type != ENC_EXPLICIT) && (type != ENC_IMPLICITCA) && (type != ENC_OID))
-      throw Invalid_Argument("Invalid encoding type for EC-key object specified");
+      throw std::invalid_argument("Invalid encoding type for EC-key object specified");
 
    affirm_init();
 
    if((type == ENC_OID) && (mp_dom_pars->get_oid() == ""))
-      throw Invalid_Argument("Invalid encoding type ENC_OID specified for "
+      throw std::invalid_argument("Invalid encoding type ENC_OID specified for "
                              "EC-key object whose corresponding domain "
                              "parameters are without oid");
 

@@ -142,7 +142,7 @@ BigInt inverse_mod(const BigInt& n, const BigInt& mod)
    if(mod.is_zero())
       throw BigInt::DivideByZero();
    if(mod.is_negative() || n.is_negative())
-      throw Invalid_Argument("inverse_mod: arguments must be non-negative");
+      throw std::invalid_argument("inverse_mod: arguments must be non-negative");
 
    if(n.is_zero() || (n.is_even() && mod.is_even()))
       return 0;
@@ -308,7 +308,7 @@ bool passes_mr_tests(RandomNumberGenerator& rng,
 bool MillerRabin_Test::passes_test(const BigInt& a)
    {
    if(a < 2 || a >= n_minus_1)
-      throw Invalid_Argument("Bad size for nonce in Miller-Rabin test");
+      throw std::invalid_argument("Bad size for nonce in Miller-Rabin test");
 
    BigInt y = pow_mod(a);
    if(y == 1 || y == n_minus_1)
@@ -332,7 +332,7 @@ bool MillerRabin_Test::passes_test(const BigInt& a)
 MillerRabin_Test::MillerRabin_Test(const BigInt& num)
    {
    if(num.is_even() || num < 3)
-      throw Invalid_Argument("MillerRabin_Test: Invalid number for testing");
+      throw std::invalid_argument("MillerRabin_Test: Invalid number for testing");
 
    n = num;
    n_minus_1 = n - 1;

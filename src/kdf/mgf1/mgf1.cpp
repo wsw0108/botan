@@ -44,7 +44,7 @@ void MGF1::mask(const byte in[], u32bit in_len, byte out[],
 MGF1::MGF1(HashFunction* h) : hash(h)
    {
    if(!hash)
-      throw Invalid_Argument("MGF1 given null hash object");
+      throw std::invalid_argument("MGF1 given null hash object");
    }
 
 /*

@@ -48,7 +48,7 @@ void ECDSA_PublicKey::set_domain_parameters(const EC_Domain_Params& dom_pars)
       {
       // they are already set, we must ensure that they are equal to the arg
       if(dom_pars != *mp_dom_pars.get())
-         throw Invalid_Argument("EC_PublicKey::set_domain_parameters - cannot reset to a new value");
+         throw std::invalid_argument("EC_PublicKey::set_domain_parameters - cannot reset to a new value");
 
       return;
       }
@@ -208,7 +208,7 @@ SecureVector<byte> ECDSA_PrivateKey::sign(const byte message[],
    SecureVector<byte> sv_sig = m_ecdsa_core.sign(message, mess_len, rng);
 
    if(sv_sig.size() % 2 != 0)
-      throw Invalid_Argument("Erroneous length of signature");
+      throw std::invalid_argument("Erroneous length of signature");
 
    u32bit rs_len = sv_sig.size() / 2;
    SecureVector<byte> sv_r, sv_s;

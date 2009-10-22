@@ -108,7 +108,7 @@ void EAC1_1_ADO::encode(Pipe& out, X509_Encoding encoding) const
       .end_cons()
       .get_contents();
    if(encoding == PEM)
-      throw Invalid_Argument("EAC1_1_ADO::encode() cannot PEM encode an EAC object");
+      throw std::invalid_argument("EAC1_1_ADO::encode() cannot PEM encode an EAC object");
    else
       out.write(der);
    }

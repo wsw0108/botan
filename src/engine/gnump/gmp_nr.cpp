@@ -47,7 +47,7 @@ SecureVector<byte> GMP_NR_Op::verify(const byte sig[], u32bit sig_len) const
 
    if(mpz_cmp_ui(c.value, 0) <= 0 || mpz_cmp(c.value, q.value) >= 0 ||
                                      mpz_cmp(d.value, q.value) >= 0)
-      throw Invalid_Argument("GMP_NR_Op::verify: Invalid signature");
+      throw std::invalid_argument("GMP_NR_Op::verify: Invalid signature");
 
    GMP_MPZ i1, i2;
    mpz_powm(i1.value, g.value, d.value, p.value);
@@ -72,7 +72,7 @@ SecureVector<byte> GMP_NR_Op::sign(const byte in[], u32bit length,
    GMP_MPZ k(k_bn);
 
    if(mpz_cmp(f.value, q.value) >= 0)
-      throw Invalid_Argument("GMP_NR_Op::sign: Input is out of range");
+      throw std::invalid_argument("GMP_NR_Op::sign: Input is out of range");
 
    GMP_MPZ c, d;
    mpz_powm(c.value, g.value, k.value, p.value);

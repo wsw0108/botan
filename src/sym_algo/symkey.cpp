@@ -35,7 +35,7 @@ void OctetString::change(const std::string& hex_string)
          hex.append(hex_string[j]);
 
    if(hex.size() % 2 != 0)
-      throw Invalid_Argument("OctetString: hex string must encode full bytes");
+      throw std::invalid_argument("OctetString: hex string must encode full bytes");
    bits.create(hex.size() / 2);
    for(u32bit j = 0; j != bits.size(); ++j)
       bits[j] = Hex_Decoder::decode(hex.begin() + 2*j);

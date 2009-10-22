@@ -31,7 +31,7 @@ SecureVector<byte> Default_ELG_Op::encrypt(const byte in[], u32bit length,
    {
    BigInt m(in, length);
    if(m >= p)
-      throw Invalid_Argument("Default_ELG_Op::encrypt: Input is too large");
+      throw std::invalid_argument("Default_ELG_Op::encrypt: Input is too large");
 
    BigInt a = powermod_g_p(k);
    BigInt b = mod_p.multiply(m, powermod_y_p(k));
@@ -48,7 +48,7 @@ SecureVector<byte> Default_ELG_Op::encrypt(const byte in[], u32bit length,
 BigInt Default_ELG_Op::decrypt(const BigInt& a, const BigInt& b) const
    {
    if(a >= p || b >= p)
-      throw Invalid_Argument("Default_ELG_Op: Invalid message");
+      throw std::invalid_argument("Default_ELG_Op: Invalid message");
 
    return mod_p.multiply(b, inverse_mod(powermod_x_p(a), p));
    }

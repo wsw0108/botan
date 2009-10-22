@@ -112,7 +112,7 @@ SecureVector<byte> DH_PrivateKey::derive_key(const BigInt& w) const
    {
    const BigInt& p = group_p();
    if(w <= 1 || w >= p-1)
-      throw Invalid_Argument(algo_name() + "::derive_key: Invalid key input");
+      throw std::invalid_argument(algo_name() + "::derive_key: Invalid key input");
    return BigInt::encode_1363(core.agree(w), p.bytes());
    }
 
