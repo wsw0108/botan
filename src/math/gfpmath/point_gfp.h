@@ -2,7 +2,7 @@
 * Arithmetic for point groups of elliptic curves over GF(p)
 *
 * (C) 2007 Martin Doering, Christoph Ludwig, Falko Strenzke
-*     2008 Jack Lloyd
+*     2008-2009 Jack Lloyd
 *
 * Distributed under the terms of the Botan license
 */
@@ -15,6 +15,7 @@
 #include <botan/bigint.h>
 #include <botan/exceptn.h>
 #include <vector>
+#include <tr1/memory>
 
 namespace Botan {
 
@@ -221,29 +222,11 @@ class BOTAN_DLL PointGFp
       */
       void swap(PointGFp& other);
 
-      /**
-      * Sets the shared pointer to the GFpModulus that will be
-      * held in *this, specifically the various members of *this.
-      * Warning: do not use this function unless you know in detail about
-      * the implications of using
-      * the shared GFpModulus objects!
-      * Do NOT spread a shared pointer to GFpModulus over different
-      * threads!
-      * @param mod a shared pointer to a GFpModulus that will
-      * be held in the members *this
-      */
-      void set_shrd_mod(std::tr1::shared_ptr<GFpModulus> p_mod);
-
       static GFpElement decompress(bool yMod2, GFpElement const& x, const CurveGFp& curve);
 
    private:
       static const u32bit GFPEL_WKSP_SIZE = 9;
       void ensure_worksp() const;
-
-      inline std::tr1::shared_ptr<PointGFp> mult_loop(int l, const BigInt& m,
-                                                      std::tr1::shared_ptr<PointGFp> H,
-                                                      std::tr1::shared_ptr<PointGFp> tmp,
-                                                      const PointGFp& P);
 
       CurveGFp mC;
       mutable GFpElement mX;  // NOTE: these values must be mutable (affine<->proj)
@@ -255,8 +238,7 @@ class BOTAN_DLL PointGFp
       mutable bool mZpow2_set;
       mutable bool mZpow3_set;
       mutable bool mAZpow4_set;
-      mutable std::tr1::shared_ptr<std::vector<GFpElement> > mp_worksp_gfp_el;
-
+      //mutable std::tr1::shared_ptr<std::vector<GFpElement> > mp_worksp_gfp_el;
    };
 
 // relational operators
@@ -278,10 +260,10 @@ PointGFp mult_point_secure(const PointGFp& point,
                            const BigInt& point_order,
                            const BigInt& max_secret);
 
-PointGFp const mult2(const PointGFp& point);
+PointGFp mult2(const PointGFp& point);
 
-PointGFp const create_random_point(RandomNumberGenerator& rng,
-                                   const CurveGFp& curve);
+PointGFp create_random_point(RandomNumberGenerator& rng,
+                             const CurveGFp& curve);
 
 // encoding and decoding
 SecureVector<byte> EC2OSP(const PointGFp& point, byte format);

@@ -2,7 +2,7 @@
 * Arithmetic for point groups of elliptic curves over GF(p)
 *
 * (C) 2007 Martin Doering, Christoph Ludwig, Falko Strenzke
-*     2008 Jack Lloyd
+*     2008-2009 Jack Lloyd
 *
 * Distributed under the terms of the Botan license
 */
@@ -12,71 +12,120 @@
 
 namespace Botan {
 
-// construct the point at infinity or a random point
-PointGFp::PointGFp(const CurveGFp& curve)
-   :	mC(curve),
-        mX(curve.get_p(), 0),
-        mY(curve.get_p(), 1),
-        mZ(curve.get_p(), 0),
-        mZpow2(curve.get_p(),0),
-        mZpow3(curve.get_p(),0),
-        mAZpow4(curve.get_p(),0),
-        mZpow2_set(false),
-        mZpow3_set(false),
-        mAZpow4_set(false)
+namespace {
+
+std::tr1::shared_ptr<PointGFp> mult_loop(int l,
+                                         const BigInt& m,
+                                         std::tr1::shared_ptr<PointGFp> H,
+                                         std::tr1::shared_ptr<PointGFp> tmp,
+                                         const PointGFp& P)
    {
-   // first set the point wide pointer
+   //assert(l >= (int)m.bits()- 1);
+   tmp = H;
+   std::tr1::shared_ptr<PointGFp> to_add(new PointGFp(P)); // we just need some point
+   // so that we can use op=
+   // inside the loop
+   for (int i=l; i >=0; i--)
+      {
+      H->mult2_in_place();
 
-   set_shrd_mod(mC.get_ptr_mod());
+#ifndef CM_AADA
 
+      if (m.get_bit(i))
+         {
+         *H += P;
+         }
+#else // (CM_AADA is in)
+
+      if (H.get() == to_add.get())
+         {
+         to_add = tmp; // otherwise all pointers might point to the same object
+         // and we always need two objects to be able to switch around
+         }
+      to_add->assign_within_same_curve(*H);
+      tmp = H;
+      *tmp += P; // tmp already points to H
+
+      if (m.get_bit(i))
+         {
+         H = tmp; // NOTE: assign the pointer, not the value!
+         // (so that the operation is fast and thus as difficult
+         // to detect as possible)
+         }
+      else
+         {
+         H = to_add; // NOTE: this is necessary, because the assignment
+         // "*tmp = ..." already changed what H pointed to
+
+
+         }
+#endif // CM_AADA
+
+      }
+   return H;
+   }
+
+}
+
+// construct the point at infinity or a random point
+PointGFp::PointGFp(const CurveGFp& curve) :
+   mC(curve),
+   mX(curve.get_modulus(), 0),
+   mY(curve.get_modulus(), 1),
+   mZ(curve.get_modulus(), 0),
+   mZpow2(curve.get_modulus(),0),
+   mZpow3(curve.get_modulus(),0),
+   mAZpow4(curve.get_modulus(),0),
+   mZpow2_set(false),
+   mZpow3_set(false),
+   mAZpow4_set(false)
+   {
    }
 
 // construct a point given its jacobian projective coordinates
 PointGFp::PointGFp(const CurveGFp& curve, const GFpElement& x,
-                   const GFpElement& y, const GFpElement& z)
-   :	mC(curve),
-        mX(x),
-        mY(y),
-        mZ(z),
-        mZpow2(curve.get_p(),0),
-        mZpow3(curve.get_p(),0),
-        mAZpow4(curve.get_p(),0),
-        mZpow2_set(false),
-        mZpow3_set(false),
-        mAZpow4_set(false)
+                   const GFpElement& y, const GFpElement& z) :
+   mC(curve),
+   mX(x),
+   mY(y),
+   mZ(z),
+   mZpow2(curve.get_modulus(),0),
+   mZpow3(curve.get_modulus(),0),
+   mAZpow4(curve.get_modulus(),0),
+   mZpow2_set(false),
+   mZpow3_set(false),
+   mAZpow4_set(false)
    {
-   set_shrd_mod(mC.get_ptr_mod());
    }
-PointGFp::PointGFp ( const CurveGFp& curve, const GFpElement& x,
-                     const GFpElement& y )
-   :mC(curve),
-    mX(x),
-    mY(y),
-    mZ(curve.get_p(),1),
-    mZpow2(curve.get_p(),0),
-    mZpow3(curve.get_p(),0),
-    mAZpow4(curve.get_p(),0),
-    mZpow2_set(false),
-    mZpow3_set(false),
-    mAZpow4_set(false)
+
+PointGFp::PointGFp(const CurveGFp& curve, const GFpElement& x,
+                   const GFpElement& y) :
+   mC(curve),
+   mX(x),
+   mY(y),
+   mZ(curve.get_modulus(),1),
+   mZpow2(curve.get_modulus(),0),
+   mZpow3(curve.get_modulus(),0),
+   mAZpow4(curve.get_modulus(),0),
+   mZpow2_set(false),
+   mZpow3_set(false),
+   mAZpow4_set(false)
    {
-   set_shrd_mod(mC.get_ptr_mod());
    }
 
 // copy constructor
-PointGFp::PointGFp(const PointGFp& other)
-   :	mC(other.mC),
-        mX(other.mX),
-        mY(other.mY),
-        mZ(other.mZ),
-        mZpow2(other.mZpow2),
-        mZpow3(other.mZpow3),
-        mAZpow4(other.mAZpow4),
-        mZpow2_set(other.mZpow2_set),
-        mZpow3_set(other.mZpow3_set),
-        mAZpow4_set(other.mAZpow4_set)
+PointGFp::PointGFp(const PointGFp& other) :
+   mC(other.mC),
+   mX(other.mX),
+   mY(other.mY),
+   mZ(other.mZ),
+   mZpow2(other.mZpow2),
+   mZpow3(other.mZpow3),
+   mAZpow4(other.mAZpow4),
+   mZpow2_set(other.mZpow2_set),
+   mZpow3_set(other.mZpow3_set),
+   mAZpow4_set(other.mAZpow4_set)
    {
-   set_shrd_mod(mC.get_ptr_mod());
    }
 
 // assignment operator
@@ -106,16 +155,6 @@ const PointGFp& PointGFp::assign_within_same_curve(PointGFp const& other)
    mAZpow4_set = false;
    // the rest stays!
    return *this;
-   }
-
-void PointGFp::set_shrd_mod(std::tr1::shared_ptr<GFpModulus> p_mod)
-   {
-   mX.set_shrd_mod(p_mod);
-   mY.set_shrd_mod(p_mod);
-   mZ.set_shrd_mod(p_mod);
-   mZpow2.set_shrd_mod(p_mod);
-   mZpow3.set_shrd_mod(p_mod);
-   mAZpow4.set_shrd_mod(p_mod);
    }
 
 void PointGFp::ensure_worksp() const
@@ -476,57 +515,6 @@ PointGFp& PointGFp::operator*=(const BigInt& scalar)
    return *this;
    }
 
-inline std::tr1::shared_ptr<PointGFp> PointGFp::mult_loop(int l,
-                                                          const BigInt& m,
-                                                          std::tr1::shared_ptr<PointGFp> H,
-                                                          std::tr1::shared_ptr<PointGFp> tmp,
-                                                          const PointGFp& P)
-   {
-   //assert(l >= (int)m.bits()- 1);
-   tmp = H;
-   std::tr1::shared_ptr<PointGFp> to_add(new PointGFp(P)); // we just need some point
-   // so that we can use op=
-   // inside the loop
-   for (int i=l; i >=0; i--)
-      {
-      H->mult2_in_place();
-
-#ifndef CM_AADA
-
-      if (m.get_bit(i))
-         {
-         *H += P;
-         }
-#else // (CM_AADA is in)
-
-      if (H.get() == to_add.get())
-         {
-         to_add = tmp; // otherwise all pointers might point to the same object
-         // and we always need two objects to be able to switch around
-         }
-      to_add->assign_within_same_curve(*H);
-      tmp = H;
-      *tmp += P; // tmp already points to H
-
-      if (m.get_bit(i))
-         {
-         H = tmp; // NOTE: assign the pointer, not the value!
-         // (so that the operation is fast and thus as difficult
-         // to detect as possible)
-         }
-      else
-         {
-         H = to_add; // NOTE: this is necessary, because the assignment
-         // "*tmp = ..." already changed what H pointed to
-
-
-         }
-#endif // CM_AADA
-
-      }
-   return H;
-   }
-
 PointGFp& PointGFp::negate()
    {
    if (!is_zero())
@@ -839,7 +827,7 @@ void PointGFp::swap(PointGFp& other)
    std::swap<bool>(mAZpow4_set, other.mAZpow4_set);
    }
 
-PointGFp const mult2(const PointGFp& point)
+PointGFp mult2(const PointGFp& point)
    {
    return (PointGFp(point)).mult2_in_place();
    }
@@ -1114,8 +1102,8 @@ GFpElement PointGFp::decompress(bool yMod2, const GFpElement& x,
    return GFpElement(curve.get_p(),z);
    }
 
-PointGFp const create_random_point(RandomNumberGenerator& rng,
-                                   const CurveGFp& curve)
+PointGFp create_random_point(RandomNumberGenerator& rng,
+                             const CurveGFp& curve)
    {
 
    // create a random point
