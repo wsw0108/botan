@@ -149,14 +149,6 @@ class BOTAN_DLL PointGFp
       const PointGFp& set_z_to_one() const;
 
       /**
-      * Turn on the special reduction multiplication (i.e. the
-      * Montgomery multiplication in the current implementation) for
-      * the coordinates. This enables fast execution of mult2_in_place()
-      * and operator+=().
-      */
-      void turn_on_sp_red_mul() const;
-
-      /**
       * Return a point
       * where the coordinates are transformed
       * so that z equals one,
@@ -215,7 +207,6 @@ class BOTAN_DLL PointGFp
       */
       void check_invariants() const;
 
-
       /**
       *  swaps the states of *this and other, does not throw!
       * @param other the object to swap values with
@@ -223,11 +214,7 @@ class BOTAN_DLL PointGFp
       void swap(PointGFp& other);
 
       static GFpElement decompress(bool yMod2, GFpElement const& x, const CurveGFp& curve);
-
    private:
-      static const u32bit GFPEL_WKSP_SIZE = 9;
-      void ensure_worksp() const;
-
       CurveGFp mC;
       mutable GFpElement mX;  // NOTE: these values must be mutable (affine<->proj)
       mutable GFpElement mY;
@@ -238,7 +225,6 @@ class BOTAN_DLL PointGFp
       mutable bool mZpow2_set;
       mutable bool mZpow3_set;
       mutable bool mAZpow4_set;
-      //mutable std::tr1::shared_ptr<std::vector<GFpElement> > mp_worksp_gfp_el;
    };
 
 // relational operators

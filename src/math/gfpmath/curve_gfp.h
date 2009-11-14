@@ -31,18 +31,6 @@ class BOTAN_DLL CurveGFp
       CurveGFp(const GFpElement& a, const GFpElement& b,
                const BigInt& p);
 
-      /**
-      * Copy constructor
-      * @param other The curve to clone
-      */
-      CurveGFp(const CurveGFp& other);
-
-      /**
-      * Assignment operator
-      * @param other The curve to use as source for the assignment
-      */
-      const CurveGFp& operator=(const CurveGFp& other);
-
       // getters
 
       /**
@@ -74,6 +62,10 @@ class BOTAN_DLL CurveGFp
       * @param other The curve to swap values with
       */
       void swap(CurveGFp& other);
+
+      GFpElement get_mres_1() const;
+      GFpElement get_mres_a() const;
+      GFpElement get_mres_b() const;
 
    private:
       GFpModulus modulus;

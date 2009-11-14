@@ -29,6 +29,21 @@ void CurveGFp::swap(CurveGFp& other)
    modulus.swap(other.modulus);
    }
 
+GFpElement CurveGFp::get_mres_1() const
+   {
+   return GFpElement(get_p(), modulus.get_r());
+   }
+
+GFpElement CurveGFp::get_mres_a() const
+   {
+   return GFpElement(get_p(), mA.get_value() * modulus.get_r());
+   }
+
+GFpElement CurveGFp::get_mres_b() const
+   {
+   return GFpElement(get_p(), mB.get_value() * modulus.get_r());
+   }
+
 bool operator==(const CurveGFp& lhs, const CurveGFp& rhs)
    {
    if(lhs.get_modulus() != rhs.get_modulus())
@@ -40,6 +55,8 @@ bool operator==(const CurveGFp& lhs, const CurveGFp& rhs)
 
    return true;
    }
+
+
 
 std::ostream& operator<<(std::ostream& output, const CurveGFp& elem)
    {
