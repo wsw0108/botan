@@ -129,7 +129,7 @@ PointGFp::PointGFp(const PointGFp& other) :
    }
 
 // assignment operator
-const PointGFp& PointGFp::operator=(PointGFp const& other)
+const PointGFp& PointGFp::operator=(const PointGFp& other)
    {
    mC = other.get_curve();
    mX = other.get_jac_proj_x();
@@ -144,7 +144,7 @@ const PointGFp& PointGFp::operator=(PointGFp const& other)
    return *this;
    }
 
-const PointGFp& PointGFp::assign_within_same_curve(PointGFp const& other)
+const PointGFp& PointGFp::assign_within_same_curve(const PointGFp& other)
    {
    mX = other.get_jac_proj_x();
    mY = other.get_jac_proj_y();
@@ -783,7 +783,7 @@ PointGFp mult2(const PointGFp& point)
    return (PointGFp(point)).mult2_in_place();
    }
 
-bool operator==(const PointGFp& lhs, PointGFp const& rhs)
+bool operator==(const PointGFp& lhs, const PointGFp& rhs)
    {
    if(lhs.is_zero() && rhs.is_zero())
       {
@@ -804,13 +804,13 @@ bool operator==(const PointGFp& lhs, PointGFp const& rhs)
    }
 
 // arithmetic operators
-PointGFp operator+(const PointGFp& lhs, PointGFp const& rhs)
+PointGFp operator+(const PointGFp& lhs, const PointGFp& rhs)
    {
    PointGFp tmp(lhs);
    return tmp += rhs;
    }
 
-PointGFp operator-(const PointGFp& lhs, PointGFp const& rhs)
+PointGFp operator-(const PointGFp& lhs, const PointGFp& rhs)
    {
    PointGFp tmp(lhs);
    return tmp -= rhs;
@@ -844,37 +844,25 @@ PointGFp mult_point_secure(const PointGFp& point, const BigInt& scalar,
 // encoding and decoding
 SecureVector<byte> EC2OSP(const PointGFp& point, byte format)
    {
-   SecureVector<byte> result;
    if(format == PointGFp::UNCOMPRESSED)
-      {
-      result = encode_uncompressed(point);
-      }
+      return encode_uncompressed(point);
    else if(format == PointGFp::COMPRESSED)
-      {
-      result = encode_compressed(point);
-
-      }
+      return encode_compressed(point);
    else if(format == PointGFp::HYBRID)
-      {
-      result = encode_hybrid(point);
-      }
-   else
-      {
-      throw Format_Error("illegal point encoding format specification");
-      }
-   return result;
+      return encode_hybrid(point);
+
+   throw Format_Error("illegal point encoding format specification");
    }
+
 SecureVector<byte> encode_compressed(const PointGFp& point)
    {
-
-
    if(point.is_zero())
       {
       SecureVector<byte> result (1);
       result[0] = 0;
       return result;
-
       }
+
    u32bit l = point.get_curve().get_p().bits();
    int dummy = l & 7;
    if(dummy != 0)
@@ -894,7 +882,6 @@ SecureVector<byte> encode_compressed(const PointGFp& point)
       }
    return result;
    }
-
 
 SecureVector<byte> encode_uncompressed(const PointGFp& point)
    {
@@ -953,7 +940,7 @@ SecureVector<byte> encode_hybrid(const PointGFp& point)
    return result;
    }
 
-PointGFp OS2ECP(MemoryRegion<byte> const& os, const CurveGFp& curve)
+PointGFp OS2ECP(const MemoryRegion<byte>& os, const CurveGFp& curve)
    {
    if(os.size() == 1 && os[0] == 0)
       {

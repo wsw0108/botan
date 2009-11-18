@@ -57,8 +57,8 @@ class BOTAN_DLL PointGFp
       * @param x affine x coordinate
       * @param y affine y coordinate
       */
-      explicit PointGFp(const CurveGFp& curve, GFpElement const& x,
-                          GFpElement const& y);
+      explicit PointGFp(const CurveGFp& curve, const GFpElement& x,
+                        const GFpElement& y);
 
       /**
       * Construct a point given its jacobian projective coordinates
@@ -67,8 +67,8 @@ class BOTAN_DLL PointGFp
       * @param y jacobian projective y coordinate
       * @param z jacobian projective y coordinate
       */
-      explicit PointGFp(const CurveGFp& curve, GFpElement const& x,
-                          GFpElement const& y, GFpElement const& z);
+      explicit PointGFp(const CurveGFp& curve, const GFpElement& x,
+                        const GFpElement& y, const GFpElement& z);
 
       /**
       * copy constructor
@@ -213,10 +213,13 @@ class BOTAN_DLL PointGFp
       */
       void swap(PointGFp& other);
 
-      static GFpElement decompress(bool yMod2, GFpElement const& x, const CurveGFp& curve);
+      static GFpElement decompress(bool yMod2, const GFpElement& x,
+                                   const CurveGFp& curve);
    private:
       CurveGFp mC;
-      mutable GFpElement mX;  // NOTE: these values must be mutable (affine<->proj)
+
+      // NOTE: these values must be mutable (affine<->proj)
+      mutable GFpElement mX;
       mutable GFpElement mY;
       mutable GFpElement mZ;
       mutable GFpElement mZpow2;  // mZ^2
@@ -253,7 +256,7 @@ PointGFp create_random_point(RandomNumberGenerator& rng,
 
 // encoding and decoding
 SecureVector<byte> EC2OSP(const PointGFp& point, byte format);
-PointGFp OS2ECP(MemoryRegion<byte> const& os, const CurveGFp& curve);
+PointGFp OS2ECP(const MemoryRegion<byte>& os, const CurveGFp& curve);
 
 SecureVector<byte> encode_uncompressed(const PointGFp& point); // maybe make private
 SecureVector<byte> encode_hybrid(const PointGFp& point); // maybe make private
