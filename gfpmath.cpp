@@ -28,38 +28,6 @@ using namespace Botan;
 
 namespace {
 
-bool test_turn_on_sp_red_mul()
-   {
-   std::cout << "." << std::flush;
-
-   bool pass = true;
-
-   GFpElement a1(23,15);
-   GFpElement b1(23,18);
-
-   GFpElement c1 = a1*b1;
-
-   GFpElement a2(23,15);
-   GFpElement b2(23,18);
-
-   a2.turn_on_sp_red_mul();
-   a2.turn_on_sp_red_mul();
-   b2.turn_on_sp_red_mul();
-   b2.turn_on_sp_red_mul();
-
-   GFpElement c2 = a2*b2;
-
-   if(c1 != c2)
-      {
-      std::cout << "test_turn_on_sp_red_mul: ";
-      std::cout << "c1 = " << c1 << " != ";
-      std::cout << "c2 = " << c2 << "\n";
-      return false; // test failed
-      }
-
-   return pass; // pass
-   }
-
 bool test_bi_div_even()
    {
    std::cout << "." << std::flush;
@@ -125,10 +93,6 @@ bool test_deep_montgm()
    GFpElement gfp_b_trf(bi_prime, bi_value_b, true);
    GFpElement gfp_b_ntrf(bi_prime, bi_value_b, false);
 
-   //CHECK(!gfp_b_trf.is_trf_to_mres());
-   gfp_b_trf.get_mres();
-   gfp_a_trf.get_mres();
-
    GFpElement c_trf(gfp_a_trf * gfp_b_trf);
    GFpElement c_ntrf(gfp_a_ntrf * gfp_b_ntrf);
 
@@ -156,17 +120,9 @@ bool test_gfp_div_small_numbers()
    GFpElement gfp_b(bi_prime, bi_value_b, true);
    GFpElement gfp_c(bi_prime, bi_value_b, false);
 
-   CHECK(!gfp_a.is_trf_to_mres());
-   //convert to montgomery
-   gfp_b.get_mres();
-   CHECK(gfp_b.is_trf_to_mres());
-   CHECK(!gfp_c.is_trf_to_mres());
-
    GFpElement res_div_m = gfp_a / gfp_b;
-   CHECK(res_div_m.is_trf_to_mres());
 
    GFpElement res_div_n = gfp_a / gfp_c;
-   CHECK(!res_div_n.is_trf_to_mres());
 
    CHECK_MESSAGE(res_div_n.get_value() == res_div_m.get_value(), "transformed result is not equal to untransformed result");
    CHECK_MESSAGE(gfp_a.get_value() == s_value_a, "GFpElement has changed while division operation");
@@ -206,9 +162,6 @@ bool test_gfp_basics()
    GFpElement gfp_a(bi_prime, bi_value_a, true);
    CHECK(gfp_a.get_p() == s_prime);
    CHECK(gfp_a.get_value() == s_value_a);
-   CHECK(!gfp_a.is_trf_to_mres());
-   gfp_a.get_mres();
-   CHECK(gfp_a.is_trf_to_mres());
    return pass;
    }
 
@@ -247,21 +200,12 @@ bool test_gfp_mult()
    std::string s_value_b = "4444444444444";
    BigInt bi_value_b(s_value_b);
 
-   GFpElement gfp_a(bi_prime, bi_value_a, true);
-   GFpElement gfp_b(bi_prime, bi_value_b, true);
-   GFpElement gfp_c(bi_prime, bi_value_b, false);
-
-   CHECK(!gfp_a.is_trf_to_mres());
-   //convert to montgomery
-   gfp_b.get_mres();
-   CHECK(gfp_b.is_trf_to_mres());
-   CHECK(!gfp_c.is_trf_to_mres());
+   GFpElement gfp_a(bi_prime, bi_value_a);
+   GFpElement gfp_b(bi_prime, bi_value_b);
+   GFpElement gfp_c(bi_prime, bi_value_b);
 
    GFpElement res_mult_m = gfp_a * gfp_b;
-   CHECK(res_mult_m.is_trf_to_mres());
-
    GFpElement res_mult_n = gfp_a * gfp_c;
-   CHECK(!res_mult_n.is_trf_to_mres());
 
    if(res_mult_n != res_mult_m)
       std::cout << gfp_a << " * " << gfp_b << " =? "
@@ -400,15 +344,9 @@ bool test_more_gfp_div()
    std::string s_value_b = "4444444444444";
    BigInt bi_value_b(s_value_b);
 
-   GFpElement gfp_a(bi_prime, bi_value_a, true);
-   GFpElement gfp_b_trf(bi_prime, bi_value_b, true);
-   GFpElement gfp_b_ntrf(bi_prime, bi_value_b, false);
-
-   CHECK(!gfp_b_trf.is_trf_to_mres());
-   gfp_b_trf.get_mres();
-   CHECK(gfp_b_trf.is_trf_to_mres());
-
-   CHECK(!gfp_a.is_trf_to_mres());
+   GFpElement gfp_a(bi_prime, bi_value_a);
+   GFpElement gfp_b_trf(bi_prime, bi_value_b);
+   GFpElement gfp_b_ntrf(bi_prime, bi_value_b);
 
    bool exc_ntrf = false;
    try
@@ -493,12 +431,10 @@ bool test_gfp_shared_vals()
    std::tr1::shared_ptr<GFpModulus> ptr_b_p = b.get_ptr_mod();
    CHECK_MESSAGE(ptr1.get() != ptr_b_p.get(), "non shared pointers for moduli are equal");
 
-   a.turn_on_sp_red_mul();
    GFpElement c1 = a * shcpy_a;
    GFpElement c2 = a * a;
    GFpElement c3 = shcpy_a * shcpy_a;
    GFpElement c4 = shcpy_a * a;
-   shcpy_a.turn_on_sp_red_mul();
    GFpElement c5 = shcpy_a * shcpy_a;
 
    if(c1 != c2 || c2 != c3 || c3 != c4 || c4 != c5)
@@ -569,7 +505,6 @@ bool test_gfpel_ass_op()
    CHECK(d.get_ptr_mod().get() == c.get_ptr_mod().get());
    CHECK(d.get_ptr_mod()->get_p() == c.get_ptr_mod()->get_p());
    CHECK(c.get_ptr_mod()->get_r().is_zero());
-   c.turn_on_sp_red_mul();
    CHECK(d.get_ptr_mod().get() == c.get_ptr_mod().get());
    CHECK(d.get_ptr_mod()->get_p() == c.get_ptr_mod()->get_p());
    CHECK(!c.get_ptr_mod()->get_p().is_zero());
@@ -587,14 +522,12 @@ bool test_gfpel_ass_op()
    d2.share_assign(c2);
    GFpElement f2(11,5);
    d2 = f2;
-   c2.turn_on_sp_red_mul();
    CHECK(d2.get_ptr_mod().get() != c2.get_ptr_mod().get()); // the sharing group was left
    CHECK(d2.get_ptr_mod()->get_r() == f2.get_ptr_mod()->get_r());
    CHECK(c2.get_p() == 5); // c2´s shared values weren´t modified because
    // the sharing group with d2 was separated by
    // the assignment "d2 = f2"
 
-   d2.turn_on_sp_red_mul();
    CHECK(d2.get_ptr_mod()->get_p() != c2.get_ptr_mod()->get_p());
    GFpElement e2 = c2*c2;
    GFpElement g2 = d2*d2;
@@ -661,7 +594,6 @@ bool test_inv_in_place()
 
    BigInt mod(173);
    GFpElement a1(mod, 288);
-   a1.turn_on_sp_red_mul();
    a1.get_mres(); // enforce the conversion
 
    GFpElement a1_inv(a1);
@@ -688,7 +620,6 @@ bool test_op_eq()
 
    BigInt mod(173);
    GFpElement a1(mod, 299);
-   a1.turn_on_sp_red_mul();
    a1.get_mres(); // enforce the conversion
    GFpElement a2(mod, 288);
    CHECK_MESSAGE(a1 != a2, "error with GFpElement comparison");
@@ -779,7 +710,6 @@ u32bit do_gfpmath_tests(Botan::RandomNumberGenerator& rng)
 
    u32bit failed = 0;
 
-   failed += !test_turn_on_sp_red_mul();
    failed += !test_bi_div_even();
    failed += !test_bi_div_odd();
    failed += !test_deep_montgm();
