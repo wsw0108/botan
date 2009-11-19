@@ -28,6 +28,9 @@ class BOTAN_DLL ECKAEG_PublicKey : public virtual EC_PublicKey
       */
       ECKAEG_PublicKey() {}
 
+      ECKAEG_PublicKey(const AlgorithmIdentifier& alg_id,
+                       const MemoryRegion<byte>& key_bits);
+
       /**
       * Construct a public key from a given public point.
       * @param dom_par the domain parameters associated with this key
@@ -45,7 +48,7 @@ class BOTAN_DLL ECKAEG_PublicKey : public virtual EC_PublicKey
       /**
       * Get the maximum number of bits allowed to be fed to this key.
       * This is the bitlength of the order of the base point.
-
+      *
       * @result the maximum number of input bits
       */
       u32bit max_input_bits() const

@@ -3,8 +3,8 @@ define IF_PUBLIC_KEY_FAMILY
 load_on dep
 
 <add>
-if_algo.cpp
-if_algo.h
+#if_algo.cpp
+#if_algo.h
 if_core.cpp
 if_core.h
 if_op.cpp

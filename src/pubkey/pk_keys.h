@@ -10,14 +10,16 @@
 
 #include <botan/secmem.h>
 #include <botan/asn1_oid.h>
+#include <botan/alg_id.h>
 #include <botan/rng.h>
+#include <utility>
 
 namespace Botan {
 
 /**
 * Public Key Base Class.
 */
-class BOTAN_DLL Public_Key
+class BOTAN_DLL Public_Key_Algorithm
    {
    public:
       /**
@@ -60,45 +62,35 @@ class BOTAN_DLL Public_Key
       */
       virtual u32bit max_input_bits() const = 0;
 
-      /**
-      * Get an X509 encoder that can be used to encode this key in X509 format.
-      * @return an X509 encoder for this key
-      */
-      virtual class X509_Encoder* x509_encoder() const = 0;
-
-      /**
-      * Get an X509 decoder that can be used to set the values of this
-      * key based on an X509 encoded key object.
-      * @return an X509 decoder for this key
-      */
-      virtual class X509_Decoder* x509_decoder() = 0;
-
-      virtual ~Public_Key() {}
+      virtual ~Public_Key_Algorithm() {}
    protected:
       virtual void load_check(RandomNumberGenerator&) const;
+   };
+
+class Public_Key : public virtual Public_Key_Algorithm
+   {
+   public:
+      /**
+      * Return data needed to encode as a subjectPublicKeyInfo
+      * @return algorithm identifier and key bits
+      */
+      virtual std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+         subject_public_key_info() const = 0;
    };
 
 /**
 * Private Key Base Class
 */
-class BOTAN_DLL Private_Key : public virtual Public_Key
+class BOTAN_DLL Private_Key : public virtual Public_Key_Algorithm
    {
    public:
-      /**
-      * Get a PKCS#8 encoder that can be used to encode this key in
-      * PKCS#8 format.
-      * @return an PKCS#8 encoder for this key
-      */
-      virtual class PKCS8_Encoder* pkcs8_encoder() const
-         { return 0; }
 
       /**
-      * Get an PKCS#8 decoder that can be used to set the values of this key
-      * based on an PKCS#8 encoded key object.
-      * @return an PKCS#8 decoder for this key
+      * Return the PKCS #8 algorithm identifier and key data (or throw)
       */
-      virtual class PKCS8_Decoder* pkcs8_decoder(RandomNumberGenerator&)
-         { return 0; }
+      virtual std::pair<AlgorithmIdentifier, SecureVector<byte> >
+         pkcs8_encoding() const = 0;
+
    protected:
       void load_check(RandomNumberGenerator&) const;
       void gen_check(RandomNumberGenerator&) const;
@@ -168,7 +160,7 @@ class BOTAN_DLL PK_Key_Agreement_Key : public virtual Private_Key
       virtual ~PK_Key_Agreement_Key() {}
    };
 
-/*
+/**
 * Typedefs
 */
 typedef PK_Key_Agreement_Key PK_KA_Key;

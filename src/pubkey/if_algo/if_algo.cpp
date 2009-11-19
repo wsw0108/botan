@@ -12,178 +12,50 @@
 
 namespace Botan {
 
-/*
-* Return the X.509 public key encoder
+/**
+* Return the X.509 subjectPublicKeyInfo for a RSA/RW key
 */
-X509_Encoder* IF_Scheme_PublicKey::x509_encoder() const
+std::pair<AlgorithmIdentifier, MemoryVector<byte> >
+IF_Scheme_PublicKey::subject_public_key_info() const
    {
-   class IF_Scheme_Encoder : public X509_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            return AlgorithmIdentifier(key->get_oid(),
-                                       AlgorithmIdentifier::USE_NULL_PARAM);
-            }
+   DER_Encoder key_bits;
 
-         MemoryVector<byte> key_bits() const
-            {
-            return DER_Encoder()
-               .start_cons(SEQUENCE)
-                  .encode(key->n)
-                  .encode(key->e)
-               .end_cons()
-            .get_contents();
-            }
+   key_bits.start_cons(SEQUENCE)
+              .encode(this->get_n())
+              .encode(this->get_e())
+           .end_cons();
 
-         IF_Scheme_Encoder(const IF_Scheme_PublicKey* k) : key(k) {}
-      private:
-         const IF_Scheme_PublicKey* key;
-      };
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              AlgorithmIdentifier::USE_NULL_PARAM);
 
-   return new IF_Scheme_Encoder(this);
+   return std::make_pair(alg_id, key_bits.get_contents());
    }
 
-/*
-* Return the X.509 public key decoder
-*/
-X509_Decoder* IF_Scheme_PublicKey::x509_decoder()
+std::pair<AlgorithmIdentifier, SecureVector<byte> >
+IF_Scheme_PrivateKey::pkcs8_encoding() const
    {
-   class IF_Scheme_Decoder : public X509_Decoder
-      {
-      public:
-         void alg_id(const AlgorithmIdentifier&) {}
+   AlgorithmIdentifier alg_id(this->get_oid(),
+                              AlgorithmIdentifier::USE_NULL_PARAM);
 
-         void key_bits(const MemoryRegion<byte>& bits)
-            {
-            BER_Decoder(bits)
-               .start_cons(SEQUENCE)
-               .decode(key->n)
-               .decode(key->e)
-               .verify_end()
-               .end_cons();
+   SecureVector<byte> key_bits =
+      DER_Encoder()
+        .start_cons(SEQUENCE)
+           .encode(static_cast<u32bit>(0))
+           .encode(this->n)
+           .encode(this->e)
+           .encode(this->d)
+           .encode(this->p)
+           .encode(this->q)
+           .encode(this->d1)
+           .encode(this->d2)
+           .encode(this->c)
+        .end_cons()
+        .get_contents();
 
-            key->X509_load_hook();
-            }
-
-         IF_Scheme_Decoder(IF_Scheme_PublicKey* k) : key(k) {}
-      private:
-         IF_Scheme_PublicKey* key;
-      };
-
-   return new IF_Scheme_Decoder(this);
+   return std::make_pair(alg_id, key_bits);
    }
 
-/*
-* Return the PKCS #8 public key encoder
-*/
-PKCS8_Encoder* IF_Scheme_PrivateKey::pkcs8_encoder() const
-   {
-   class IF_Scheme_Encoder : public PKCS8_Encoder
-      {
-      public:
-         AlgorithmIdentifier alg_id() const
-            {
-            return AlgorithmIdentifier(key->get_oid(),
-                                       AlgorithmIdentifier::USE_NULL_PARAM);
-            }
-
-         MemoryVector<byte> key_bits() const
-            {
-            return DER_Encoder()
-               .start_cons(SEQUENCE)
-                  .encode(static_cast<u32bit>(0))
-                  .encode(key->n)
-                  .encode(key->e)
-                  .encode(key->d)
-                  .encode(key->p)
-                  .encode(key->q)
-                  .encode(key->d1)
-                  .encode(key->d2)
-                  .encode(key->c)
-               .end_cons()
-            .get_contents();
-            }
-
-         IF_Scheme_Encoder(const IF_Scheme_PrivateKey* k) : key(k) {}
-      private:
-         const IF_Scheme_PrivateKey* key;
-      };
-
-   return new IF_Scheme_Encoder(this);
-   }
-
-/*
-* Return the PKCS #8 public key decoder
-*/
-PKCS8_Decoder* IF_Scheme_PrivateKey::pkcs8_decoder(RandomNumberGenerator& rng)
-   {
-   class IF_Scheme_Decoder : public PKCS8_Decoder
-      {
-      public:
-         void alg_id(const AlgorithmIdentifier&) {}
-
-         void key_bits(const MemoryRegion<byte>& bits)
-            {
-            u32bit version;
-
-            BER_Decoder(bits)
-               .start_cons(SEQUENCE)
-                  .decode(version)
-                  .decode(key->n)
-                  .decode(key->e)
-                  .decode(key->d)
-                  .decode(key->p)
-                  .decode(key->q)
-                  .decode(key->d1)
-                  .decode(key->d2)
-                  .decode(key->c)
-               .end_cons();
-
-            if(version != 0)
-               throw Decoding_Error("Unknown PKCS #1 key format version");
-
-            key->PKCS8_load_hook(rng);
-            }
-
-         IF_Scheme_Decoder(IF_Scheme_PrivateKey* k, RandomNumberGenerator& r) :
-            key(k), rng(r) {}
-      private:
-         IF_Scheme_PrivateKey* key;
-         RandomNumberGenerator& rng;
-      };
-
-   return new IF_Scheme_Decoder(this, rng);
-   }
-
-/*
-* Algorithm Specific X.509 Initialization Code
-*/
-void IF_Scheme_PublicKey::X509_load_hook()
-   {
-   core = IF_Core(e, n);
-   }
-
-/*
-* Algorithm Specific PKCS #8 Initialization Code
-*/
-void IF_Scheme_PrivateKey::PKCS8_load_hook(RandomNumberGenerator& rng,
-                                           bool generated)
-   {
-   if(n == 0)  n = p * q;
-   if(d1 == 0) d1 = d % (p - 1);
-   if(d2 == 0) d2 = d % (q - 1);
-   if(c == 0)  c = inverse_mod(q, p);
-
-   core = IF_Core(rng, e, n, d, p, q, d1, d2, c);
-
-   if(generated)
-      gen_check(rng);
-   else
-      load_check(rng);
-   }
-
-/*
+/**
 * Check IF Scheme Public Parameters
 */
 bool IF_Scheme_PublicKey::check_key(RandomNumberGenerator&, bool) const
@@ -193,7 +65,7 @@ bool IF_Scheme_PublicKey::check_key(RandomNumberGenerator&, bool) const
    return true;
    }
 
-/*
+/**
 * Check IF Scheme Private Parameters
 */
 bool IF_Scheme_PrivateKey::check_key(RandomNumberGenerator& rng,

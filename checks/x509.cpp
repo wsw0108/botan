@@ -34,15 +34,14 @@ namespace {
 
 u64bit key_id(const Public_Key* key)
    {
-   std::auto_ptr<X509_Encoder> encoder(key->x509_encoder());
-   if(!encoder.get())
-      throw Internal_Error("Public_Key:key_id: No encoder found");
+   std::pair<AlgorithmIdentifier, MemoryVector<byte> > sub_pubkey =
+      key->subject_public_key_info();
 
    Pipe pipe(new Hash_Filter("SHA-1", 8));
    pipe.start_msg();
    pipe.write(key->algo_name());
-   pipe.write(encoder->alg_id().parameters);
-   pipe.write(encoder->key_bits());
+   pipe.write(sub_pubkey.first.parameters);
+   pipe.write(sub_pubkey.second);
    pipe.end_msg();
 
    SecureVector<byte> output = pipe.read_all();
