@@ -39,7 +39,7 @@ class BuildConfigurationInformation(object):
     version_minor = 9
     version_patch = 3
     version_so_patch = 3
-    version_suffix = '-dev'
+    version_suffix = ''
 
     version_string = '%d.%d.%d%s' % (
         version_major, version_minor, version_patch, version_suffix)
@@ -535,7 +535,6 @@ class CompilerInfo(object):
                         'lang_flags': '',
                         'warning_flags': '',
                         'dll_import_flags': '',
-                        'dll_export_flags': '',
                         'ar_command': None,
                         'makefile_style': '',
                         'compiler_has_tr1': False,
@@ -611,7 +610,9 @@ class CompilerInfo(object):
     def so_link_command_for(self, osname):
         if osname in self.so_link_flags:
             return self.so_link_flags[osname]
-        return self.so_link_flags['default']
+        if 'default' in self.so_link_flags:
+            return self.so_link_flags['default']
+        return ''
 
     """
     Return defines for build.h
@@ -831,7 +832,7 @@ def create_template_vars(build_config, options, modules, cc, arch, osinfo):
         'lang_flags': cc.lang_flags + options.extra_flags,
         'warn_flags': cc.warning_flags,
         'shared_flags': cc.shared_flags,
-        'dll_export_flags': cc.dll_export_flags,
+        'dll_import_flags': cc.dll_import_flags,
 
         'so_link': cc.so_link_command_for(osinfo.basename),
 
@@ -1102,7 +1103,8 @@ def setup_build(build_config, options, template_vars):
     for (template, sink) in [('buildh.in', 'build.h'),
                              ('botan-config.in', 'botan-config'),
                              ('botan.pc.in', build_config.pkg_config_file()),
-                             ('botan.doxy.in', 'botan.doxy')]:
+                             ('botan.doxy.in', 'botan.doxy'),
+                             ('innosetup.in', 'botan.iss')]:
         templates_to_proc[os.path.join(options.build_data, template)] = \
              os.path.join(build_config.build_dir, sink)
 
