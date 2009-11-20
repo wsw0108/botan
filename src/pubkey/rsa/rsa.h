@@ -23,6 +23,11 @@ class BOTAN_DLL RSA_PublicKey : public PK_Encrypting_Key,
       RSA_PublicKey(const AlgorithmIdentifier& alg_id,
                     const MemoryRegion<byte>& key_bits);
 
+      /**
+      * Create a RSA_PublicKey
+      * @arg n the modulus
+      * @arg e the exponent
+      */
       RSA_PublicKey(const BigInt& n, const BigInt& e);
 
       std::string algo_name() const { return "RSA"; }
@@ -50,15 +55,6 @@ class BOTAN_DLL RSA_PublicKey : public PK_Encrypting_Key,
 
       std::pair<AlgorithmIdentifier, MemoryVector<byte> >
          subject_public_key_info() const;
-   protected:
-      RSA_PublicKey() {}
-
-      /**
-      * Create a RSA_PublicKey
-      * @arg n the modulus
-      * @arg e the exponent
-      */
-      RSA_PublicKey(const BigInt& n, const BigInt& e);
    protected:
       BigInt public_op(const BigInt&) const;
 
