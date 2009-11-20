@@ -1,7 +1,8 @@
 /*
-* Modulus and related data for a specific implementation of GF(p)
+* GF(p) modulus class
 *
 * (C) 2008 Martin Doering, Christoph Ludwig, Falko Strenzke
+*     2009 Jack Lloyd
 *
 * Distributed under the terms of the Botan license
 */
@@ -13,8 +14,6 @@
 
 namespace Botan {
 
-class BOTAN_DLL GFpElement;
-
 /**
 * This class represents a GFpElement modulus including the modulus
 * related values necessary for the montgomery multiplication.
@@ -22,17 +21,12 @@ class BOTAN_DLL GFpElement;
 class BOTAN_DLL GFpModulus
    {
    public:
-      friend class GFpElement;
-
       /**
       * Construct a GF(P)-Modulus from a BigInt
       */
-      GFpModulus(BigInt p)
-         : m_p(p),
-           m_p_dash(),
-           m_r(),
-           m_r_inv()
-         {}
+      GFpModulus(const BigInt& p);
+
+      // default cp-ctor, operator= are fine
 
       /**
       * Tells whether the precomputations necessary for the use of the
@@ -41,7 +35,7 @@ class BOTAN_DLL GFpModulus
       */
       inline bool has_precomputations() const
          {
-         return(!m_p_dash.is_zero() && !m_r.is_zero() && !m_r_inv.is_zero());
+         return true; // FIXME: remove
          }
 
       /**
@@ -50,20 +44,26 @@ class BOTAN_DLL GFpModulus
       */
       inline void swap(GFpModulus& other)
          {
-         m_p.swap(other.m_p);
-         m_p_dash.swap(other.m_p_dash);
-         m_r.swap(other.m_r);
-         m_r_inv.swap(other.m_r_inv);
+         p.swap(other.p);
+         p_dash.swap(other.p_dash);
+         r.swap(other.r);
+         r_inv.swap(other.r_inv);
          }
 
       /**
-      * Tells whether the modulus of *this is equal to the argument.
-      * @param mod the modulus to compare this with
-      * @result true if the modulus of *this and the argument are equal.
+      * The other member values depend only on p
       */
-      inline bool p_equal_to(const BigInt& mod) const
+      bool operator==(const GFpModulus& other) const
          {
-         return (m_p == mod);
+         return (get_p() == other.get_p());
+         }
+
+      /**
+      * The other member values depend only on p
+      */
+      bool operator!=(const GFpModulus& other) const
+         {
+         return (get_p() != other.get_p());
          }
 
       /**
@@ -72,48 +72,41 @@ class BOTAN_DLL GFpModulus
       */
       inline const BigInt& get_p() const
          {
-         return m_p;
+         return p;
          }
 
       /**
       * returns the montgomery multiplication related value r.
-      * Warning: will be zero if precomputations have not yet been
-      * performed!
       * @result r
       */
       inline const BigInt& get_r() const
          {
-         return m_r;
+         return r;
          }
 
       /**
       * returns the montgomery multiplication related value r^{-1}.
-      * Warning: will be zero if precomputations have not yet been
-      * performed!
       * @result r^{-1}
       */
       inline const BigInt& get_r_inv() const
          {
-         return m_r_inv;
+         return r_inv;
          }
 
       /**
       * returns the montgomery multiplication related value p'.
-      * Warning: will be zero if precomputations have not yet been
-      * performed!
       * @result p'
       */
       inline const BigInt& get_p_dash() const
          {
-         return m_p_dash;
+         return p_dash;
          }
-      // default cp-ctor, op= are fine
 
    private:
-      BigInt m_p; // the modulus itself
-      mutable BigInt m_p_dash;
-      mutable BigInt m_r;
-      mutable BigInt m_r_inv;
+      BigInt p; // the modulus itself
+      BigInt p_dash;
+      BigInt r;
+      BigInt r_inv;
    };
 
 }
