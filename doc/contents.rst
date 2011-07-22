@@ -34,6 +34,7 @@ Contents
    pgpkey
    algos
    build_log
+   relnotes/index
 
 Indices and tables
 ==================
