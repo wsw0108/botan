@@ -13,6 +13,17 @@
 
 import sys, os
 
+# Nasty hack :(
+def is_website_build():
+    try:
+        opt_t = sys.argv.index('-t')
+        opt_website = sys.argv.index('website')
+        return opt_t + 1 == opt_website
+    except ValueError:
+        return False
+
+is_website_build = is_website_build()
+
 sys.path.insert(0, os.pardir)
 
 # Avoid useless botan_version.pyc (Python 2.6 or higher)
@@ -54,13 +65,16 @@ check_sphinx_version()
 extensions = []
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['_sphinx/templates']
+
+if is_website_build:
+    templates_path += ['_sphinx/disqus']
 
 # The suffix of source filenames.
-source_suffix = '.txt'
+source_suffix = '.rst'
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+source_encoding = 'utf-8-sig'
 
 # The master toctree document.
 master_doc = 'contents'
@@ -92,7 +106,7 @@ today_fmt = '%Y-%m-%d'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = []
+exclude_patterns = ['relnotes']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
@@ -119,13 +133,11 @@ pygments_style = 'sphinx'
 
 # -- Options for HTML output ---------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
 html_theme = 'agogo'
 
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
+# Add any paths that contain custom themes here, relative to this directory.
+#html_theme_path = ['_sphinx']
+
 html_theme_options = {
     'linkcolor': 'blue',
     'headerlinkcolor': 'blue',
@@ -133,9 +145,6 @@ html_theme_options = {
     'headercolor2': 'darkblue',
     'textalign': 'left'
     }
-
-# Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -186,15 +195,18 @@ html_static_path = []
 #html_show_sourcelink = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-#html_show_copyright = True
+html_show_copyright = False
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
 # base URL from which the finished HTML is served.
-#html_use_opensearch = ''
+if is_website_build:
+    html_use_opensearch = 'http://botan.randombit.net/'
+else:
+    html_use_opensearch = ''
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
 #html_file_suffix = None

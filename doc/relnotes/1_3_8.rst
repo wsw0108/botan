@@ -1,0 +1,45 @@
+
+:Author: Jack Lloyd
+:Date: 2003-12-30
+
+Version 1.3.8, 2003-12-30
+----------------------------------------
+
+Internal changes to PK algorithms to divide data and algorithms
+
+DSA/DH/NR/ElGamal constructors accept taking just the private key again
+
+ElGamal keys now support being imported/exported as ASN.1 objects
+
+Much more consistent and complete error checking in PK algorithms
+
+Support for arbitrary backends (engines) for PK operations
+
+Added Montgomery reductions
+
+Added an engine that uses GNU MP (requires 4.1 or later)
+
+Removed the obsolete mp_gmp module
+
+Moved several initialization/shutdown functions to init.h
+
+Major refactoring of the memory containers
+
+New non-locking container, MemoryVector
+
+Fixed 64-bit problems in BigInt::set_bit/clear_bit
+
+Renamed PK_Key::check_params() to check_key()
+
+Some incompatible changes to OctetString
+
+Added version checking macros in version.h
+
+Removed the fips140 module pending rewrite
+
+Added some functions and hooks to help GUIs
+
+Moved more shared code into MDx_HashFunction
+
+Added a policy hook for specifying the encoding of X.509 strings
+

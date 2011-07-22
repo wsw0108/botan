@@ -1,0 +1,59 @@
+
+:Author: Jack Lloyd
+:Date: 2010-03-09
+
+Version 1.9.4, 2010-03-09
+----------------------------------------
+
+An SSLv3/TLSv1.0 implementation previously distributed standalone
+(Ajisai) has been merged into the library.
+
+Extend Salsa20 to support longer IVs, which is the variant called
+XSalsa20
+
+Add GOST 34.10-2001 public key signature scheme
+
+Add SIMD implementation of Noekeon
+
+Add SSE2 implementation of IDEA
+
+Perform XTS encryption and decryption in parallel where possible
+
+Perform CBC decryption in parallel where possible
+
+Add SQLite3 db encryption codec, contributed by Olivier de Gaalon
+
+Add a block cipher cascade construction
+
+Add support for password hashing for authentication (passhash9.h)
+
+Add support for Win32 high resolution system timers
+
+Major refactoring and API changes in the public key code
+
+PK_Signer will verify newly generated signatures before releasing them
+to the caller, which can help prevent a variety of fault attacks.
+
+Changed S2K interface: derive_key now takes salt, iteration count
+
+Remove dependency on TR1 for ECC and CVC code
+
+Renamed ECKAEG to its more usual name, ECDH
+
+Fix crash in GMP_Engine if library is shutdown and reinitialized
+
+Fix an invalid memory read in MD4
+
+Fix Visual C++ static builds
+
+Remove Timer class entirely
+
+Switch default PKCS #8 encryption algorithm from 3DES to AES-128
+
+New option --gen-amalgamation for creating a SQLite-style amalgamation
+
+Many headers are now explicitly internal-use-only and are not installed
+
+Greatly improve the Win32 installer
+
+Several fixes for Visual C++ debug builds

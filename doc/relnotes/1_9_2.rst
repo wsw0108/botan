@@ -1,0 +1,17 @@
+
+:Author: Jack Lloyd
+:Date: 2009-11-03
+
+Version 1.9.2, 2009-11-03
+----------------------------------------
+
+Add SIMD version of XTEA
+
+Support both SSE2 and AltiVec SIMD for Serpent and XTEA
+
+Unroll the expansion loop in SHA-1 and SHA-2 for 5-10% speedup on
+Core2.
+
+Add AltiVec runtime detection
+
+Fix x86 CPU identification with Intel C++ and Visual C++

@@ -1,0 +1,24 @@
+
+:Author: Jack Lloyd
+:Date: 2009-09-09
+
+Version 1.9.0, 2009-09-09
+----------------------------------------
+
+Add an implementation of Serpent that uses SSE2 to process 4 blocks in
+parallel.
+
+Add a new interface to ``BlockCipher`` for supporting parallel
+processing of multiple blocks.
+
+Use parallel processing of blocks in ECB and CTR modes.
+
+Add Rivest's package transform (an all or nothing transform)
+
+Minor speedups to the Turing key schedule
+
+Fix processing multiple messages in XTS mode
+
+Add --no-autoload option to configure.py, for minimized builds
+
+The previously used configure.pl script is no longer supported

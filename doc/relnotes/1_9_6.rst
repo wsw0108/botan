@@ -1,0 +1,12 @@
+
+:Author: Jack Lloyd
+:Date: 2010-04-09
+
+Version 1.9.6, 2010-04-09
+----------------------------------------
+
+Numerous additions to the TLS implementation, including support for
+TLS v1.1 and the server name indicator extension. Bugs in the server
+implementation were fixed. Additionally a timing channel between the
+CBC padding check and MAC verification that could be used to attack
+TLS servers was avoided.

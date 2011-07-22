@@ -1,0 +1,29 @@
+
+:Author: Jack Lloyd
+:Date: 2009-07-11
+
+Version 1.8.3, 2009-07-11
+----------------------------------------
+
+Add a new configuration script written in Python. Requires Python 2.5
+or higher. The Perl configure is still included and supported, but is
+now deprecated, and will be removed at a later date.
+
+Add Skein-512, a SHA-3 candidate hash function
+
+Add the XTS block cipher mode from IEEE P1619
+
+Fix random_prime when generating a prime of less than 7 bits. Problem
+pointed out by Devai Tamas.
+
+Improve handling of low-entropy situations during PRNG seeding
+
+Change random device polling to prefer /dev/urandom over /dev/random
+
+Use an input insensitive implementation of same_mem instead of memcmp
+
+Correct DataSource::discard_next to return the number of discardleed bytes
+
+Provide a default value for AutoSeeded_RNG::reseed
+
+Fix Gentoo bug 272242

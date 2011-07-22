@@ -1,0 +1,18 @@
+
+:Author: Jack Lloyd
+:Date: 2010-11-02
+
+Version 1.8.11, 2010-11-02
+----------------------------------------
+
+Fix a number of CRL encoding and decoding bugs, including a bug that
+prevented parsing a CRL with more than one record in it.
+
+When building a debug library under VC++, use the debug runtime
+
+Fix compilation under Sun Studio on Linux and Solaris, contributed
+by Thomas Maier-Komor.
+
+In the examples, read most input files as binary.
+
+The Perl build script has been removed in this release.

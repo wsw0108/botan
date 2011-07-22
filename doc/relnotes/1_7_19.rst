@@ -1,0 +1,20 @@
+
+:Author: Jack Lloyd
+:Date: 2008-11-06
+
+Version 1.7.19, 2008-11-06
+----------------------------------------
+
+Add HMAC_RNG, based on a design by Hugo Krawczyk
+
+Add a new AutoSeeded_RNG in auto_rng.h which handles all seeding
+operations.
+
+Optimized the Turing stream cipher (about 20% faster on x86-64)
+
+Modify Randpool's reseeding algorithm to poll more sources
+
+OpenPGP_S2K changed to take hash object instead of name
+
+Add automatic identification for Intel's Prescott processors
+

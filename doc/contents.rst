@@ -3,7 +3,7 @@ Contents
 =================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    index
    reading
@@ -25,7 +25,6 @@ Contents
 .. toctree::
    :hidden:
 
-   log
    license
    credits
    faq

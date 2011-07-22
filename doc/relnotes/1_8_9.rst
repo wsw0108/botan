@@ -1,0 +1,33 @@
+
+:Author: Jack Lloyd
+:Date: 2010-06-16
+
+Version 1.8.9, 2010-06-16
+----------------------------------------
+
+Use constant time multiplication in IDEA
+
+Avoid possible timing attack against OAEP decoding
+
+Add new X509::BER_encode and PKCS8::BER_encode. Previously, the only
+way to BER encode a key as raw binary required using a Pipe.
+
+Build a DLL by default on Windows.
+
+Add support for building a Windows installer using InnoSetup.
+
+Add support for the Clang compiler
+
+Fix problem in semcem.h preventing build under Clang or GCC 3.4
+
+Fix a bug in the FIPS 186-3 kosherizer prevented creating DSA groups
+that had 512 or 768 bit p values.
+
+Fix a bug in the GNU MP backend engine which would cause a crash if
+the library was initialized, then shutdown and reinitialized, and a PK
+algorithm was used after the second init.
+
+Work around problem with recent binutils in x86-64 SHA-1
+
+The Perl build script is no longer supported, and refuses to run by
+default

@@ -1,0 +1,33 @@
+
+:Author: Jack Lloyd
+:Date: 2011-03-21
+
+Version 1.9.15, 2011-03-21
+----------------------------------------
+
+This is the first release candidate for 1.10.0
+
+Modify how message expansion is done in SHA-256 and SHA-512. Instead
+of expanding the entire message at the start, compute them in the
+minimum number of registers. Values are computed 15 rounds before they
+are needed. On a Core i7-860, GCC 4.5.2, went from 143 to 157 MiB/s in
+SHA-256, and 211 to 256 MiB/s in SHA-512.
+
+Pipe will delete empty output queues as soon as they are no longer
+needed, even if earlier messages still have data unread. However an
+(empty) entry in a deque of pointers will remain until all prior
+messages are completely emptied.
+
+Avoid reading the SPARC ``%tick`` register on OpenBSD as unlike
+Linux the kernel will not trap and emulate it for us, causing a
+illegal instruction crash.
+
+Some improvements for ARM autodetection have been made. This has been
+aided especially by the `Tahoe-LAFS Software Foundation
+<http://tahoe-lafs.org/>`_, who donated a Sheevaplug that I'll be
+using to figure out how to make the cryptographic primitives
+Tahoe-LAFS relies on faster, particularly targeting the ARMv5TE.
+Interestingly, the x86-64 performance improvements in SHA-2 in this
+release were driven by trying to make SHA-2 faster on ARM. (Though,
+unfortunately it appears performance on this processor is mostly
+unchanged by this modification).

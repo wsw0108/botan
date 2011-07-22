@@ -1,0 +1,29 @@
+
+:Author: Jack Lloyd
+:Date: 2009-04-07
+
+Version 1.8.2, 2009-04-07
+----------------------------------------
+
+Entropy polling/scanning for the PRNG has been sped up quite a bit,
+mostly by removing redundant operations, as well as by maintaining a
+target bit count to collect. Once this goal is reached, the poll is
+stopped. Since entropy sources are scanned (more or less) in the order
+fastest to slowest, this tends to improve the runtime of an entropy
+poll quite noticably.
+
+The GOST 34.11 hash function has been added. This hash function is
+standardized in Russia, and uses the GOST 28147 block cipher as a
+cryptographic component. RFC 4357 specifies a particular set of sboxes
+for the GOST cipher for use in the 34.11 hash function. Adding support
+for 34.11 required modifying the block cipher implementation, and it
+now supports the standard 'test' sboxes as well as the RFC 4357
+parameters. The so-called 'test' parameters are commonly used in other
+GOST 28147 software implementations (such as in Crypto++ and
+BeeCrypt), and, according to Wikipedia, are also used by the Russian
+Central Bank. The previous implementation of GOST 28147 used a
+completely non-standard set of sboxes. These sboxes are not supported
+any longer.
+
+A bug preventing ``botan-config`` from working properly on MacOS X was
+fixed.

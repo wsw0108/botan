@@ -1,0 +1,12 @@
+
+:Author: Jack Lloyd
+:Date: 2011-06-20
+
+Version 1.10.0, 2011-06-20
+----------------------------------------
+
+Detection for the rdrand instruction being added to upcoming Intel
+Ivy Bridge processors has been added.
+
+A template specialization of std::swap was added for the memory
+container types.

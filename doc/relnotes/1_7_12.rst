@@ -1,0 +1,38 @@
+
+:Author: Jack Lloyd
+:Date: 2008-09-18
+
+Version 1.7.12, 2008-09-18
+----------------------------------------
+
+Add x86-32 assembly for Visual C++, contributed by Luca Piccarreta
+
+Add SSE2 implementation of SHA-1, based on public domain code by Dean
+Gaudet
+
+Add a Perl XS module, by Vaclav Ovsik
+
+Add SWIG-based wrapper for Botan
+
+Remove the BigInt::sig_words cache added in 1.7.10 due to bugs
+
+Combine the 4 Blowfish sboxes, optimization suggested by Yves Jerschow
+
+Changed BigInt::grow_by and BigInt::grow_to to be non-const
+
+Add private assignment operators to classes that don't support assignment
+
+Benchmark RSA encryption and signatures
+
+Added test programs for random_prime and ressol
+
+Add support for high resolution timers on IA-64, HP-PA, and S390x
+
+Reduce use of the RNG during benchmarks
+
+Fix builds on STI Cell PPU
+
+Add support for IBM's XLC compiler
+
+Add IETF 8192 bit MODP group
+

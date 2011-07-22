@@ -1,0 +1,32 @@
+
+:Author: Jack Lloyd
+:Date: 2011-02-19
+
+Version 1.9.13, 2011-02-19
+----------------------------------------
+
+A bug in how GOST 34.10 signatures were formatted which prevented
+botan from being interoperable with other implementations, and
+specifically how GOST is used in DNSSEC, was fixed.
+
+The Keccak hash function was updated to the tweaked variant proposed
+for round 3 of the NIST hash competition. This version is not
+compatible with the previous algorithm.
+
+Small integers in the BER/DER code classes are typed as ``size_t``
+rather than ``u32bit``.
+
+A new option ``--distribution-info`` was added to the configure
+script. It allows the user building the library to set any
+distribution-specific notes on the build, which are available as a
+macro ``BOTAN_DISTRIBUTION_INFO``. The default value is
+'unspecified'. If you are building an unmodified version of botan
+(especially for distribution), and want to indicate to applications
+that this is the case, consider using
+``--distribution-info=pristine``. If you are making any patches or
+modifications, it is recommended to use
+``--distribution-info=[Distribution Name] [Version]``, for instance
+``--distribution-info='FooNix 1.9.13-r3'``.
+
+A bug that prevented the amalgamation build from working, and problems
+preventing building using Clang 2.9 and Sun Studio 12 were fixed.

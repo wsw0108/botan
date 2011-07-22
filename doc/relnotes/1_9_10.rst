@@ -1,0 +1,28 @@
+
+:Author: Jack Lloyd
+:Date: 2010-08-12
+
+Version 1.9.10, 2010-08-12
+----------------------------------------
+
+Add a constant time AES implementation using SSSE3. This code is based
+on `public domain assembly <http://crypto.stanford.edu/vpaes/>`_
+written by Mike Hamburg and described in his CHES 2009 paper
+"Accelerating AES with Vector Permute Instructions". In addition to
+being constant time, it is also significantly faster than the
+table-based implementation on some processors, especially recent Intel
+processors.
+
+Add support for loading new Engines at runtime. Currently only systems
+that use ``dlopen``-style dynamic linking are supported.
+
+Use GCC byteswap intrinsics where possible
+
+Drop support for building with Python 2.4
+
+Fix benchmarking of block ciphers in ECB mode
+
+Consolidate the two x86 assembly engines
+
+Rename S2K to PBKDF, though a typedef remains for backwards
+compatability.

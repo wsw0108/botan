@@ -1,0 +1,18 @@
+
+:Author: Jack Lloyd
+:Date: 2007-01-20
+
+Version 1.6.1, 2007-01-20
+----------------------------------------
+
+Fix some base64 decoder bugs
+
+Add a new option to base64 encoding, to always append a newline
+
+The maximum allowed keylength for RC4 has been increased to 256 bytes.
+
+Fix some build problems under Visual Studio with debug enabled
+
+Fix a bug in BER_Decoder that was triggered under compilers that did
+not perform named return value optimization consistently, including at
+least some versions of Visual C++ 2005.

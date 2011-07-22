@@ -1,0 +1,9 @@
+
+:Author: Jack Lloyd
+:Date: 2008-12-08
+
+Version 1.8.0, 2008-12-08
+----------------------------------------
+
+The only change in this release versus 1.7.19 is fixing compilation on
+Solaris with GCC

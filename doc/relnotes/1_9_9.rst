@@ -1,0 +1,24 @@
+
+:Author: Jack Lloyd
+:Date: 2010-06-28
+
+Version 1.9.9, 2010-06-28
+----------------------------------------
+
+Add new X509::BER_encode and PKCS8::BER_encode
+
+Give all Filter objects a name() function
+
+Add Keyed_Filter::valid_iv_length. Previously, partially because there
+was no such query mechanism, if a filter did not support IVs at all,
+then calls to ``set_iv`` would be silently ignored. Now an exception
+about the invalid IV length will be thrown.
+
+Increase default iteration counts for private key encryption
+
+Fix compilation of mp_asm64 on 64-bit MIPS with GCC 4.4 and later
+
+Fix compilation under Apple's GCC 4.2
+
+Expand and update the Doxygen documentation
+

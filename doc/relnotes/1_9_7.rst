@@ -1,0 +1,25 @@
+
+:Author: Jack Lloyd
+:Date: 2010-04-27
+
+Version 1.9.7, 2010-04-27
+----------------------------------------
+
+Support reading SSLv2 client hellos in the TLS server, though SSLv2
+itself is not and will not be supported.
+
+Add support for the SEED TLS ciphersuites (:rfc:`4162`)
+
+Add the Comb4P hash combiner function, descrbied in `Robust
+Multi-Property Combiners for Hash Functions Revisited
+<http://www.cdc.informatik.tu-darmstadt.de/~alehmann/publications/MPRCombiners.pdf>`_. It
+is a way of combining two n-bit hash functions to produce a 2n-bit
+output that preserves the collision resistance and PRF properties of
+the two hashes. This may be useful in applications which are very
+concerned about hash functions being broken; for instance it allows
+use of both SHA-512 and Skein-512, such that even if one remains
+unbroken then the combination will also remain unbroken.
+
+A bug in checking of 'raw' encoding signatures was fixed; verifying a
+message with leading zero bytes would always fail, even if the
+signature was actually valid.

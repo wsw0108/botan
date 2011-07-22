@@ -1,0 +1,36 @@
+
+:Author: Jack Lloyd
+:Date: 2009-01-20
+
+Version 1.8.1, 2009-01-20
+----------------------------------------
+
+Fixed two memory leaks in the PKCS #8 key loading code.
+
+Fixed a bug in the Unix entropy gathering code which caused Valgrind
+to produce warnings about uninitialized data usage on at least some
+32-bit Linux systems. This warning was in fact harmless to application
+code: it seems on some systems, the stat structure contains padding
+bytes which are not written to by the stat syscall. However, Botan's
+usage of the stat buffer involves copying the entire binary
+representation into a buffer which is used as part of a PRNG
+seed. Thus the padding bytes not being written to is actually pretty
+harmless, but, because the uninitialized bytes are fed into the PRNG
+state, Valgrind taints both the PRNG's internal state as well as all
+of the PRNG's output as depending on an uninitialized value. Since
+this is quite undesirable, the stat buffer is zeroized with memset
+before calling stat, so Valgrind knows that all bytes were
+initialized.
+
+Fixed a bug in the ``botan-config`` program that caused it to produce
+bogus output on some systems. Previously it had assumed that the echo
+command supported the -n option, however that is not true on (at
+least) MacOS X and Solaris 10. Now the printf shell command is used
+instead, which should work portably across most Unix/Unix-like systems
+of interest.
+
+Previously the API reference was licensed under the Creative Commons
+Attribution-ShareAlike license. However this caused unnecessary
+complications in terms of licensing of the overall distribution, so it
+has been changed to the standard BSD license that the rest of the code
+and documentation is distributed under.

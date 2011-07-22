@@ -1,0 +1,19 @@
+
+:Author: Jack Lloyd
+:Date: 2008-10-07
+
+Version 1.7.15, 2008-10-07
+----------------------------------------
+
+Add GF(p) arithmetic and ECDSA/ECDH over GF(p), merged from InSiTo
+by FlexSecure GmbH.
+
+Minimize internal dependencies, allowing for smaller build
+configurations
+
+Add new User Manual and Architecture Guide from FlexSecure GmbH
+
+Alter configure.pl options for better autotools compatibility,
+and update build instructions for recent changes to configure.pl
+
+Fix CPU detection using /proc/cpuinfo
