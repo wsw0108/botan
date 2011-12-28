@@ -49,13 +49,21 @@ class BOTAN_DLL Record_Writer
 
       void set_keys(const CipherSuite& suite,
                     const SessionKeys& keys,
-                    Connection_Side side);
+                    Connection_Side side,
+                    byte compression_method);
 
       void set_version(Version_Code version);
 
       void reset();
 
-      Record_Writer(std::tr1::function<void (const byte[], size_t)> output_fn);
+      /**
+      * @param fragment_size messages will be broken up in records of
+      *        roughly fragment_size (though headers and compression
+      *        may increase or decrease this size resp). If zero, uses
+      *        a reasonable default.
+      */
+      Record_Writer(std::tr1::function<void (const byte[], size_t)> output_fn,
+                    size_t fragment_size = 0);
 
       ~Record_Writer() { delete mac; }
    private:
@@ -64,6 +72,9 @@ class BOTAN_DLL Record_Writer
                        const byte input[], size_t length);
 
       std::tr1::function<void (const byte[], size_t)> output_fn;
+
+      Pipe compressor;
+      Filter* compressor_filter;
       Pipe cipher;
       MessageAuthenticationCode* mac;
 
@@ -96,7 +107,8 @@ class BOTAN_DLL Record_Reader
 
       void set_keys(const CipherSuite& suite,
                     const SessionKeys& keys,
-                    Connection_Side side);
+                    Connection_Side side,
+                    byte compression_method);
 
       void set_version(Version_Code version);
 
@@ -110,6 +122,7 @@ class BOTAN_DLL Record_Reader
    private:
       SecureQueue input_queue;
 
+      Pipe decompressor;
       Pipe cipher;
       MessageAuthenticationCode* mac;
       size_t block_size, mac_size, iv_size;

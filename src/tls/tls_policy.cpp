@@ -66,7 +66,13 @@ std::vector<u16bit> TLS_Policy::suite_list(bool use_rsa,
 std::vector<byte> TLS_Policy::compression() const
    {
    std::vector<byte> algs;
+
+#if defined(BOTAN_HAS_COMPRESSOR_ZLIB)
+   algs.push_back(DEFLATE_COMPRESSION);
+#endif
+
    algs.push_back(NO_COMPRESSION);
+
    return algs;
    }
 
@@ -97,7 +103,7 @@ u16bit TLS_Policy::choose_suite(const std::vector<u16bit>& c_suites,
 */
 byte TLS_Policy::choose_compression(const std::vector<byte>& c_comp) const
    {
-   std::vector<byte> s_comp = compression();
+   std::vector<byte> s_comp = compression(); // what we support
 
    for(size_t i = 0; i != s_comp.size(); ++i)
       for(size_t j = 0; j != c_comp.size(); ++j)

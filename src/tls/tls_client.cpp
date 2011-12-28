@@ -12,6 +12,8 @@
 #include <botan/dsa.h>
 #include <botan/dh.h>
 
+#include <stdio.h>
+
 namespace Botan {
 
 /*
@@ -213,6 +215,7 @@ void TLS_Client::process_handshake_msg(Handshake_Type type,
             state->cert_req->acceptable_types();
 
          // FIXME: Fill in useful certs here, if any
+
          state->client_certs = new Certificate(writer, send_certs,
                                                state->hash);
          }
@@ -224,10 +227,15 @@ void TLS_Client::process_handshake_msg(Handshake_Type type,
 
       if(state->received_handshake_msg(CERTIFICATE_REQUEST))
          {
+         printf("Sending certificate verify\n");
+
          Private_Key* key_matching_cert = 0; // FIXME
-         state->client_verify = new Certificate_Verify(rng,
-                                                       writer, state->hash,
-                                                       key_matching_cert);
+
+         state->client_verify =
+            new Certificate_Verify(rng,
+                                   writer,
+                                   state->hash,
+                                   key_matching_cert);
          }
 
       state->keys = SessionKeys(state->suite, state->version,
@@ -238,7 +246,8 @@ void TLS_Client::process_handshake_msg(Handshake_Type type,
       writer.send(CHANGE_CIPHER_SPEC, 1);
       writer.flush();
 
-      writer.set_keys(state->suite, state->keys, CLIENT);
+      writer.set_keys(state->suite, state->keys, CLIENT,
+                      state->server_hello->compression_method());
 
       state->client_finished = new Finished(writer, state->version, CLIENT,
                                             state->keys.master_secret(),
@@ -248,7 +257,8 @@ void TLS_Client::process_handshake_msg(Handshake_Type type,
       {
       state->set_expected_next(FINISHED);
 
-      reader.set_keys(state->suite, state->keys, CLIENT);
+      reader.set_keys(state->suite, state->keys, CLIENT,
+                      state->server_hello->compression_method());
       }
    else if(type == FINISHED)
       {

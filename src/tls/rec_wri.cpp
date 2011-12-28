@@ -12,28 +12,48 @@
 #include <botan/loadstor.h>
 #include <botan/libstate.h>
 
+#if defined(BOTAN_HAS_COMPRESSOR_ZLIB)
+  #include <botan/zlib.h>
+#endif
+
+#include <stdio.h>
+#include <botan/hex.h>
+
 namespace Botan {
 
-/**
+/*
 * Record_Writer Constructor
 */
-Record_Writer::Record_Writer(std::tr1::function<void (const byte[], size_t)> out) :
+Record_Writer::Record_Writer(std::tr1::function<void (const byte[], size_t)> out,
+                             size_t fragment_size) :
    output_fn(out),
-   buffer(DEFAULT_BUFFERSIZE)
+   buffer(fragment_size ? fragment_size : static_cast<size_t>(MAX_PLAINTEXT_SIZE))
    {
+   compressor_filter = 0;
    mac = 0;
    reset();
    }
 
-/**
+/*
 * Reset the state
 */
 void Record_Writer::reset()
    {
    cipher.reset();
 
+   try {
+      compressor.end_msg();
+   } catch(...) {}
+
+   try {
+      compressor.reset();
+   }
+   catch(...) {}
+
    delete mac;
    mac = 0;
+
+   compressor_filter = 0;
 
    zeroise(buffer);
    buf_pos = 0;
@@ -46,7 +66,7 @@ void Record_Writer::reset()
    seq_no = 0;
    }
 
-/**
+/*
 * Set the version to use
 */
 void Record_Writer::set_version(Version_Code version)
@@ -58,12 +78,13 @@ void Record_Writer::set_version(Version_Code version)
    minor = (version & 0xFF);
    }
 
-/**
-* Set the keys for writing
+/*
+* Set the keys and algos for writing
 */
 void Record_Writer::set_keys(const CipherSuite& suite,
                              const SessionKeys& keys,
-                             Connection_Side side)
+                             Connection_Side side,
+                             byte compression_method)
    {
    cipher.reset();
    delete mac;
@@ -124,9 +145,25 @@ void Record_Writer::set_keys(const CipherSuite& suite,
       }
    else
       throw Invalid_Argument("Record_Writer: Unknown hash " + mac_algo);
+
+   if(compression_method == DEFLATE_COMPRESSION)
+      {
+#if defined(BOTAN_HAS_COMPRESSOR_ZLIB)
+      compressor_filter = new Zlib_Compression(1, true);
+      compressor.append(compressor_filter);
+#else
+      throw TLS_Exception(INTERNAL_ERROR,
+                          "Negotiated deflate, but zlib not available");
+#endif
+      }
+   else if(compression_method != NO_COMPRESSION)
+      throw TLS_Exception(INTERNAL_ERROR,
+                          "Negotiated an unknown compression method");
+
+   compressor.start_msg();
    }
 
-/**
+/*
 * Send one or more records to the other side
 */
 void Record_Writer::send(byte type, const byte input[], size_t length)
@@ -136,8 +173,6 @@ void Record_Writer::send(byte type, const byte input[], size_t length)
 
    const size_t BUFFER_SIZE = buffer.size();
    buf_type = type;
-
-   // FIXME: compression right here
 
    buffer.copy(buf_pos, input, length);
    if(buf_pos + length >= BUFFER_SIZE)
@@ -157,7 +192,7 @@ void Record_Writer::send(byte type, const byte input[], size_t length)
    buf_pos += length;
    }
 
-/**
+/*
 * Split buffer into records, and send them all
 */
 void Record_Writer::flush()
@@ -178,7 +213,7 @@ void Record_Writer::flush()
    buf_pos = 0;
    }
 
-/**
+/*
 * Encrypt and send the record
 */
 void Record_Writer::send_record(byte type, const byte buf[], size_t length)
@@ -191,18 +226,30 @@ void Record_Writer::send_record(byte type, const byte buf[], size_t length)
       send_record(type, major, minor, buf, length);
    else
       {
+      compressor.write(buf, length);
+
+      if(compressor_filter)
+         {
+         dynamic_cast<Zlib_Compression*>(compressor_filter)->flush();
+         }
+
+      SecureVector<byte> plaintext = compressor.read_all(Pipe::LAST_MESSAGE);
+
+      printf("Uncompressed plaintext %s\n", hex_encode(buf, length).c_str());
+      printf("Compressed plaintext: %s\n", hex_encode(plaintext).c_str());
+
       mac->update_be(seq_no);
       mac->update(type);
 
       if(major > 3 || (major == 3 && minor != 0))
-         {
+         { // except in SSLv3
          mac->update(major);
          mac->update(minor);
          }
 
-      mac->update(get_byte<u16bit>(0, length));
-      mac->update(get_byte<u16bit>(1, length));
-      mac->update(buf, length);
+      mac->update(get_byte<u16bit>(0, plaintext.size()));
+      mac->update(get_byte<u16bit>(1, plaintext.size()));
+      mac->update(plaintext);
 
       SecureVector<byte> buf_mac = mac->final();
 
@@ -220,13 +267,13 @@ void Record_Writer::send_record(byte type, const byte buf[], size_t length)
          cipher.write(random_iv);
          }
 
-      cipher.write(buf, length);
+      cipher.write(plaintext);
       cipher.write(buf_mac);
 
       if(block_size)
          {
          const size_t pad_val =
-            (block_size - (1 + length + buf_mac.size())) % block_size;
+            (block_size - (1 + plaintext.size() + buf_mac.size())) % block_size;
 
          for(size_t i = 0; i != pad_val + 1; ++i)
             cipher.write(pad_val);
@@ -241,7 +288,7 @@ void Record_Writer::send_record(byte type, const byte buf[], size_t length)
       }
    }
 
-/**
+/*
 * Send a final record packet
 */
 void Record_Writer::send_record(byte type, byte major, byte minor,
@@ -259,7 +306,7 @@ void Record_Writer::send_record(byte type, byte major, byte minor,
    output_fn(out, length);
    }
 
-/**
+/*
 * Send an alert
 */
 void Record_Writer::alert(Alert_Level level, Alert_Type type)

@@ -186,7 +186,8 @@ void TLS_Server::process_handshake_msg(Handshake_Type type,
          writer.send(CHANGE_CIPHER_SPEC, 1);
          writer.flush();
 
-         writer.set_keys(state->suite, state->keys, SERVER);
+         writer.set_keys(state->suite, state->keys, SERVER,
+                         state->server_hello->compression_method());
 
          state->server_finished = new Finished(writer, state->version, SERVER,
                                                state->keys.master_secret(),
@@ -318,7 +319,8 @@ void TLS_Server::process_handshake_msg(Handshake_Type type,
       {
       state->set_expected_next(FINISHED);
 
-      reader.set_keys(state->suite, state->keys, SERVER);
+      reader.set_keys(state->suite, state->keys, SERVER,
+                      state->server_hello->compression_method());
       }
    else if(type == FINISHED)
       {
@@ -339,7 +341,8 @@ void TLS_Server::process_handshake_msg(Handshake_Type type,
          writer.send(CHANGE_CIPHER_SPEC, 1);
          writer.flush();
 
-         writer.set_keys(state->suite, state->keys, SERVER);
+         writer.set_keys(state->suite, state->keys, SERVER,
+                         state->server_hello->compression_method());
 
          state->server_finished = new Finished(writer, state->version, SERVER,
                                                state->keys.master_secret(),

@@ -10,6 +10,13 @@
 #include <botan/loadstor.h>
 #include <botan/internal/tls_session_key.h>
 
+#if defined(BOTAN_HAS_COMPRESSOR_ZLIB)
+  #include <botan/zlib.h>
+#endif
+
+#include <botan/hex.h>
+#include <iostream>
+
 namespace Botan {
 
 /*
@@ -18,6 +25,15 @@ namespace Botan {
 void Record_Reader::reset()
    {
    cipher.reset();
+
+   try {
+      decompressor.end_msg();
+   }
+   catch(...) {}
+
+   try {
+      decompressor.reset();
+   } catch(...) {}
 
    delete mac;
    mac = 0;
@@ -44,8 +60,10 @@ void Record_Reader::set_version(Version_Code version)
 /*
 * Set the keys for reading
 */
-void Record_Reader::set_keys(const CipherSuite& suite, const SessionKeys& keys,
-                             Connection_Side side)
+void Record_Reader::set_keys(const CipherSuite& suite,
+                             const SessionKeys& keys,
+                             Connection_Side side,
+                             byte compression_method)
    {
    cipher.reset();
    delete mac;
@@ -106,6 +124,23 @@ void Record_Reader::set_keys(const CipherSuite& suite, const SessionKeys& keys,
       }
    else
       throw Invalid_Argument("Record_Reader: Unknown hash " + mac_algo);
+
+   if(compression_method == DEFLATE_COMPRESSION)
+      {
+#if defined(BOTAN_HAS_COMPRESSOR_ZLIB)
+      decompressor.append(new Zlib_Decompression(false));
+#else
+      throw TLS_Exception(INTERNAL_ERROR,
+                          "Negotiated deflate, but zlib not available");
+#endif
+      }
+   else if(compression_method != NO_COMPRESSION)
+      {
+      throw TLS_Exception(INTERNAL_ERROR,
+                          "Negotiated an unknown compression method");
+      }
+
+   decompressor.start_msg();
    }
 
 void Record_Reader::add_input(const byte input[], size_t input_size)
@@ -255,10 +290,12 @@ size_t Record_Reader::get_record(byte& msg_type,
    if(received_mac != computed_mac)
       throw TLS_Exception(BAD_RECORD_MAC, "Record_Reader: MAC failure");
 
+   std::cout << "Compressed input: " << hex_encode(&plaintext[iv_size], plain_length) << "\n";
+   decompressor.write(&plaintext[iv_size], plain_length);
+   output = decompressor.read_all(Pipe::LAST_MESSAGE);
+
    msg_type = header[0];
 
-   output.resize(plain_length);
-   copy_mem(&output[0], &plaintext[iv_size], plain_length);
    return 0;
    }
 
