@@ -1,6 +1,6 @@
 /*
 * TLS Record Writing
-* (C) 2004-2011 Jack Lloyd
+* (C) 2004-2012 Jack Lloyd
 *
 * Released under the terms of the Botan license
 */
@@ -9,6 +9,8 @@
 #include <botan/internal/tls_session_key.h>
 #include <botan/internal/tls_handshake_hash.h>
 #include <botan/lookup.h>
+#include <botan/internal/rounding.h>
+#include <botan/internal/assert.h>
 #include <botan/loadstor.h>
 #include <botan/libstate.h>
 
@@ -21,17 +23,26 @@
 
 namespace Botan {
 
+namespace TLS {
+
 /*
 * Record_Writer Constructor
 */
-Record_Writer::Record_Writer(std::tr1::function<void (const byte[], size_t)> out,
-                             size_t fragment_size) :
-   output_fn(out),
-   buffer(fragment_size ? fragment_size : static_cast<size_t>(MAX_PLAINTEXT_SIZE))
+Record_Writer::Record_Writer(std::tr1::function<void (const byte[], size_t)> out) :
+   m_output_fn(out), m_writebuf(TLS_HEADER_SIZE + MAX_CIPHERTEXT_SIZE)
    {
    compressor_filter = 0;
-   mac = 0;
+   m_mac = 0;
    reset();
+   set_maximum_fragment_size(0);
+   }
+
+void Record_Writer::set_maximum_fragment_size(size_t max_fragment)
+   {
+   if(max_fragment == 0)
+      m_max_fragment = MAX_PLAINTEXT_SIZE;
+   else
+      m_max_fragment = clamp(max_fragment, 128, MAX_PLAINTEXT_SIZE);
    }
 
 /*
@@ -39,7 +50,8 @@ Record_Writer::Record_Writer(std::tr1::function<void (const byte[], size_t)> out
 */
 void Record_Writer::reset()
    {
-   cipher.reset();
+   set_maximum_fragment_size(0);
+   m_cipher.reset();
 
    try {
       compressor.end_msg();
@@ -50,45 +62,49 @@ void Record_Writer::reset()
    }
    catch(...) {}
 
-   delete mac;
-   mac = 0;
+   delete m_mac;
+   m_mac = 0;
 
    compressor_filter = 0;
 
    zeroise(buffer);
    buf_pos = 0;
 
-   major = minor = buf_type = 0;
-   block_size = 0;
-   mac_size = 0;
-   iv_size = 0;
+   m_version = Protocol_Version();
+   m_block_size = 0;
+   m_mac_size = 0;
+   m_iv_size = 0;
 
-   seq_no = 0;
+   m_seq_no = 0;
    }
 
 /*
 * Set the version to use
 */
-void Record_Writer::set_version(Version_Code version)
+void Record_Writer::set_version(Protocol_Version version)
    {
-   if(version != SSL_V3 && version != TLS_V10 && version != TLS_V11)
-      throw Invalid_Argument("Record_Writer: Invalid protocol version");
-
-   major = (version >> 8) & 0xFF;
-   minor = (version & 0xFF);
+   m_version = version;
    }
 
 /*
-* Set the keys and algos for writing
+* Set the keys for writing
 */
-void Record_Writer::set_keys(const CipherSuite& suite,
+void Record_Writer::activate(const CipherSuite& suite,
                              const SessionKeys& keys,
                              Connection_Side side,
                              byte compression_method)
    {
-   cipher.reset();
-   delete mac;
-   mac = 0;
+   m_cipher.reset();
+   delete m_mac;
+   m_mac = 0;
+
+   /*
+   RFC 4346:
+     A sequence number is incremented after each record: specifically,
+     the first record transmitted under a particular connection state
+     MUST use sequence number 0
+   */
+   m_seq_no = 0;
 
    SymmetricKey mac_key, cipher_key;
    InitializationVector iv;
@@ -111,22 +127,22 @@ void Record_Writer::set_keys(const CipherSuite& suite,
 
    if(have_block_cipher(cipher_algo))
       {
-      cipher.append(get_cipher(
+      m_cipher.append(get_cipher(
                        cipher_algo + "/CBC/NoPadding",
                        cipher_key, iv, ENCRYPTION)
          );
-      block_size = block_size_of(cipher_algo);
+      m_block_size = block_size_of(cipher_algo);
 
-      if(major > 3 || (major == 3 && minor >= 2))
-         iv_size = block_size;
+      if(m_version >= Protocol_Version::TLS_V11)
+         m_iv_size = m_block_size;
       else
-         iv_size = 0;
+         m_iv_size = 0;
       }
    else if(have_stream_cipher(cipher_algo))
       {
-      cipher.append(get_cipher(cipher_algo, cipher_key, ENCRYPTION));
-      block_size = 0;
-      iv_size = 0;
+      m_cipher.append(get_cipher(cipher_algo, cipher_key, ENCRYPTION));
+      m_block_size = 0;
+      m_iv_size = 0;
       }
    else
       throw Invalid_Argument("Record_Writer: Unknown cipher " + cipher_algo);
@@ -135,13 +151,13 @@ void Record_Writer::set_keys(const CipherSuite& suite,
       {
       Algorithm_Factory& af = global_state().algorithm_factory();
 
-      if(major == 3 && minor == 0)
-         mac = af.make_mac("SSL3-MAC(" + mac_algo + ")");
+      if(m_version == Protocol_Version::SSL_V3)
+         m_mac = af.make_mac("SSL3-MAC(" + mac_algo + ")");
       else
-         mac = af.make_mac("HMAC(" + mac_algo + ")");
+         m_mac = af.make_mac("HMAC(" + mac_algo + ")");
 
-      mac->set_key(mac_key);
-      mac_size = mac->output_length();
+      m_mac->set_key(mac_key);
+      m_mac_size = m_mac->output_length();
       }
    else
       throw Invalid_Argument("Record_Writer: Unknown hash " + mac_algo);
@@ -168,62 +184,58 @@ void Record_Writer::set_keys(const CipherSuite& suite,
 */
 void Record_Writer::send(byte type, const byte input[], size_t length)
    {
-   if(type != buf_type)
-      flush();
+   if(length == 0)
+      return;
 
-   const size_t BUFFER_SIZE = buffer.size();
-   buf_type = type;
-
-   buffer.copy(buf_pos, input, length);
-   if(buf_pos + length >= BUFFER_SIZE)
+   /*
+   * If using CBC mode in SSLv3/TLS v1.0, send a single byte of
+   * plaintext to randomize the (implicit) IV of the following main
+   * block. If using a stream cipher, or TLS v1.1, this isn't
+   * necessary.
+   *
+   * An empty record also works but apparently some implementations do
+   * not like this (https://bugzilla.mozilla.org/show_bug.cgi?id=665814)
+   *
+   * See http://www.openssl.org/~bodo/tls-cbc.txt for background.
+   */
+   if((type == APPLICATION) && (m_block_size > 0) && (m_iv_size == 0))
       {
-      send_record(buf_type, &buffer[0], length);
-      input += (BUFFER_SIZE - buf_pos);
-      length -= (BUFFER_SIZE - buf_pos);
-      while(length >= BUFFER_SIZE)
-         {
-         send_record(buf_type, input, BUFFER_SIZE);
-         input += BUFFER_SIZE;
-         length -= BUFFER_SIZE;
-         }
-      buffer.copy(input, length);
-      buf_pos = 0;
+      send_record(type, &input[0], 1);
+      input += 1;
+      length -= 1;
       }
-   buf_pos += length;
-   }
 
-/*
-* Split buffer into records, and send them all
-*/
-void Record_Writer::flush()
-   {
-   const byte* buf_ptr = &buffer[0];
-   size_t offset = 0;
-
-   while(offset != buf_pos)
+   while(length)
       {
-      size_t record_size = buf_pos - offset;
-      if(record_size > MAX_PLAINTEXT_SIZE)
-         record_size = MAX_PLAINTEXT_SIZE;
+      const size_t sending = std::min(length, m_max_fragment);
+      send_record(type, &input[0], sending);
 
-      send_record(buf_type, buf_ptr + offset, record_size);
-      offset += record_size;
+      input += sending;
+      length -= sending;
       }
-   buf_type = 0;
-   buf_pos = 0;
    }
 
 /*
 * Encrypt and send the record
 */
-void Record_Writer::send_record(byte type, const byte buf[], size_t length)
+void Record_Writer::send_record(byte type, const byte input[], size_t length)
    {
-   if(length >= MAX_COMPRESSED_SIZE)
-      throw TLS_Exception(INTERNAL_ERROR,
-                          "Record_Writer: Compressed packet is too big");
+   if(length >= MAX_PLAINTEXT_SIZE)
+      throw Internal_Error("Record_Writer: Compressed packet is too big");
 
-   if(mac_size == 0)
-      send_record(type, major, minor, buf, length);
+   if(m_mac_size == 0)
+      {
+      const byte header[TLS_HEADER_SIZE] = {
+         type,
+         m_version.major_version(),
+         m_version.minor_version(),
+         get_byte<u16bit>(0, length),
+         get_byte<u16bit>(1, length)
+      };
+
+      m_output_fn(header, TLS_HEADER_SIZE);
+      m_output_fn(input, length);
+      }
    else
       {
       compressor.write(buf, length);
@@ -238,72 +250,77 @@ void Record_Writer::send_record(byte type, const byte buf[], size_t length)
       printf("Uncompressed plaintext %s\n", hex_encode(buf, length).c_str());
       printf("Compressed plaintext: %s\n", hex_encode(plaintext).c_str());
 
-      mac->update_be(seq_no);
-      mac->update(type);
+      m_mac->update_be(seq_no);
+      m_mac->update(type);
 
-      if(major > 3 || (major == 3 && minor != 0))
-         { // except in SSLv3
-         mac->update(major);
-         mac->update(minor);
+      if(m_version != Protocol_Version::SSL_V3)
+         {
+         m_mac->update(m_version.major_version());
+         m_mac->update(m_version.minor_version());
          }
 
-      mac->update(get_byte<u16bit>(0, plaintext.size()));
-      mac->update(get_byte<u16bit>(1, plaintext.size()));
-      mac->update(plaintext);
+      m_mac->update(get_byte<u16bit>(0, length));
+      m_mac->update(get_byte<u16bit>(1, length));
+      m_mac->update(input, length);
 
-      SecureVector<byte> buf_mac = mac->final();
+      const size_t buf_size = round_up(m_iv_size + length +
+                                       m_mac->output_length() +
+                                       (m_block_size ? 1 : 0),
+                                       m_block_size);
 
-      // FIXME: this could be done in place in a single buffer
-      cipher.start_msg();
+      if(buf_size >= MAX_CIPHERTEXT_SIZE)
+         throw Internal_Error("Record_Writer: Record is too big");
 
-      if(iv_size)
+      BOTAN_ASSERT(m_writebuf.size() >= TLS_HEADER_SIZE + MAX_CIPHERTEXT_SIZE,
+                   "Write buffer is big enough");
+
+      // TLS record header
+      m_writebuf[0] = type;
+      m_writebuf[1] = m_version.major_version();
+      m_writebuf[2] = m_version.minor_version();
+      m_writebuf[3] = get_byte<u16bit>(0, buf_size);
+      m_writebuf[4] = get_byte<u16bit>(1, buf_size);
+
+      byte* buf_write_ptr = &m_writebuf[TLS_HEADER_SIZE];
+
+      if(m_iv_size)
          {
          RandomNumberGenerator& rng = global_state().global_rng();
-
-         SecureVector<byte> random_iv(iv_size);
-
-         rng.randomize(&random_iv[0], random_iv.size());
-
-         cipher.write(random_iv);
+         rng.randomize(buf_write_ptr, m_iv_size);
+         buf_write_ptr += m_iv_size;
          }
 
-      cipher.write(plaintext);
-      cipher.write(buf_mac);
+      copy_mem(buf_write_ptr, input, length);
+      buf_write_ptr += length;
 
-      if(block_size)
+      m_mac->final(buf_write_ptr);
+      buf_write_ptr += m_mac->output_length();
+
+      if(m_block_size)
          {
          const size_t pad_val =
-            (block_size - (1 + plaintext.size() + buf_mac.size())) % block_size;
+            buf_size - (m_iv_size + length + m_mac->output_length() + 1);
 
          for(size_t i = 0; i != pad_val + 1; ++i)
-            cipher.write(pad_val);
+            {
+            *buf_write_ptr = pad_val;
+            buf_write_ptr += 1;
+            }
          }
-      cipher.end_msg();
 
-      SecureVector<byte> output = cipher.read_all(Pipe::LAST_MESSAGE);
+      // FIXME: this could be done in-place without copying
+      m_cipher.process_msg(&m_writebuf[TLS_HEADER_SIZE], buf_size);
+      const size_t got_back = m_cipher.read(&m_writebuf[TLS_HEADER_SIZE], buf_size, Pipe::LAST_MESSAGE);
 
-      send_record(type, major, minor, &output[0], output.size());
+      BOTAN_ASSERT_EQUAL(got_back, buf_size, "Cipher encrypted full amount");
 
-      seq_no++;
+      BOTAN_ASSERT_EQUAL(m_cipher.remaining(Pipe::LAST_MESSAGE), 0,
+                         "No data remains in pipe");
+
+      m_output_fn(&m_writebuf[0], TLS_HEADER_SIZE + buf_size);
+
+      m_seq_no++;
       }
-   }
-
-/*
-* Send a final record packet
-*/
-void Record_Writer::send_record(byte type, byte major, byte minor,
-                                const byte out[], size_t length)
-   {
-   if(length >= MAX_CIPHERTEXT_SIZE)
-      throw TLS_Exception(INTERNAL_ERROR,
-                          "Record_Writer: Record is too big");
-
-   byte header[5] = { type, major, minor, 0 };
-   for(size_t i = 0; i != 2; ++i)
-      header[i+3] = get_byte<u16bit>(i, length);
-
-   output_fn(header, 5);
-   output_fn(out, length);
    }
 
 /*
@@ -313,7 +330,8 @@ void Record_Writer::alert(Alert_Level level, Alert_Type type)
    {
    byte alert[2] = { level, type };
    send(ALERT, alert, sizeof(alert));
-   flush();
    }
+
+}
 
 }

@@ -1,6 +1,6 @@
 /*
 * TLS Record Handling
-* (C) 2004-2010 Jack Lloyd
+* (C) 2004-2012 Jack Lloyd
 *
 * Released under the terms of the Botan license
 */
@@ -8,7 +8,9 @@
 #ifndef BOTAN_TLS_RECORDS_H__
 #define BOTAN_TLS_RECORDS_H__
 
-#include <botan/tls_suites.h>
+#include <botan/tls_ciphersuite.h>
+#include <botan/tls_magic.h>
+#include <botan/tls_version.h>
 #include <botan/pipe.h>
 #include <botan/mac.h>
 #include <botan/secqueue.h>
@@ -30,9 +32,9 @@
 
 namespace Botan {
 
-using namespace std::tr1::placeholders;
+namespace TLS {
 
-class SessionKeys;
+class Session_Keys;
 
 /**
 * TLS Record Writer
@@ -43,48 +45,39 @@ class BOTAN_DLL Record_Writer
       void send(byte type, const byte input[], size_t length);
       void send(byte type, byte val) { send(type, &val, 1); }
 
-      void flush();
-
       void alert(Alert_Level level, Alert_Type type);
 
-      void set_keys(const CipherSuite& suite,
-                    const SessionKeys& keys,
+      void activate(const Ciphersuite& suite,
+                    const Session_Keys& keys,
                     Connection_Side side,
                     byte compression_method);
 
-      void set_version(Version_Code version);
+      void set_version(Protocol_Version version);
 
       void reset();
 
-      /**
-      * @param fragment_size messages will be broken up in records of
-      *        roughly fragment_size (though headers and compression
-      *        may increase or decrease this size resp). If zero, uses
-      *        a reasonable default.
-      */
-      Record_Writer(std::tr1::function<void (const byte[], size_t)> output_fn,
-                    size_t fragment_size = 0);
+      void set_maximum_fragment_size(size_t max_fragment);
 
-      ~Record_Writer() { delete mac; }
+      Record_Writer(std::tr1::function<void (const byte[], size_t)> output_fn);
+
+      ~Record_Writer() { delete m_mac; }
    private:
+      Record_Writer(const Record_Writer&) {}
+      Record_Writer& operator=(const Record_Writer&) { return (*this); }
+
       void send_record(byte type, const byte input[], size_t length);
-      void send_record(byte type, byte major, byte minor,
-                       const byte input[], size_t length);
 
-      std::tr1::function<void (const byte[], size_t)> output_fn;
+      std::tr1::function<void (const byte[], size_t)> m_output_fn;
 
-      Pipe compressor;
-      Filter* compressor_filter;
-      Pipe cipher;
-      MessageAuthenticationCode* mac;
+      MemoryVector<byte> m_writebuf;
 
-      SecureVector<byte> buffer;
-      size_t buf_pos;
+      Pipe m_cipher;
+      MessageAuthenticationCode* m_mac;
 
-      size_t block_size, mac_size, iv_size;
+      size_t m_block_size, m_mac_size, m_iv_size, m_max_fragment;
 
-      u64bit seq_no;
-      byte major, minor, buf_type;
+      u64bit m_seq_no;
+      Protocol_Version m_version;
    };
 
 /**
@@ -93,42 +86,56 @@ class BOTAN_DLL Record_Writer
 class BOTAN_DLL Record_Reader
    {
    public:
-      void add_input(const byte input[], size_t input_size);
 
       /**
-      * @param msg_type (output variable)
-      * @param buffer (output variable)
-      * @return Number of bytes still needed (minimum), or 0 if success
+      * @param input new input data (may be NULL if input_size == 0)
+      * @param input_size size of input in bytes
+      * @param input_consumed is set to the number of bytes of input
+      *        that were consumed
+      * @param msg_type is set to the type of the message just read if
+      *        this function returns 0
+      * @param msg is set to the contents of the record
+      * @return number of bytes still needed (minimum), or 0 if success
       */
-      size_t get_record(byte& msg_type,
-                        MemoryRegion<byte>& buffer);
+      size_t add_input(const byte input[], size_t input_size,
+                       size_t& input_consumed,
+                       byte& msg_type,
+                       MemoryVector<byte>& msg);
 
-      SecureVector<byte> get_record(byte& msg_type);
+      void activate(const Ciphersuite& suite,
+                    const Session_Keys& keys,
+                    Connection_Side side);
 
-      void set_keys(const CipherSuite& suite,
-                    const SessionKeys& keys,
-                    Connection_Side side,
-                    byte compression_method);
-
-      void set_version(Version_Code version);
+      void set_version(Protocol_Version version);
 
       void reset();
 
-      bool currently_empty() const { return input_queue.size() == 0; }
+      void set_maximum_fragment_size(size_t max_fragment);
 
-      Record_Reader() { mac = 0; reset(); }
+      Record_Reader();
 
-      ~Record_Reader() { delete mac; }
+      ~Record_Reader() { delete m_mac; }
    private:
-      SecureQueue input_queue;
+      Record_Reader(const Record_Reader&) {}
+      Record_Reader& operator=(const Record_Reader&) { return (*this); }
 
-      Pipe decompressor;
-      Pipe cipher;
-      MessageAuthenticationCode* mac;
-      size_t block_size, mac_size, iv_size;
-      u64bit seq_no;
-      byte major, minor;
+      size_t fill_buffer_to(const byte*& input,
+                            size_t& input_size,
+                            size_t& input_consumed,
+                            size_t desired);
+
+      MemoryVector<byte> m_readbuf;
+      MemoryVector<byte> m_macbuf;
+      size_t m_readbuf_pos;
+
+      Pipe m_cipher;
+      MessageAuthenticationCode* m_mac;
+      size_t m_block_size, m_iv_size, m_max_fragment;
+      u64bit m_seq_no;
+      Protocol_Version m_version;
    };
+
+}
 
 }
 

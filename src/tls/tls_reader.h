@@ -1,6 +1,6 @@
 /*
 * TLS Data Reader
-* (C) 2010 Jack Lloyd
+* (C) 2010-2011 Jack Lloyd
 *
 * Released under the terms of the Botan license
 */
@@ -8,10 +8,16 @@
 #ifndef BOTAN_TLS_READER_H__
 #define BOTAN_TLS_READER_H__
 
+#include <botan/exceptn.h>
 #include <botan/secmem.h>
 #include <botan/loadstor.h>
+#include <string>
+#include <vector>
+#include <stdexcept>
 
 namespace Botan {
+
+namespace TLS {
 
 /**
 * Helper class for decoding TLS protocol messages
@@ -22,7 +28,7 @@ class TLS_Data_Reader
       TLS_Data_Reader(const MemoryRegion<byte>& buf_in) :
          buf(buf_in), offset(0) {}
 
-      ~TLS_Data_Reader()
+      void assert_done() const
          {
          if(has_remaining())
             throw Decoding_Error("Extra bytes at end of message");
@@ -97,6 +103,16 @@ class TLS_Data_Reader
          return get_elem<T, std::vector<T> >(num_elems);
          }
 
+      std::string get_string(size_t len_bytes,
+                             size_t min_bytes,
+                             size_t max_bytes)
+         {
+         std::vector<byte> v =
+            get_range_vector<byte>(len_bytes, min_bytes, max_bytes);
+
+         return std::string(reinterpret_cast<char*>(&v[0]), v.size());
+         }
+
       template<typename T>
       SecureVector<T> get_fixed(size_t size)
          {
@@ -137,7 +153,9 @@ class TLS_Data_Reader
       void assert_at_least(size_t n) const
          {
          if(buf.size() - offset < n)
-            throw Decoding_Error("TLS_Data_Reader: Corrupt packet");
+            throw Decoding_Error("TLS_Data_Reader: Expected " + to_string(n) +
+                                 " bytes remaining, only " + to_string(buf.size()-offset) +
+                                 " left");
          }
 
       const MemoryRegion<byte>& buf;
@@ -186,6 +204,8 @@ void append_tls_length_value(MemoryRegion<byte>& buf,
    {
    append_tls_length_value(buf, &vals[0], vals.size(), tag_size);
    }
+
+}
 
 }
 

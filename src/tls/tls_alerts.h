@@ -12,6 +12,8 @@
 
 namespace Botan {
 
+namespace TLS {
+
 /**
 * SSL/TLS Alert Message
 */
@@ -35,7 +37,8 @@ class Alert
       Alert(const MemoryRegion<byte>& buf)
          {
          if(buf.size() != 2)
-            throw Decoding_Error("Alert: Bad size for alert message");
+            throw Decoding_Error("Alert: Bad size " + to_string(buf.size()) +
+                                 " for alert message");
 
          if(buf[0] == 1)      fatal = false;
          else if(buf[0] == 2) fatal = true;
@@ -53,6 +56,8 @@ class Alert
       bool fatal;
       Alert_Type type_code;
    };
+
+}
 
 }
 

@@ -9,53 +9,65 @@
 #define BOTAN_TLS_SERVER_H__
 
 #include <botan/tls_channel.h>
-#include <botan/tls_session_state.h>
+#include <botan/tls_session_manager.h>
+#include <botan/credentials_manager.h>
 #include <vector>
 
 namespace Botan {
 
+namespace TLS {
+
 /**
 * TLS Server
 */
-class BOTAN_DLL TLS_Server : public TLS_Channel
+class BOTAN_DLL Server : public Channel
    {
    public:
-
       /**
-      * TLS_Server initialization
-      *
-      * FIXME: support cert chains (!)
-      * FIXME: support anonymous servers
+      * Server initialization
       */
-      TLS_Server(std::tr1::function<void (const byte[], size_t)> socket_output_fn,
+      Server(std::tr1::function<void (const byte[], size_t)> socket_output_fn,
                  std::tr1::function<void (const byte[], size_t, u16bit)> proc_fn,
-                 TLS_Session_Manager& session_manager,
-                 const TLS_Policy& policy,
+                 std::tr1::function<bool (const Session&)> handshake_complete,
+                 Session_Manager& session_manager,
+                 Credentials_Manager& creds,
+                 const Policy& policy,
                  RandomNumberGenerator& rng,
-                 const X509_Certificate& cert,
-                 const Private_Key& cert_key);
+                 const std::vector<std::string>& protocols =
+                    std::vector<std::string>());
 
-      ~TLS_Server();
+      void renegotiate();
 
       /**
-      * Return the server name indicator, if set by the client
+      * Return the server name indicator, if sent by the client
       */
       std::string server_name_indicator() const
-         { return client_requested_hostname; }
+         { return m_hostname; }
+
+      /**
+      * Return the protocol negotiated with NPN extension
+      */
+      std::string next_protocol() const
+         { return m_next_protocol; }
+
    private:
       void read_handshake(byte, const MemoryRegion<byte>&);
 
       void process_handshake_msg(Handshake_Type, const MemoryRegion<byte>&);
 
-      const TLS_Policy& policy;
+      void alert_notify(bool is_fatal, Alert_Type type);
+
+      const Policy& policy;
       RandomNumberGenerator& rng;
-      TLS_Session_Manager& session_manager;
+      Session_Manager& session_manager;
+      Credentials_Manager& creds;
 
-      std::vector<X509_Certificate> cert_chain;
-      Private_Key* private_key;
-
-      std::string client_requested_hostname;
+      std::vector<std::string> m_possible_protocols;
+      std::string m_hostname;
+      std::string m_next_protocol;
    };
+
+}
 
 }
 

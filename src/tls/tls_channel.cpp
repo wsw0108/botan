@@ -1,52 +1,65 @@
 /*
 * TLS Channels
-* (C) 2011 Jack Lloyd
+* (C) 2011-2012 Jack Lloyd
 *
 * Released under the terms of the Botan license
 */
 
 #include <botan/tls_channel.h>
 #include <botan/internal/tls_alerts.h>
-#include <botan/internal/tls_state.h>
+#include <botan/internal/tls_handshake_state.h>
+#include <botan/internal/tls_messages.h>
+#include <botan/internal/assert.h>
 #include <botan/loadstor.h>
 
 namespace Botan {
 
-TLS_Channel::TLS_Channel(std::tr1::function<void (const byte[], size_t)> socket_output_fn,
-                         std::tr1::function<void (const byte[], size_t, u16bit)> proc_fn) :
+namespace TLS {
+
+Channel::Channel(std::tr1::function<void (const byte[], size_t)> socket_output_fn,
+                 std::tr1::function<void (const byte[], size_t, u16bit)> proc_fn,
+                 std::tr1::function<bool (const Session&)> handshake_complete) :
    proc_fn(proc_fn),
+   handshake_fn(handshake_complete),
    writer(socket_output_fn),
    state(0),
-   active(false)
+   handshake_completed(false),
+   connection_closed(false)
    {
    }
 
-TLS_Channel::~TLS_Channel()
+Channel::~Channel()
    {
-   close();
    delete state;
    state = 0;
    }
 
-size_t TLS_Channel::received_data(const byte buf[], size_t buf_size)
+size_t Channel::received_data(const byte buf[], size_t buf_size)
    {
    try
       {
-      reader.add_input(buf, buf_size);
-
-      byte rec_type = CONNECTION_CLOSED;
-      SecureVector<byte> record;
-
-      while(!reader.currently_empty())
+      while(buf_size)
          {
-         const size_t bytes_needed = reader.get_record(rec_type, record);
+         byte rec_type = CONNECTION_CLOSED;
+         MemoryVector<byte> record;
+         size_t consumed = 0;
 
-         if(bytes_needed > 0)
-            return bytes_needed;
+         const size_t needed = reader.add_input(buf, buf_size,
+                                                consumed,
+                                                rec_type, record);
+
+         buf += consumed;
+         buf_size -= consumed;
+
+         BOTAN_ASSERT(buf_size == 0 || needed == 0,
+                      "Got a full record or consumed all input");
+
+         if(buf_size == 0 && needed != 0)
+            return needed; // need more data to complete record
 
          if(rec_type == APPLICATION_DATA)
             {
-            if(active)
+            if(handshake_completed)
                {
                /*
                * OpenSSL among others sends empty records in versions
@@ -69,18 +82,32 @@ size_t TLS_Channel::received_data(const byte buf[], size_t buf_size)
             {
             Alert alert_msg(record);
 
+            alert_notify(alert_msg.is_fatal(), alert_msg.type());
+
             proc_fn(0, 0, alert_msg.type());
 
-            if(alert_msg.is_fatal() || alert_msg.type() == CLOSE_NOTIFY)
+            if(alert_msg.type() == CLOSE_NOTIFY)
                {
-               if(alert_msg.type() == CLOSE_NOTIFY)
-                  alert(FATAL, CLOSE_NOTIFY);
+               if(connection_closed)
+                  reader.reset();
                else
-                  alert(FATAL, NULL_ALERT);
+                  alert(WARNING, CLOSE_NOTIFY); // reply in kind
+               }
+            else if(alert_msg.is_fatal())
+               {
+               // delete state immediately
+               connection_closed = true;
+
+               delete state;
+               state = 0;
+
+               writer.reset();
+               reader.reset();
                }
             }
          else
-            throw Unexpected_Message("Unknown message type received");
+            throw Unexpected_Message("Unknown TLS message type " +
+                                     to_string(rec_type) + " received");
          }
 
       return 0; // on a record boundary
@@ -95,6 +122,11 @@ size_t TLS_Channel::received_data(const byte buf[], size_t buf_size)
       alert(FATAL, DECODE_ERROR);
       throw;
       }
+   catch(Internal_Error& e)
+      {
+      alert(FATAL, INTERNAL_ERROR);
+      throw;
+      }
    catch(std::exception& e)
       {
       alert(FATAL, INTERNAL_ERROR);
@@ -105,16 +137,20 @@ size_t TLS_Channel::received_data(const byte buf[], size_t buf_size)
 /*
 * Split up and process handshake messages
 */
-void TLS_Channel::read_handshake(byte rec_type,
-                                 const MemoryRegion<byte>& rec_buf)
+void Channel::read_handshake(byte rec_type,
+                             const MemoryRegion<byte>& rec_buf)
    {
    if(rec_type == HANDSHAKE)
+      {
+      if(!state)
+         state = new Handshake_State;
       state->queue.write(&rec_buf[0], rec_buf.size());
+      }
 
    while(true)
       {
       Handshake_Type type = HANDSHAKE_NONE;
-      SecureVector<byte> contents;
+      MemoryVector<byte> contents;
 
       if(rec_type == HANDSHAKE)
          {
@@ -154,44 +190,113 @@ void TLS_Channel::read_handshake(byte rec_type,
       }
    }
 
-void TLS_Channel::queue_for_sending(const byte buf[], size_t buf_size)
+void Channel::send(const byte buf[], size_t buf_size)
    {
-   if(active)
-      {
-      while(!pre_handshake_write_queue.end_of_data())
-         {
-         SecureVector<byte> q_buf(1024);
-         const size_t got = pre_handshake_write_queue.read(&q_buf[0], q_buf.size());
-         writer.send(APPLICATION_DATA, &q_buf[0], got);
-         }
+   if(!is_active())
+      throw std::runtime_error("Data cannot be sent on inactive TLS connection");
 
-      writer.send(APPLICATION_DATA, buf, buf_size);
-      writer.flush();
-      }
-   else
-      pre_handshake_write_queue.write(buf, buf_size);
+   writer.send(APPLICATION_DATA, buf, buf_size);
    }
 
-void TLS_Channel::alert(Alert_Level alert_level, Alert_Type alert_code)
+void Channel::alert(Alert_Level alert_level, Alert_Type alert_code)
    {
-   if(alert_code != NULL_ALERT)
+   if(alert_code != NULL_ALERT && !connection_closed)
       {
       try
          {
          writer.alert(alert_level, alert_code);
-         writer.flush();
          }
       catch(...) { /* swallow it */ }
       }
 
-   if(active && alert_level == FATAL)
+   if(!connection_closed &&
+      (alert_code == CLOSE_NOTIFY || alert_level == FATAL))
       {
-      reader.reset();
-      writer.reset();
+      connection_closed = true;
+
       delete state;
       state = 0;
-      active = false;
+
+      writer.reset();
       }
    }
+
+void Channel::Secure_Renegotiation_State::update(Client_Hello* client_hello)
+   {
+   if(initial_handshake)
+      {
+      secure_renegotiation = client_hello->secure_renegotiation();
+      }
+   else
+      {
+      if(secure_renegotiation != client_hello->secure_renegotiation())
+         throw TLS_Exception(HANDSHAKE_FAILURE,
+                             "Client changed its mind about secure renegotiation");
+      }
+
+   if(client_hello->secure_renegotiation())
+      {
+      const MemoryVector<byte>& data = client_hello->renegotiation_info();
+
+      if(initial_handshake)
+         {
+         if(!data.empty())
+            throw TLS_Exception(HANDSHAKE_FAILURE,
+                                "Client sent renegotiation data on initial handshake");
+         }
+      else
+         {
+         if(data != for_client_hello())
+            throw TLS_Exception(HANDSHAKE_FAILURE,
+                                "Client sent bad renegotiation data");
+         }
+      }
+   }
+
+void Channel::Secure_Renegotiation_State::update(Server_Hello* server_hello)
+   {
+   if(initial_handshake)
+      {
+      /* If the client offered but server rejected, then this toggles
+      *  secure_renegotiation to off
+      */
+      secure_renegotiation = server_hello->secure_renegotiation();
+      }
+   else
+      {
+      if(secure_renegotiation != server_hello->secure_renegotiation())
+         throw TLS_Exception(HANDSHAKE_FAILURE,
+                             "Server changed its mind about secure renegotiation");
+      }
+
+   if(secure_renegotiation)
+      {
+      const MemoryVector<byte>& data = server_hello->renegotiation_info();
+
+      if(initial_handshake)
+         {
+         if(!data.empty())
+            throw TLS_Exception(HANDSHAKE_FAILURE,
+                                "Server sent renegotiation data on initial handshake");
+         }
+      else
+         {
+         if(data != for_server_hello())
+            throw TLS_Exception(HANDSHAKE_FAILURE,
+                                "Server sent bad renegotiation data");
+         }
+      }
+
+   initial_handshake = false;
+   }
+
+void Channel::Secure_Renegotiation_State::update(Finished* client_finished,
+                                                     Finished* server_finished)
+   {
+   client_verify = client_finished->verify_data();
+   server_verify = server_finished->verify_data();
+   }
+
+}
 
 }
