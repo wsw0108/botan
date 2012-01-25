@@ -31,7 +31,7 @@ namespace TLS {
 Record_Writer::Record_Writer(std::tr1::function<void (const byte[], size_t)> out) :
    m_output_fn(out), m_writebuf(TLS_HEADER_SIZE + MAX_CIPHERTEXT_SIZE)
    {
-   compressor_filter = 0;
+   m_compressor_filter = 0;
    m_mac = 0;
    reset();
    set_maximum_fragment_size(0);
@@ -53,22 +53,24 @@ void Record_Writer::reset()
    set_maximum_fragment_size(0);
    m_cipher.reset();
 
-   try {
-      compressor.end_msg();
-   } catch(...) {}
+   try
+      {
+      m_compressor.end_msg();
+      }
+   catch(...) {}
 
-   try {
-      compressor.reset();
-   }
+   try
+      {
+      m_compressor.reset();
+      }
    catch(...) {}
 
    delete m_mac;
    m_mac = 0;
 
-   compressor_filter = 0;
+   m_compressor_filter = 0;
 
-   zeroise(buffer);
-   buf_pos = 0;
+   zeroise(m_writebuf);
 
    m_version = Protocol_Version();
    m_block_size = 0;
@@ -89,8 +91,8 @@ void Record_Writer::set_version(Protocol_Version version)
 /*
 * Set the keys for writing
 */
-void Record_Writer::activate(const CipherSuite& suite,
-                             const SessionKeys& keys,
+void Record_Writer::activate(const Ciphersuite& suite,
+                             const Session_Keys& keys,
                              Connection_Side side,
                              byte compression_method)
    {
@@ -165,8 +167,8 @@ void Record_Writer::activate(const CipherSuite& suite,
    if(compression_method == DEFLATE_COMPRESSION)
       {
 #if defined(BOTAN_HAS_COMPRESSOR_ZLIB)
-      compressor_filter = new Zlib_Compression(1, true);
-      compressor.append(compressor_filter);
+      m_compressor_filter = new Zlib_Compression(1, true);
+      m_compressor.append(m_compressor_filter);
 #else
       throw TLS_Exception(INTERNAL_ERROR,
                           "Negotiated deflate, but zlib not available");
@@ -176,7 +178,7 @@ void Record_Writer::activate(const CipherSuite& suite,
       throw TLS_Exception(INTERNAL_ERROR,
                           "Negotiated an unknown compression method");
 
-   compressor.start_msg();
+   m_compressor.start_msg();
    }
 
 /*
@@ -238,19 +240,20 @@ void Record_Writer::send_record(byte type, const byte input[], size_t length)
       }
    else
       {
-      compressor.write(buf, length);
+      m_compressor.write(buf, length);
 
-      if(compressor_filter)
+      if(m_compressor_filter)
          {
-         dynamic_cast<Zlib_Compression*>(compressor_filter)->flush();
+         // FIXME!
+         dynamic_cast<Zlib_Compression*>(m_compressor_filter)->flush();
          }
 
-      SecureVector<byte> plaintext = compressor.read_all(Pipe::LAST_MESSAGE);
+      SecureVector<byte> plaintext = m_compressor.read_all(Pipe::LAST_MESSAGE);
 
       printf("Uncompressed plaintext %s\n", hex_encode(buf, length).c_str());
       printf("Compressed plaintext: %s\n", hex_encode(plaintext).c_str());
 
-      m_mac->update_be(seq_no);
+      m_mac->update_be(m_seq_no);
       m_mac->update(type);
 
       if(m_version != Protocol_Version::SSL_V3)

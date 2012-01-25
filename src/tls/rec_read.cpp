@@ -44,16 +44,13 @@ void Record_Reader::reset()
    m_cipher.reset();
 
    try {
-      decompressor.end_msg();
+      m_decompressor.end_msg();
    }
    catch(...) {}
 
    try {
-      decompressor.reset();
+      m_decompressor.reset();
    } catch(...) {}
-
-   delete mac;
-   mac = 0;
 
    delete m_mac;
    m_mac = 0;
@@ -153,7 +150,7 @@ void Record_Reader::activate(const Ciphersuite& suite,
    if(compression_method == DEFLATE_COMPRESSION)
       {
 #if defined(BOTAN_HAS_COMPRESSOR_ZLIB)
-      decompressor.append(new Zlib_Decompression(false));
+      m_decompressor.append(new Zlib_Decompression(false));
 #else
       throw TLS_Exception(INTERNAL_ERROR,
                           "Negotiated deflate, but zlib not available");
@@ -165,7 +162,7 @@ void Record_Reader::activate(const Ciphersuite& suite,
                           "Negotiated an unknown compression method");
       }
 
-   decompressor.start_msg();
+   m_decompressor.start_msg();
    }
 
 size_t Record_Reader::fill_buffer_to(const byte*& input,
@@ -372,9 +369,11 @@ size_t Record_Reader::add_input(const byte input_array[], size_t input_sz,
    if(!same_mem(&m_readbuf[TLS_HEADER_SIZE + mac_offset], &m_macbuf[0], m_macbuf.size()))
       throw TLS_Exception(BAD_RECORD_MAC, "Message authentication failure");
 
+   /*
    std::cout << "Compressed input: " << hex_encode(&plaintext[iv_size], plain_length) << "\n";
-   decompressor.write(&plaintext[iv_size], plain_length);
-   output = decompressor.read_all(Pipe::LAST_MESSAGE);
+   m_decompressor.write(&plaintext[iv_size], plain_length);
+   output = m_decompressor.read_all(Pipe::LAST_MESSAGE);
+   */
 
    msg_type = m_readbuf[0];
 

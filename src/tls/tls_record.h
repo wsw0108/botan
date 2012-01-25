@@ -72,6 +72,9 @@ class BOTAN_DLL Record_Writer
       MemoryVector<byte> m_writebuf;
 
       Pipe m_cipher;
+      Pipe m_compressor;
+      Filter* m_compressor_filter; // owned by m_compressor
+
       MessageAuthenticationCode* m_mac;
 
       size_t m_block_size, m_mac_size, m_iv_size, m_max_fragment;
@@ -104,7 +107,8 @@ class BOTAN_DLL Record_Reader
 
       void activate(const Ciphersuite& suite,
                     const Session_Keys& keys,
-                    Connection_Side side);
+                    Connection_Side side,
+                    byte compression_method);
 
       void set_version(Protocol_Version version);
 
@@ -129,6 +133,7 @@ class BOTAN_DLL Record_Reader
       size_t m_readbuf_pos;
 
       Pipe m_cipher;
+      Pipe m_decompressor;
       MessageAuthenticationCode* m_mac;
       size_t m_block_size, m_iv_size, m_max_fragment;
       u64bit m_seq_no;
