@@ -15,38 +15,36 @@ namespace TLS {
 
 namespace {
 
-Extension* make_extension(TLS_Data_Reader& reader,
-                          u16bit code,
-                          u16bit size)
+Extension* new_extension(u16bit code, const MemoryRegion<byte>& val)
    {
    switch(code)
       {
       case TLSEXT_SERVER_NAME_INDICATION:
-         return new Server_Name_Indicator(reader, size);
+         return new Server_Name_Indicator(val);
 
       case TLSEXT_MAX_FRAGMENT_LENGTH:
-         return new Maximum_Fragment_Length(reader, size);
+         return new Maximum_Fragment_Length(val);
 
       case TLSEXT_SRP_IDENTIFIER:
-         return new SRP_Identifier(reader, size);
+         return new SRP_Identifier(val);
 
       case TLSEXT_USABLE_ELLIPTIC_CURVES:
-         return new Supported_Elliptic_Curves(reader, size);
+         return new Supported_Elliptic_Curves(val);
 
       case TLSEXT_SAFE_RENEGOTIATION:
-         return new Renegotation_Extension(reader, size);
+         return new Renegotation_Extension(val, true);
 
       case TLSEXT_SIGNATURE_ALGORITHMS:
-         return new Signature_Algorithms(reader, size);
+         return new Signature_Algorithms(val);
 
       case TLSEXT_NEXT_PROTOCOL:
-         return new Next_Protocol_Notification(reader, size);
+         return new Next_Protocol_Notification(val);
 
       case TLSEXT_HEARTBEAT_SUPPORT:
-         return new Heartbeat_Support_Indicator(reader, size);
+         return new Heartbeat_Support_Indicator(val);
 
       case TLSEXT_SESSION_TICKET:
-         return new Session_Ticket(reader, size);
+         return new Session_Ticket(val);
 
       default:
          return 0; // not known
@@ -69,9 +67,10 @@ Extensions::Extensions(TLS_Data_Reader& reader)
          const u16bit extension_code = reader.get_u16bit();
          const u16bit extension_size = reader.get_u16bit();
 
-         Extension* extn = make_extension(reader,
-                                              extension_code,
-                                              extension_size);
+         MemoryVector<byte> extension_value =
+            reader.get_elem<byte, MemoryVector<byte> >(extension_size);
+
+         Extension* extn = new_extension(extension_code, extension_value);
 
          if(extn)
             this->add(extn);
@@ -127,36 +126,30 @@ Extensions::~Extensions()
    extensions.clear();
    }
 
-Server_Name_Indicator::Server_Name_Indicator(TLS_Data_Reader& reader,
-                                             u16bit extension_size)
+Server_Name_Indicator::Server_Name_Indicator(const MemoryRegion<byte>& buf)
    {
-   /*
-   * This is used by the server to confirm that it knew the name
-   */
-   if(extension_size == 0)
+   // This is used by the server to confirm that it knew the name
+   if(buf.empty())
       return;
 
-   u16bit name_bytes = reader.get_u16bit();
+   TLS_Data_Reader reader(buf);
 
-   if(name_bytes + 2 != extension_size)
+   const size_t name_bytes = reader.get_u16bit();
+
+   if(name_bytes + 2 != buf.size())
       throw Decoding_Error("Bad encoding of SNI extension");
 
-   while(name_bytes)
+   while(reader.has_remaining())
       {
-      byte name_type = reader.get_byte();
-      name_bytes--;
+      const byte name_type = reader.get_byte();
 
       if(name_type == 0) // DNS
-         {
          sni_host_name = reader.get_string(2, 1, 65535);
-         name_bytes -= (2 + sni_host_name.size());
-         }
-      else // some other unknown name type
-         {
-         reader.discard_next(name_bytes);
-         name_bytes = 0;
-         }
+      else
+         reader.discard_remaining();
       }
+
+   reader.assert_done();
    }
 
 MemoryVector<byte> Server_Name_Indicator::serialize() const
@@ -179,13 +172,13 @@ MemoryVector<byte> Server_Name_Indicator::serialize() const
    return buf;
    }
 
-SRP_Identifier::SRP_Identifier(TLS_Data_Reader& reader,
-                               u16bit extension_size)
+SRP_Identifier::SRP_Identifier(const MemoryRegion<byte>& buf)
    {
+   TLS_Data_Reader reader(buf);
+
    srp_identifier = reader.get_string(1, 1, 255);
 
-   if(srp_identifier.size() + 1 != extension_size)
-      throw Decoding_Error("Bad encoding for SRP identifier extension");
+   reader.assert_done();
    }
 
 MemoryVector<byte> SRP_Identifier::serialize() const
@@ -200,13 +193,17 @@ MemoryVector<byte> SRP_Identifier::serialize() const
    return buf;
    }
 
-Renegotation_Extension::Renegotation_Extension(TLS_Data_Reader& reader,
-                                               u16bit extension_size)
+Renegotation_Extension::Renegotation_Extension(const MemoryRegion<byte>& val,
+                                               bool decoding)
    {
-   reneg_data = reader.get_range<byte>(1, 0, 255);
-
-   if(reneg_data.size() + 1 != extension_size)
-      throw Decoding_Error("Bad encoding for secure renegotiation extn");
+   if(decoding)
+      {
+      TLS_Data_Reader reader(val);
+      reneg_data = reader.get_range<byte>(1, 0, 255);
+      reader.assert_done();
+      }
+   else
+      reneg_data = val;
    }
 
 MemoryVector<byte> Renegotation_Extension::serialize() const
@@ -249,33 +246,27 @@ Maximum_Fragment_Length::Maximum_Fragment_Length(size_t max_fragment)
                                   " for maximum fragment size");
    }
 
-Maximum_Fragment_Length::Maximum_Fragment_Length(TLS_Data_Reader& reader,
-                                                 u16bit extension_size)
+Maximum_Fragment_Length::Maximum_Fragment_Length(const MemoryRegion<byte>& buf)
    {
-   if(extension_size != 1)
+   if(buf.size() != 1)
       throw Decoding_Error("Bad size for maximum fragment extension");
-   val = reader.get_byte();
+   val = buf[0];
    }
 
-Next_Protocol_Notification::Next_Protocol_Notification(TLS_Data_Reader& reader,
-                                                       u16bit extension_size)
+Next_Protocol_Notification::Next_Protocol_Notification(const MemoryRegion<byte>& buf)
    {
-   if(extension_size == 0)
-      return; // empty extension
+   if(buf.empty())
+      return;
 
-   size_t bytes_remaining = extension_size;
+   TLS_Data_Reader reader(buf);
 
-   while(bytes_remaining)
+   while(reader.has_remaining())
       {
       const std::string p = reader.get_string(1, 0, 255);
-
-      if(bytes_remaining < p.size() + 1)
-         throw Decoding_Error("Bad encoding for next protocol extension");
-
-      bytes_remaining -= (p.size() + 1);
-
       m_protocols.push_back(p);
       }
+
+   reader.assert_done();
    }
 
 MemoryVector<byte> Next_Protocol_Notification::serialize() const
@@ -372,20 +363,16 @@ MemoryVector<byte> Supported_Elliptic_Curves::serialize() const
    return buf;
    }
 
-Supported_Elliptic_Curves::Supported_Elliptic_Curves(TLS_Data_Reader& reader,
-                                                     u16bit extension_size)
+Supported_Elliptic_Curves::Supported_Elliptic_Curves(const MemoryRegion<byte>& buf)
    {
-   u16bit len = reader.get_u16bit();
+   TLS_Data_Reader reader(buf);
 
-   if(len + 2 != extension_size)
+   const size_t len = reader.get_u16bit();
+
+   if(len + 2 != buf.size() || len % 2 == 1)
       throw Decoding_Error("Inconsistent length field in elliptic curve list");
 
-   if(len % 2 == 1)
-      throw Decoding_Error("Elliptic curve list of strange size");
-
-   len /= 2;
-
-   for(size_t i = 0; i != len; ++i)
+   while(reader.has_remaining())
       {
       const u16bit id = reader.get_u16bit();
       const std::string name = curve_id_to_name(id);
@@ -393,6 +380,8 @@ Supported_Elliptic_Curves::Supported_Elliptic_Curves(TLS_Data_Reader& reader,
       if(name != "")
          m_curves.push_back(name);
       }
+
+   reader.assert_done();
    }
 
 std::string Signature_Algorithms::hash_algo_name(byte code)
@@ -489,20 +478,19 @@ MemoryVector<byte> Signature_Algorithms::serialize() const
    return buf;
    }
 
-Signature_Algorithms::Signature_Algorithms(TLS_Data_Reader& reader,
-                                           u16bit extension_size)
+Signature_Algorithms::Signature_Algorithms(const MemoryRegion<byte>& buf)
    {
-   u16bit len = reader.get_u16bit();
+   TLS_Data_Reader reader(buf);
 
-   if(len + 2 != extension_size)
+   const size_t len = reader.get_u16bit();
+
+   if(len + 2 != buf.size() || len % 2 == 1)
       throw Decoding_Error("Bad encoding on signature algorithms extension");
 
-   while(len)
+   while(reader.has_remaining())
       {
       const std::string hash_code = hash_algo_name(reader.get_byte());
       const std::string sig_code = sig_algo_name(reader.get_byte());
-
-      len -= 2;
 
       // If not something we know, ignore it completely
       if(hash_code == "" || sig_code == "")
@@ -510,12 +498,8 @@ Signature_Algorithms::Signature_Algorithms(TLS_Data_Reader& reader,
 
       m_supported_algos.push_back(std::make_pair(hash_code, sig_code));
       }
-   }
 
-Session_Ticket::Session_Ticket(TLS_Data_Reader& reader,
-                               u16bit extension_size)
-   {
-   m_ticket = reader.get_elem<byte, MemoryVector<byte> >(extension_size);
+   reader.assert_done();
    }
 
 }

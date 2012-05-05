@@ -70,8 +70,7 @@ class Server_Name_Indicator : public Extension
       Server_Name_Indicator(const std::string& host_name) :
          sni_host_name(host_name) {}
 
-      Server_Name_Indicator(TLS_Data_Reader& reader,
-                            u16bit extension_size);
+      Server_Name_Indicator(const MemoryRegion<byte>& buf);
 
       std::string host_name() const { return sni_host_name; }
 
@@ -96,8 +95,7 @@ class SRP_Identifier : public Extension
       SRP_Identifier(const std::string& identifier) :
          srp_identifier(identifier) {}
 
-      SRP_Identifier(TLS_Data_Reader& reader,
-                     u16bit extension_size);
+      SRP_Identifier(const MemoryRegion<byte>& buf);
 
       std::string identifier() const { return srp_identifier; }
 
@@ -121,11 +119,8 @@ class Renegotation_Extension : public Extension
 
       Renegotation_Extension() {}
 
-      Renegotation_Extension(const MemoryRegion<byte>& bits) :
-         reneg_data(bits) {}
-
-      Renegotation_Extension(TLS_Data_Reader& reader,
-                             u16bit extension_size);
+      Renegotation_Extension(const MemoryRegion<byte>& buf,
+                             bool decoding = false);
 
       const MemoryVector<byte>& renegotiation_info() const
          { return reneg_data; }
@@ -164,8 +159,7 @@ class Maximum_Fragment_Length : public Extension
       */
       Maximum_Fragment_Length(size_t max_fragment);
 
-      Maximum_Fragment_Length(TLS_Data_Reader& reader,
-                              u16bit extension_size);
+      Maximum_Fragment_Length(const MemoryRegion<byte>& buf);
 
    private:
       byte val;
@@ -201,8 +195,7 @@ class Next_Protocol_Notification : public Extension
       Next_Protocol_Notification(const std::vector<std::string>& protocols) :
          m_protocols(protocols) {}
 
-      Next_Protocol_Notification(TLS_Data_Reader& reader,
-                                 u16bit extension_size);
+      Next_Protocol_Notification(const MemoryRegion<byte>& buf);
 
       MemoryVector<byte> serialize() const;
 
@@ -226,16 +219,8 @@ class Session_Ticket : public Extension
       */
       Session_Ticket() {}
 
-      /**
-      * Extension with ticket, used by client
-      */
       Session_Ticket(const MemoryRegion<byte>& session_ticket) :
          m_ticket(session_ticket) {}
-
-      /**
-      * Deserialize a session ticket
-      */
-      Session_Ticket(TLS_Data_Reader& reader, u16bit extension_size);
 
       MemoryVector<byte> serialize() const { return m_ticket; }
 
@@ -265,8 +250,7 @@ class Supported_Elliptic_Curves : public Extension
       Supported_Elliptic_Curves(const std::vector<std::string>& curves) :
          m_curves(curves) {}
 
-      Supported_Elliptic_Curves(TLS_Data_Reader& reader,
-                                u16bit extension_size);
+      Supported_Elliptic_Curves(const MemoryRegion<byte>& buf);
 
       bool empty() const { return m_curves.empty(); }
    private:
@@ -303,8 +287,7 @@ class Signature_Algorithms : public Extension
       Signature_Algorithms(const std::vector<std::pair<std::string, std::string> >& algos) :
          m_supported_algos(algos) {}
 
-      Signature_Algorithms(TLS_Data_Reader& reader,
-                           u16bit extension_size);
+      Signature_Algorithms(const MemoryRegion<byte>& buf);
    private:
       std::vector<std::pair<std::string, std::string> > m_supported_algos;
    };
@@ -329,7 +312,7 @@ class Heartbeat_Support_Indicator : public Extension
       Heartbeat_Support_Indicator(bool peer_allowed_to_send) :
          m_peer_allowed_to_send(peer_allowed_to_send) {}
 
-      Heartbeat_Support_Indicator(TLS_Data_Reader& reader, u16bit extension_size);
+      Heartbeat_Support_Indicator(const MemoryRegion<byte>& val);
 
    private:
       bool m_peer_allowed_to_send;

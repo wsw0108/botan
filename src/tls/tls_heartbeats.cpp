@@ -58,13 +58,12 @@ MemoryVector<byte> Heartbeat_Support_Indicator::serialize() const
    return heartbeat;
    }
 
-Heartbeat_Support_Indicator::Heartbeat_Support_Indicator(TLS_Data_Reader& reader,
-                                                         u16bit extension_size)
+Heartbeat_Support_Indicator::Heartbeat_Support_Indicator(const MemoryRegion<byte>& val)
    {
-   if(extension_size != 1)
+   if(val.size() != 1)
       throw Decoding_Error("Strange size for heartbeat extension");
 
-   const byte code = reader.get_byte();
+   const byte code = val[0];
 
    if(code != 1 && code != 2)
       throw TLS_Exception(Alert::ILLEGAL_PARAMETER,

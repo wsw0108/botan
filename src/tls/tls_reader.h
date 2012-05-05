@@ -44,6 +44,11 @@ class TLS_Data_Reader
          return (remaining_bytes() > 0);
          }
 
+      void discard_remaining()
+         {
+         offset = buf.size();
+         }
+
       void discard_next(size_t bytes)
          {
          assert_at_least(bytes);
