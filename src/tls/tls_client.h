@@ -9,7 +9,6 @@
 #define BOTAN_TLS_CLIENT_H__
 
 #include <botan/tls_channel.h>
-#include <botan/tls_session_manager.h>
 #include <botan/credentials_manager.h>
 #include <vector>
 
@@ -62,7 +61,6 @@ class BOTAN_DLL Client : public Channel
 
       const Policy& policy;
       RandomNumberGenerator& rng;
-      Session_Manager& session_manager;
       Credentials_Manager& creds;
       const std::string m_hostname;
    };

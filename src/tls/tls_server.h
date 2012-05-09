@@ -59,7 +59,6 @@ class BOTAN_DLL Server : public Channel
 
       const Policy& policy;
       RandomNumberGenerator& rng;
-      Session_Manager& session_manager;
       Credentials_Manager& creds;
 
       std::vector<std::string> m_possible_protocols;

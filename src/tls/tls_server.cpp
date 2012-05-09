@@ -192,10 +192,9 @@ Server::Server(std::tr1::function<void (const byte[], size_t)> output_fn,
                const Policy& policy,
                RandomNumberGenerator& rng,
                const std::vector<std::string>& next_protocols) :
-   Channel(output_fn, proc_fn, handshake_fn),
+   Channel(output_fn, proc_fn, handshake_fn, session_manager),
    policy(policy),
    rng(rng),
-   session_manager(session_manager),
    creds(creds),
    m_possible_protocols(next_protocols)
    {
@@ -299,7 +298,7 @@ void Server::process_handshake_msg(Handshake_Type type,
       const bool resuming =
          m_state->allow_session_resumption &&
          check_for_resume(session_info,
-                          session_manager,
+                          m_session_manager,
                           creds,
                           m_state->client_hello,
                           policy.session_ticket_lifetime());
@@ -349,7 +348,7 @@ void Server::process_handshake_msg(Handshake_Type type,
 
          if(!m_handshake_fn(session_info))
             {
-            session_manager.remove_entry(session_info.session_id());
+            m_session_manager.remove_entry(session_info.session_id());
 
             if(m_state->server_hello->supports_session_ticket()) // send an empty ticket
                m_state->new_session_ticket = new New_Session_Ticket(m_writer, m_state->hash);
@@ -590,7 +589,7 @@ void Server::process_handshake_msg(Handshake_Type type,
                catch(...) {}
                }
             else
-               session_manager.save(session_info);
+               m_session_manager.save(session_info);
             }
 
          if(m_state->server_hello->supports_session_ticket() && !m_state->new_session_ticket)

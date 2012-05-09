@@ -27,10 +27,9 @@ Client::Client(std::tr1::function<void (const byte[], size_t)> output_fn,
                RandomNumberGenerator& rng,
                const std::string& hostname,
                std::tr1::function<std::string (std::vector<std::string>)> next_protocol) :
-   Channel(output_fn, proc_fn, handshake_fn),
+   Channel(output_fn, proc_fn, handshake_fn, session_manager),
    policy(policy),
    rng(rng),
-   session_manager(session_manager),
    creds(creds),
    m_hostname(hostname)
    {
@@ -48,7 +47,7 @@ Client::Client(std::tr1::function<void (const byte[], size_t)> output_fn,
    if(hostname != "")
       {
       Session session_info;
-      if(session_manager.load_from_host_info(hostname, 0, session_info))
+      if(m_session_manager.load_from_host_info(hostname, 0, session_info))
          {
          if(session_info.srp_identifier() == srp_identifier)
             {
@@ -98,7 +97,7 @@ void Client::renegotiate(bool force_full_renegotiation)
    if(!force_full_renegotiation)
       {
       Session session_info;
-      if(session_manager.load_from_host_info(m_hostname, 0, session_info))
+      if(m_session_manager.load_from_host_info(m_hostname, 0, session_info))
          {
          m_state->client_hello = new Client_Hello(
             m_writer,
@@ -469,9 +468,9 @@ void Client::process_handshake_msg(Handshake_Type type,
          );
 
       if(m_handshake_fn(session_info))
-         session_manager.save(session_info);
+         m_session_manager.save(session_info);
       else
-         session_manager.remove_entry(session_info.session_id());
+         m_session_manager.remove_entry(session_info.session_id());
 
       delete m_state;
       m_state = 0;

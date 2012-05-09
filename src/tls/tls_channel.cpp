@@ -18,11 +18,13 @@ namespace TLS {
 
 Channel::Channel(std::tr1::function<void (const byte[], size_t)> socket_output_fn,
                  std::tr1::function<void (const byte[], size_t, Alert)> proc_fn,
-                 std::tr1::function<bool (const Session&)> handshake_complete) :
+                 std::tr1::function<bool (const Session&)> handshake_complete,
+                 Session_Manager& session_manager) :
    m_proc_fn(proc_fn),
    m_handshake_fn(handshake_complete),
    m_writer(socket_output_fn),
    m_state(0),
+   m_session_manager(session_manager),
    m_handshake_completed(false),
    m_connection_closed(false),
    m_peer_supports_heartbeats(false),

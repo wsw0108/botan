@@ -12,6 +12,7 @@
 #include <botan/tls_record.h>
 #include <botan/tls_session.h>
 #include <botan/tls_alert.h>
+#include <botan/tls_session_manager.h>
 #include <botan/x509cert.h>
 #include <vector>
 
@@ -78,7 +79,8 @@ class BOTAN_DLL Channel
 
       Channel(std::tr1::function<void (const byte[], size_t)> socket_output_fn,
               std::tr1::function<void (const byte[], size_t, Alert)> proc_fn,
-              std::tr1::function<bool (const Session&)> handshake_complete);
+              std::tr1::function<bool (const Session&)> handshake_complete,
+              Session_Manager& session_manager);
 
       virtual ~Channel();
    protected:
@@ -141,6 +143,9 @@ class BOTAN_DLL Channel
          };
 
       Secure_Renegotiation_State m_secure_renegotiation;
+
+      Session_Manager& m_session_manager;
+      Session m_current_session;
 
       bool m_handshake_completed;
       bool m_connection_closed;
