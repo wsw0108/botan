@@ -5,21 +5,19 @@
 */
 
 #include "tests.h"
-#include "test_pubkey.h"
 
 #if defined(BOTAN_HAS_NYBERG_RUEPPEL)
-  #include <botan/nr.h>
-  #include <botan/pubkey.h>
-  #include <botan/dl_group.h>
-#endif
+
+#include "test_pubkey.h"
 
 #include <botan/hex.h>
+#include <botan/nr.h>
+#include <botan/pubkey.h>
+#include <botan/dl_group.h>
 #include <iostream>
 #include <fstream>
 
 using namespace Botan;
-
-#if defined(BOTAN_HAS_NYBERG_RUEPPEL)
 
 namespace {
 
@@ -51,22 +49,24 @@ size_t nr_sig_kat(const std::string& p,
    }
 
 }
-#endif
 
 size_t test_nr()
    {
    size_t fails = 0;
 
-#if defined(BOTAN_HAS_NYBERG_RUEPPEL)
-   std::ifstream nr_sig(PK_TEST_DATA_DIR "/nr.vec");
+   std::ifstream nr_sig(TEST_DATA_DIR_PK "/nr.vec");
 
    fails += run_tests_bb(nr_sig, "NR Signature", "Signature", true,
              [](std::map<std::string, std::string> m) -> size_t
              {
              return nr_sig_kat(m["P"], m["Q"], m["G"], m["X"], m["Hash"], m["Msg"], m["Nonce"], m["Signature"]);
              });
-#endif
 
    return fails;
    }
 
+#else
+
+SKIP_TEST(nr);
+
+#endif // BOTAN_HAS_NYBERG_RUEPPEL

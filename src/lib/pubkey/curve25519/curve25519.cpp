@@ -24,7 +24,7 @@ secure_vector<byte> curve25519(const secure_vector<byte>& secret,
                                const byte pubval[32])
    {
    secure_vector<byte> out(32);
-   const int rc = curve25519_donna(&out[0], &secret[0], &pubval[0]);
+   const int rc = curve25519_donna(out.data(), secret.data(), pubval);
    BOTAN_ASSERT_EQUAL(rc, 0, "Return value of curve25519_donna is ok");
    return out;
    }
@@ -126,7 +126,7 @@ class Curve25519_KA_Operation : public PK_Ops::Key_Agreement_with_KDF
          PK_Ops::Key_Agreement_with_KDF(kdf),
          m_key(key) {}
 
-      secure_vector<byte> raw_agree(const byte w[], size_t w_len)
+      secure_vector<byte> raw_agree(const byte w[], size_t w_len) override
          {
          return m_key.agree(w, w_len);
          }

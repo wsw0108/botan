@@ -6,6 +6,9 @@
 */
 
 #include "apps.h"
+
+#if defined(BOTAN_HAS_CODEC_FILTERS)
+
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -21,10 +24,10 @@ int base64(int argc, char* argv[])
    if(argc < 2)
       {
       std::cout << "Usage: " << argv[0] << " [-w] [-c n] [-e|-d] files...\n"
-                   "   -e  : Encode input to base64 strings (default) \n"
+                   "   -e  : Encode input to base64 strings (default)\n"
                    "   -d  : Decode base64 input\n"
                    "   -w  : Wrap lines\n"
-                   "   -c n: Wrap lines at column n, default 78\n";
+                   "   -c n: Wrap lines at column n, default 78" << std::endl;
       return 1;
       }
 
@@ -59,7 +62,7 @@ int base64(int argc, char* argv[])
       {
       std::istream* stream;
       if(files[j] == "-") stream = &std::cin;
-      else                stream = new std::ifstream(files[j].c_str());
+      else                stream = new std::ifstream(files[j]);
 
       if(!*stream)
          {
@@ -88,3 +91,4 @@ int base64(int argc, char* argv[])
 REGISTER_APP(base64);
 
 }
+#endif // BOTAN_HAS_CODEC_FILTERS

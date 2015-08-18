@@ -1,12 +1,15 @@
 # Compiler Options
-CXX            = %{cc}
+CXX            = %{cxx}
+LINKER         = %{linker}
 LIB_OPT        = %{lib_opt}
 APP_OPT        = %{app_opt}
 LANG_FLAGS     = %{lang_flags}
 WARN_FLAGS     = %{warn_flags}
 SO_OBJ_FLAGS   = %{shared_flags}
 
-LIB_LINK_CMD   = %{so_link}
+LIB_LINK_CMD   = %{lib_link_cmd}
+APP_LINK_CMD   = %{app_link_cmd}
+TEST_LINK_CMD  = %{test_link_cmd}
 
 LIB_LINKS_TO   = %{link_to}
 APP_LINKS_TO   = $(LIB_LINKS_TO)
@@ -17,3 +20,6 @@ APP_FLAGS      = $(LANG_FLAGS) $(APP_OPT) $(WARN_FLAGS)
 TEST_FLAGS     = $(LANG_FLAGS) $(APP_OPT) $(WARN_FLAGS)
 
 SCRIPTS_DIR    = %{scripts_dir}
+
+APP_POST_LINK_CMD  = %{app_post_link_cmd}
+TEST_POST_LINK_CMD = %{test_post_link_cmd}

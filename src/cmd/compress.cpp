@@ -6,6 +6,8 @@
 
 #include "apps.h"
 
+#if defined(BOTAN_HAS_COMPRESSION)
+
 #include <botan/compression.h>
 #include <fstream>
 
@@ -37,16 +39,16 @@ int compress(int argc, char* argv[])
    {
    if(argc != 2 && argc != 3 && argc != 4)
       {
-      std::cout << "Usage: " << argv[0] << " input [type] [level]\n";
+      std::cout << "Usage: " << argv[0] << " input [type] [level]" << std::endl;
       return 1;
       }
 
    const std::string in_file = argv[1];
-   std::ifstream in(in_file.c_str());
+   std::ifstream in(in_file);
 
    if(!in.good())
       {
-      std::cout << "Couldn't read " << in_file << "\n";
+      std::cout << "Couldn't read " << in_file << std::endl;
       return 1;
       }
 
@@ -57,12 +59,12 @@ int compress(int argc, char* argv[])
 
    if(!compress)
       {
-      std::cout << suffix << " compression not supported\n";
+      std::cout << suffix << " compression not supported" << std::endl;
       return 1;
       }
 
    const std::string out_file = in_file + "." + suffix;
-   std::ofstream out(out_file.c_str());
+   std::ofstream out(out_file);
 
    do_compress(*compress, in, out);
 
@@ -83,25 +85,31 @@ void parse_extension(const std::string& in_file,
 
 int uncompress(int argc, char* argv[])
    {
+   if(argc != 2)
+      {
+      std::cout << "Usage: " << argv[0] << " <file>" << std::endl;
+      return 1;
+      }
+
    const std::string in_file = argv[1];
-   std::ifstream in(in_file.c_str());
+   std::ifstream in(in_file);
 
    if(!in.good())
       {
-      std::cout << "Couldn't read " << argv[1] << "\n";
+      std::cout << "Couldn't read '" << argv[1] << "'" << std::endl;
       return 1;
       }
 
    std::string out_file, suffix;
    parse_extension(in_file, out_file, suffix);
 
-   std::ofstream out(out_file.c_str());
+   std::ofstream out(out_file);
 
    std::unique_ptr<Transform> decompress(make_decompressor(suffix));
 
    if(!decompress)
       {
-      std::cout << suffix << " decompression not supported\n";
+      std::cout << suffix << " decompression not supported" << std::endl;
       return 1;
       }
 
@@ -114,3 +122,5 @@ REGISTER_APP(compress);
 REGISTER_APP(uncompress);
 
 }
+
+#endif // BOTAN_HAS_COMPRESSION

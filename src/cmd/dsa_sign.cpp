@@ -10,6 +10,7 @@
 
 #include <botan/dsa.h>
 #include <botan/pubkey.h>
+#include <botan/pkcs8.h>
 #include <botan/base64.h>
 #include <fstream>
 
@@ -39,7 +40,7 @@ int dsa_sign(int argc, char* argv[])
          }
 
       std::string outfile = argv[2] + SUFFIX;
-      std::ofstream sigfile(outfile.c_str());
+      std::ofstream sigfile(outfile);
       if(!sigfile)
          {
          std::cout << "Couldn't write the signature to "
@@ -57,7 +58,7 @@ int dsa_sign(int argc, char* argv[])
 
       if(!dsakey)
          {
-         std::cout << "The loaded key is not a DSA key!\n";
+         std::cout << "The loaded key is not a DSA key!" << std::endl;
          return 1;
          }
 
@@ -68,7 +69,7 @@ int dsa_sign(int argc, char* argv[])
       while(size_t got = in.read(buf, sizeof(buf)))
          signer.update(buf, got);
 
-      sigfile << base64_encode(signer.signature(rng)) << "\n";
+      sigfile << base64_encode(signer.signature(rng)) << std::endl;
    }
    catch(std::exception& e)
       {

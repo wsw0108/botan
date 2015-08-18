@@ -7,4 +7,6 @@ posix_mlock
 gmtime_r
 dlopen
 readdir
+getsid
+timegm
 </target_features>

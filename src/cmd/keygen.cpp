@@ -5,11 +5,16 @@
 */
 
 #include "apps.h"
+
+#if defined(BOTAN_HAS_PUBLIC_KEY_CRYPTO) && defined(BOTAN_HAS_X509_CERTIFICATES)
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <cstdlib>
 #include <memory>
+#include <botan/pk_keys.h>
+#include <botan/pkcs8.h>
 
 #if defined(BOTAN_HAS_RSA)
 #include <botan/rsa.h>
@@ -76,11 +81,12 @@ Private_Key* gen_key(RandomNumberGenerator& rng, const std::string& algo, size_t
 
 int keygen(int argc, char* argv[])
    {
+   BOTAN_UNUSED(argc);
    OptionParser opts("algo=|bits=|passphrase=|pbe=");
    opts.parse(argv);
 
    const std::string algo = opts.value_or_else("algo", "rsa");
-   const size_t bits = opts.int_value_or_else("bits", 1024);
+   const size_t bits = opts.int_value_or_else("bits", 2048);
    const std::string pass = opts.value_or_else("passphrase", "");
    const std::string pbe = opts.value_or_else("pbe", "");
 
@@ -106,7 +112,7 @@ int keygen(int argc, char* argv[])
       else
          priv << PKCS8::PEM_encode(*key, rng, pass, std::chrono::milliseconds(300), pbe);
 
-      std::cout << "Wrote " << bits << " bit " << algo << " key to public.pem / private.pem\n";
+      std::cout << "Wrote " << bits << " bit " << algo << " key to public.pem / private.pem" << std::endl;
       }
    catch(std::exception& e)
       {
@@ -119,3 +125,5 @@ int keygen(int argc, char* argv[])
 REGISTER_APP(keygen);
 
 }
+
+#endif // BOTAN_HAS_PUBLIC_KEY_CRYPTO && BOTAN_HAS_X509_CERTIFICATES

@@ -7,7 +7,9 @@
 #include "apps.h"
 
 #if defined(BOTAN_HAS_X509_CERTIFICATES)
+
 #include <botan/x509_ca.h>
+#include <botan/pkcs8.h>
 
 namespace {
 

@@ -4,21 +4,20 @@
 * Botan is released under the Simplified BSD License (see license.txt)
 */
 
+#include "apps.h"
+
+#if defined(BOTAN_HAS_PUBLIC_KEY_CRYPTO)
+
 #include "speed.h"
 #include "timer.h"
 
-#include <botan/pkcs8.h>
-#include <botan/mem_ops.h>
-#include <botan/parsing.h>
-#include <botan/oids.h>
 #include <map>
 #include <sstream>
-
-#if defined(BOTAN_HAS_PUBLIC_KEY_CRYPTO)
-  #include <botan/x509_key.h>
-  #include <botan/pkcs8.h>
-  #include <botan/pubkey.h>
-#endif
+#include <botan/mem_ops.h>
+#include <botan/parsing.h>
+#include <botan/pkcs8.h>
+#include <botan/pubkey.h>
+#include <botan/x509_key.h>
 
 #if defined(BOTAN_HAS_RSA)
   #include <botan/rsa.h>
@@ -48,7 +47,7 @@
   #include <botan/elgamal.h>
 #endif
 
-#if defined(BOTAN_HAS_DLIES)
+#if defined(BOTAN_HAS_DLIES) && defined(BOTAN_HAS_KDF2)
   #include <botan/dlies.h>
   #include <botan/kdf2.h>
   #include <botan/hmac.h>
@@ -138,7 +137,7 @@ void benchmark_enc_dec(PK_Encryptor& enc, PK_Decryptor& dec,
 
          if(plaintext_out != plaintext)
             { // has never happened...
-            std::cerr << "Contents mismatched on decryption during benchmark!\n";
+            std::cerr << "Contents mismatched on decryption during benchmark!" << std::endl;
             }
          }
       }
@@ -173,7 +172,7 @@ void benchmark_sig_ver(PK_Verifier& ver, PK_Signer& sig,
          verify_timer.stop();
 
          if(!verified)
-            std::cerr << "Signature verification failure\n";
+            std::cerr << "Signature verification failure" << std::endl;
 
          if((i % 100) == 0)
             {
@@ -184,7 +183,7 @@ void benchmark_sig_ver(PK_Verifier& ver, PK_Signer& sig,
             verify_timer.stop();
 
             if(verified_bad)
-               std::cerr << "Signature verification failure (bad sig OK)\n";
+               std::cerr << "Signature verification failure (bad sig OK)" << std::endl;
             }
          }
       }
@@ -265,7 +264,7 @@ void benchmark_rsa(RandomNumberGenerator& rng,
          }
       catch(Exception& e)
          {
-         std::cout << e.what() << "\n";
+         std::cout << e.what() << std::endl;
          }
       }
 
@@ -447,7 +446,7 @@ void benchmark_ecdh(RandomNumberGenerator& rng,
             kex_timer.stop();
 
             if(secret1 != secret2)
-               std::cerr << "ECDH secrets did not match\n";
+               std::cerr << "ECDH secrets did not match" << std::endl;
             }
          }
 
@@ -545,7 +544,7 @@ void benchmark_curve25519(RandomNumberGenerator& rng,
          kex_timer.stop();
 
          if(secret1 != secret2)
-            std::cerr << "Curve25519 secrets did not match\n";
+            std::cerr << "Curve25519 secrets did not match" << std::endl;
          }
       }
 
@@ -604,7 +603,7 @@ void benchmark_dh(RandomNumberGenerator& rng,
             kex_timer.stop();
 
             if(secret1 != secret2)
-               std::cerr << "DH secrets did not match\n";
+               std::cerr << "DH secrets did not match" << std::endl;
             }
          }
 
@@ -615,7 +614,7 @@ void benchmark_dh(RandomNumberGenerator& rng,
    }
 #endif
 
-#if defined(BOTAN_HAS_DIFFIE_HELLMAN) && defined(BOTAN_HAS_DLIES)
+#if defined(BOTAN_HAS_DIFFIE_HELLMAN) && defined(BOTAN_HAS_DLIES) && defined(BOTAN_HAS_KDF2)
 void benchmark_dlies(RandomNumberGenerator& rng,
                      double seconds,
                      Benchmark_Report& report)
@@ -851,7 +850,7 @@ void bench_pk(RandomNumberGenerator& rng,
       benchmark_dh(rng, seconds, report);
 #endif
 
-#if defined(BOTAN_HAS_DIFFIE_HELLMAN) && defined(BOTAN_HAS_DLIES)
+#if defined(BOTAN_HAS_DIFFIE_HELLMAN) && defined(BOTAN_HAS_DLIES) && defined(BOTAN_HAS_KDF2)
    if(algo == "All" || algo == "DLIES")
       benchmark_dlies(rng, seconds, report);
 #endif
@@ -876,3 +875,4 @@ void bench_pk(RandomNumberGenerator& rng,
       benchmark_mce(rng, seconds, report);
 #endif
    }
+#endif // BOTAN_HAS_PUBLIC_KEY_CRYPTO

@@ -45,9 +45,10 @@ mceies_encrypt(const McEliece_PublicKey& pubkey,
 
    BOTAN_ASSERT(mce_ciphertext.size() == mce_code_bytes, "Unexpected size");
 
-   std::unique_ptr<AEAD_Mode> aead(get_aead("AES-256/OCB", ENCRYPTION));
+   const std::string algo = "AES-256/OCB";
+   std::unique_ptr<AEAD_Mode> aead(get_aead(algo, ENCRYPTION));
    if(!aead)
-      throw std::runtime_error("mce_encrypt unable to create AEAD instance");
+      throw std::runtime_error("mce_encrypt unable to create AEAD instance '" + algo + "'");
 
    const size_t nonce_len = aead->default_nonce_length();
 
@@ -57,9 +58,9 @@ mceies_encrypt(const McEliece_PublicKey& pubkey,
    const secure_vector<byte> nonce = rng.random_vec(nonce_len);
 
    secure_vector<byte> msg(mce_ciphertext.size() + nonce.size() + pt.size());
-   copy_mem(&msg[0], &mce_ciphertext[0], mce_ciphertext.size());
-   copy_mem(&msg[mce_ciphertext.size()], &nonce[0], nonce.size());
-   copy_mem(&msg[mce_ciphertext.size() + nonce.size()], &pt[0], pt.size());
+   copy_mem(msg.data(), mce_ciphertext.data(), mce_ciphertext.size());
+   copy_mem(msg.data() + mce_ciphertext.size(), nonce.data(), nonce.size());
+   copy_mem(msg.data() + mce_ciphertext.size() + nonce.size(), pt.data(), pt.size());
 
    aead->start(nonce);
    aead->finish(msg, mce_ciphertext.size() + nonce.size());
@@ -77,21 +78,23 @@ mceies_decrypt(const McEliece_PrivateKey& privkey,
 
       const size_t mce_code_bytes = (privkey.get_code_length() + 7) / 8;
 
-      std::unique_ptr<AEAD_Mode> aead(get_aead("AES-256/OCB", DECRYPTION));
+
+      const std::string algo = "AES-256/OCB";
+      std::unique_ptr<AEAD_Mode> aead(get_aead(algo, DECRYPTION));
       if(!aead)
-         throw std::runtime_error("Unable to create AEAD instance");
+         throw std::runtime_error("Unable to create AEAD instance '" + algo + "'");
 
       const size_t nonce_len = aead->default_nonce_length();
 
       if(ct.size() < mce_code_bytes + nonce_len + aead->tag_size())
          throw std::runtime_error("Input message too small to be valid");
 
-      const secure_vector<byte> mce_key = kem_op.decrypt(&ct[0], mce_code_bytes);
+      const secure_vector<byte> mce_key = kem_op.decrypt(ct.data(), mce_code_bytes);
 
       aead->set_key(aead_key(mce_key, *aead));
       aead->set_associated_data(ad, ad_len);
 
-      secure_vector<byte> pt(&ct[mce_code_bytes + nonce_len], &ct[ct.size()]);
+      secure_vector<byte> pt(ct.begin() + mce_code_bytes + nonce_len, ct.end());
 
       aead->start(&ct[mce_code_bytes], nonce_len);
       aead->finish(pt, 0);

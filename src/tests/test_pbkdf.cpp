@@ -6,6 +6,8 @@
 
 #include "tests.h"
 
+#if defined(BOTAN_HAS_PBKDF)
+
 #include <botan/pbkdf.h>
 #include <botan/lookup.h>
 #include <botan/hex.h>
@@ -29,11 +31,17 @@ size_t test_pbkdf()
              const std::string pass = vec["Passphrase"];
 
              const auto key = pbkdf->derive_key(outlen, pass,
-                                                &salt[0], salt.size(),
+                                                salt.data(), salt.size(),
                                                 iterations).bits_of();
              return hex_encode(key);
              });
       };
 
-   return run_tests_in_dir(TEST_DATA_DIR "pbkdf", test);
+   return run_tests_in_dir(TEST_DATA_DIR "/pbkdf", test);
    }
+
+#else
+
+SKIP_TEST(pbkdf);
+
+#endif // BOTAN_HAS_PBKDF

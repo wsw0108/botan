@@ -1,0 +1,40 @@
+Makefile*
+libbotan*.so.*
+*.a
+*.so
+*.exp
+*.lib
+*.dll
+*.exe
+*.manifest
+build
+build.log
+botan
+botan-test
+
+# Text file backups (e.g. gedit, joe)
+*~
+\#*\#
+.\#*
+
+# Patch files
+*.patch
+*.diff
+*.orig
+*.rej
+
+# Python cache
+*.pyc
+
+# Amalgamation code
+botan_all.h
+botan_all_internal.h
+botan_all.cpp
+botan_all_*.cpp
+
+# Coverage output
+coverage.info
+coverage/
+
+# Test output
+src/tests/outdata/*.pem

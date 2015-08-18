@@ -149,14 +149,14 @@ McEliece_PrivateKey generate_mceliece_key( RandomNumberGenerator & rng, u32bit e
    //
    //
    std::vector<u32bit> H(bit_size_to_32bit_size(codimension) * code_length );
-   u32bit* sk = &H[0];
+   u32bit* sk = H.data();
    for (i = 0; i < code_length; ++i)
       {
       for (l = 0; l < t; ++l)
          {
          k = (l * ext_deg) / 32;
          j = (l * ext_deg) % 32;
-         sk[k] ^= F[i].get_coef( l) << j;
+         sk[k] ^= static_cast<u32bit>(F[i].get_coef(l)) << j;
          if (j + ext_deg > 32)
             {
             sk[k + 1] ^= F[i].get_coef( l) >> (32 - j);

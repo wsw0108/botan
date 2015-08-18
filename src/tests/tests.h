@@ -1,5 +1,6 @@
 /*
 * (C) 2014,2015 Jack Lloyd
+* (C) 2015 Simon Warta (Kullo GmbH)
 *
 * Botan is released under the Simplified BSD License (see license.txt)
 */
@@ -7,12 +8,14 @@
 #ifndef BOTAN_TESTS_H__
 #define BOTAN_TESTS_H__
 
+#include <botan/build.h>
 #include <botan/rng.h>
 #include <functional>
 #include <istream>
 #include <map>
 #include <string>
 #include <vector>
+#include <iostream>
 
 Botan::RandomNumberGenerator& test_rng();
 
@@ -39,14 +42,16 @@ size_t run_tests_in_dir(const std::string& dir, std::function<size_t (const std:
 // Run a list of tests
 typedef std::function<size_t ()> test_fn;
 
-size_t run_tests(const std::vector<test_fn>& tests);
+size_t run_tests(const std::vector<std::pair<std::string, test_fn>>& tests);
 void test_report(const std::string& name, size_t ran, size_t failed);
 
 #define TEST(expr, msg) do { if(!(expr)) { ++fails; std::cout << msg; } while(0)
 
-#define LIB_SRC_DIR "lib/"
-#define TEST_DATA_DIR "src/tests/data/"
-#define PK_TEST_DATA_DIR "src/tests/data/pubkey"
+#define TEST_DATA_DIR     "src/tests/data"
+#define TEST_DATA_DIR_PK  "src/tests/data/pubkey"
+#define TEST_DATA_DIR_ECC "src/tests/data/ecc"
+
+#define TEST_OUTDATA_DIR  "src/tests/outdata"
 
 int test_main(int argc, char* argv[]);
 
@@ -101,5 +106,34 @@ size_t test_nist_x509();
 
 size_t test_srp6();
 size_t test_compression();
+
+size_t test_fuzzer();
+
+#define SKIP_TEST(testname) \
+   size_t test_ ## testname() {                                    \
+      std::cout << "Skipping tests: " << # testname  << std::endl; \
+      return 0; \
+   } \
+
+/*
+ * Warn if a test requires loading more modules than necessary to build
+ * the lib. E.g.
+ *    $ ./configure.py --no-autoload --enable-modules='ocb'
+ *    $ make
+ *    $ ./botan-test ocb
+ * warns the user whereas 
+ *    $ ./configure.py --no-autoload --enable-modules='ocb,aes'
+ *    $ make
+ *    $ ./botan-test ocb
+ * runs the test.
+ */
+#define UNTESTED_WARNING(testname) \
+   size_t test_ ## testname() {                                       \
+      std::cout << "Skipping tests: " << # testname << std::endl;     \
+      std::cout << "WARNING: " << # testname << " has been compiled " \
+                << "but is not tested due to other missing modules."  \
+                << std::endl; \
+      return 0; \
+   } \
 
 #endif

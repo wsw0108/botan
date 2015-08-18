@@ -6,6 +6,8 @@
 
 #include "tests.h"
 
+#if defined(BOTAN_HAS_AEAD_MODES)
+
 #include <botan/hex.h>
 #include <botan/aead.h>
 #include <iostream>
@@ -31,7 +33,7 @@ size_t aead_test(const std::string& algo,
    std::unique_ptr<Cipher_Mode> dec(get_aead(algo, DECRYPTION));
 
    if(!enc || !dec)
-      throw std::runtime_error("Unknown AEAD " + algo);
+      throw std::runtime_error("Unknown AEAD '" + algo + "'");
 
    enc->set_key(key);
    dec->set_key(key);
@@ -141,5 +143,11 @@ size_t test_aead()
              });
       };
 
-   return run_tests_in_dir(TEST_DATA_DIR "aead", test);
+   return run_tests_in_dir(TEST_DATA_DIR "/aead", test);
    }
+
+#else
+
+SKIP_TEST(aead);
+
+#endif // BOTAN_HAS_AEAD_MODES

@@ -2,6 +2,7 @@
 
 """
 Botan install script
+
 (C) 2014,2015 Jack Lloyd
 
 Botan is released under the Simplified BSD License (see license.txt)
@@ -14,11 +15,6 @@ import os
 import shutil
 import string
 import sys
-
-if 'dont_write_bytecode' in sys.__dict__:
-    sys.dont_write_bytecode = True
-
-import combine_relnotes
 
 def parse_command_line(args):
 
@@ -145,7 +141,7 @@ def main(args = None):
     copy_file(os.path.join(out_dir, static_lib),
               os.path.join(lib_dir, os.path.basename(static_lib)))
 
-    if bool(cfg['with_shared_lib']):
+    if bool(cfg['build_shared_lib']):
         if str(cfg['os']) == "windows":
             shared_lib = process_template('%{lib_prefix}%{libname}.%{so_suffix}') # botan.dll
             copy_executable(os.path.join(out_dir, shared_lib),
@@ -201,8 +197,7 @@ def main(args = None):
     for f in [f for f in os.listdir(cfg['doc_dir']) if f.endswith('.txt')]:
         copy_file(os.path.join(cfg['doc_dir'], f), os.path.join(target_doc_dir, f))
 
-    with combine_relnotes.open_for_utf8(os.path.join(target_doc_dir, 'news.txt'), 'w+') as news:
-        news.write(combine_relnotes.combine_relnotes('doc/relnotes', False))
+    copy_file(os.path.join(cfg['doc_dir'], 'news.rst'), os.path.join(target_doc_dir, 'news.txt'))
 
     logging.info('Botan %s installation complete', cfg['version'])
 

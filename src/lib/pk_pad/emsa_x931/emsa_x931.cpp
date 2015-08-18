@@ -7,6 +7,7 @@
 
 #include <botan/internal/pad_utils.h>
 #include <botan/emsa_x931.h>
+#include <botan/hash_id.h>
 
 namespace Botan {
 
@@ -35,7 +36,7 @@ secure_vector<byte> emsa2_encoding(const secure_vector<byte>& msg,
    output[0] = (empty_input ? 0x4B : 0x6B);
    output[output_length - 3 - HASH_SIZE] = 0xBA;
    set_mem(&output[1], output_length - 4 - HASH_SIZE, 0xBB);
-   buffer_insert(output, output_length - (HASH_SIZE + 2), &msg[0], msg.size());
+   buffer_insert(output, output_length - (HASH_SIZE + 2), msg.data(), msg.size());
    output[output_length-2] = hash_id;
    output[output_length-1] = 0xCC;
 

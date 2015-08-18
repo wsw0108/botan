@@ -50,7 +50,7 @@ class BOTAN_DLL X509_Certificate : public X509_Object
 
       /**
       * Get a value for a specific subject_info parameter name.
-      * @param name the name of the paramter to look up. Possible names are
+      * @param name the name of the parameter to look up. Possible names are
       * "X509.Certificate.version", "X509.Certificate.serial",
       * "X509.Certificate.start", "X509.Certificate.end",
       * "X509.Certificate.v2.key_id", "X509.Certificate.public_key",
@@ -64,7 +64,7 @@ class BOTAN_DLL X509_Certificate : public X509_Object
 
       /**
       * Get a value for a specific subject_info parameter name.
-      * @param name the name of the paramter to look up. Possible names are
+      * @param name the name of the parameter to look up. Possible names are
       * "X509.Certificate.v2.key_id" or "X509v3.AuthorityKeyIdentifier".
       * @return value(s) of the specified parameter
       */
@@ -221,7 +221,7 @@ class BOTAN_DLL X509_Certificate : public X509_Object
       X509_Certificate(const std::vector<byte>& in);
 
    private:
-      void force_decode();
+      void force_decode() override;
       friend class X509_CA;
       friend class BER_Decoder;
 

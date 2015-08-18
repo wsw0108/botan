@@ -6,6 +6,8 @@
 
 #include "tests.h"
 
+#if defined(BOTAN_HAS_STREAM_CIPHER)
+
 #include <botan/stream_cipher.h>
 #include <botan/lookup.h>
 #include <botan/hex.h>
@@ -50,7 +52,7 @@ size_t stream_test(const std::string& algo,
       cipher->set_key(key);
 
       if(nonce.size())
-         cipher->set_iv(&nonce[0], nonce.size());
+         cipher->set_iv(nonce.data(), nonce.size());
 
       secure_vector<byte> buf = pt;
 
@@ -83,3 +85,9 @@ size_t test_stream()
 
    return run_tests_in_dir(TEST_DATA_DIR "/stream", test);
    }
+
+#else
+
+SKIP_TEST(stream);
+
+#endif // BOTAN_HAS_STREAM_CIPHER

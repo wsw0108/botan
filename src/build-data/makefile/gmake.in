@@ -1,6 +1,6 @@
 %{header_in}
 
-%{commands_in}
+%{gmake_commands_in}
 
 # Executable targets
 APP           = %{out_dir}/botan%{program_suffix}
@@ -31,28 +31,28 @@ all: $(APP) $(TEST)
 %{test_build_cmds}
 
 # Link Commands
-%{dso_in}
+%{gmake_dso_in}
 
 $(APP): $(LIBRARIES) $(APPOBJS)
-	$(CXX) $(LDFLAGS) $(APPOBJS) -L%{out_dir} -l%{libname} $(APP_LINKS_TO) -o $(APP)
+	$(APP_LINK_CMD) $(LDFLAGS) $(APPOBJS) -L%{out_dir} -l%{libname} $(APP_LINKS_TO) -o $(APP)
+	$(APP_POST_LINK_CMD)
 
 $(TEST): $(LIBRARIES) $(TESTOBJS)
-	$(CXX) $(LDFLAGS) $(TESTOBJS) -L%{out_dir} -l%{libname} $(TEST_LINKS_TO) -o $(TEST)
+	$(TEST_LINK_CMD) $(LDFLAGS) $(TESTOBJS) -L%{out_dir} -l%{libname} $(TEST_LINKS_TO) -o $(TEST)
+	$(TEST_POST_LINK_CMD)
 
 $(STATIC_LIB): $(LIBOBJS)
 	$(RM) $(STATIC_LIB)
 	$(AR) $(STATIC_LIB) $(LIBOBJS)
 	$(RANLIB) $(STATIC_LIB)
 
-%{coverage_in}
+# Fake targets
+.PHONY = clean distclean docs install valgrind lcov
+
+%{gmake_coverage_in}
 
 SPHINX_CONFIG = %{sphinx_config_dir}
 SPHINX_OPTS = -b html
-
-WEBSITE_DIR=%{doc_output_dir}/website
-WEBSITE_SRC_DIR=%{doc_output_dir}/website-src
-
-.PHONY = clean distclean docs website install valgrind
 
 clean:
 	-$(RM) %{libobj_dir}/*
@@ -74,17 +74,3 @@ docs:
 
 install: $(APP) docs
 	$(SCRIPTS_DIR)/install.py --destdir=%{destdir} --build-dir="%{build_dir}" --bindir=%{bindir} --libdir=%{libdir} --docdir=%{docdir} --includedir=%{includedir}
-
-website:
-	rm -rf $(WEBSITE_SRC_DIR) $(WEBSITE_DIR)
-	mkdir -p $(WEBSITE_SRC_DIR)
-	cp -r %{doc_dir}/*.txt %{doc_dir}/*.rst %{doc_dir}/relnotes %{doc_dir}/website/*.rst $(WEBSITE_SRC_DIR)
-	./src/scripts/combine_relnotes.py %{doc_dir}/relnotes > $(WEBSITE_SRC_DIR)/news.rst
-	sphinx-build -c $(SPHINX_CONFIG) -b html $(WEBSITE_SRC_DIR) $(WEBSITE_DIR)
-	sphinx-build -c $(SPHINX_CONFIG) -b html %{doc_dir}/manual $(WEBSITE_DIR)/manual
-	rm -rf $(WEBSITE_DIR)/.doctrees
-	rm -rf $(WEBSITE_DIR)/manual/.doctrees
-	rm -f $(WEBSITE_DIR)/.buildinfo
-	rm -f $(WEBSITE_DIR)/manual/.buildinfo
-	doxygen %{build_dir}/botan.doxy
-	mv %{doc_output_dir}/doxygen $(WEBSITE_DIR)/doxygen

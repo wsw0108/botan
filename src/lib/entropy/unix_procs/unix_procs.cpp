@@ -72,7 +72,9 @@ void UnixProcessInfo_EntropySource::poll(Entropy_Accumulator& accum)
    accum.add(::getppid(), 0.0);
    accum.add(::getuid(),  0.0);
    accum.add(::getgid(),  0.0);
+#if defined(BOTAN_TARGET_OS_HAS_GETSID)
    accum.add(::getsid(0),  0.0);
+#endif
    accum.add(::getpgrp(), 0.0);
 
    struct ::rusage usage;
@@ -237,9 +239,9 @@ void Unix_EntropySource::poll(Entropy_Accumulator& accum)
 
          if(FD_ISSET(fd, &read_set))
             {
-            const ssize_t got = ::read(fd, &m_buf[0], m_buf.size());
+            const ssize_t got = ::read(fd, m_buf.data(), m_buf.size());
             if(got > 0)
-               accum.add(&m_buf[0], got, ENTROPY_ESTIMATE);
+               accum.add(m_buf.data(), got, ENTROPY_ESTIMATE);
             else
                proc.spawn(next_source());
             }

@@ -1,7 +1,22 @@
 language: cpp
 
+# BEGIN BUILD MATRIX
+#
+# Build matrix must be smaller on branch coverity_scan because quota allows
+# only 5 Coverity Scan jobs at once. Thus we have different versions of this
+# file on branch master and coverity_scan.
+#
+# Please keep this file as much in sync as possible to allow easy merging
+# from master into coverity_scan and only have differences in the build
+# matrix block.
+#
+# Check the difference as follows:
+#   $ git checkout master
+#   $ git checkout coverity_scan
+#   $ git difftool master coverity_scan .travis.yml
 os:
   - linux
+  - osx
 
 compiler:
   - clang
@@ -9,36 +24,59 @@ compiler:
 
 env:
   matrix:
-    - BUILD_MODE="shared"
-    - BUILD_MODE="static"
-    - BUILD_MODE="coverage"
+    - MODULES="all" BUILD_MODE="shared"
+    - MODULES="all" BUILD_MODE="static"
+    - MODULES="all" BUILD_MODE="coverage"
+    - MODULES="all" BUILD_MODE="sanitizer"
+
+    - MODULES="min" BUILD_MODE="shared"
+    - MODULES="min" BUILD_MODE="static"
 
 matrix:
   exclude:
+    - os: osx
+      compiler: gcc
     - compiler: clang
-      env: BUILD_MODE="coverage"
+      env: MODULES="all" BUILD_MODE="coverage"
+    - compiler: clang
+      env: MODULES="all" BUILD_MODE="sanitizer"
+    - compiler: clang
+      env: MODULES="min" BUILD_MODE="shared"
+    - compiler: clang
+      env: MODULES="min" BUILD_MODE="static"
+# END BUILD MATRIX
 
-before_install:
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq
+cache:
+  directories:
+    - $HOME/.ccache
 
 install:
-  - ./src/scripts/ci/setup.sh
+  - ./src/scripts/ci/install.sh
 
 script:
-  - ./src/scripts/ci/build.sh
+  - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then ./src/scripts/ci/build.sh ; fi
 
 after_success:
   - ./src/scripts/ci/after_success.sh
 
 notifications:
-  email: lloyd@randombit.net
+  email: botan-commits@lists.randombit.net
 
 addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - ccache
+    - g++-4.8
+    - libssl-dev
+    - libsqlite3-dev
+    - zlib1g-dev
+
   coverity_scan:
     project:
       name: "randombit/botan"
     notification_email: lloyd@randombit.net
-    build_command_prepend: "./configure.py"
-    build_command: "make -j4"
+    build_command_prepend: "./configure.py --cc-bin=/usr/bin/g++-4.8"
+    build_command: "make -j2"
     branch_pattern: coverity_scan

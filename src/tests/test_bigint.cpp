@@ -6,6 +6,10 @@
 
 #include "tests.h"
 
+#if defined(BOTAN_HAS_BIGINT)
+
+#if defined(BOTAN_HAS_NUMBERTHEORY)
+
 #include <vector>
 #include <string>
 #include <fstream>
@@ -13,14 +17,180 @@
 #include <cstdlib>
 #include <iterator>
 
-
+#include <sstream>
 #include <botan/bigint.h>
 #include <botan/exceptn.h>
 #include <botan/numthry.h>
+#include <botan/reducer.h>
+
+#if defined(BOTAN_HAS_EC_CURVE_GFP)
+#include <botan/curve_nistp.h>
+#endif
 
 using namespace Botan;
 
 namespace {
+
+class Test_State
+   {
+   public:
+      void started(const std::string& /*msg*/) { m_tests_run++; }
+
+      void test_ran(const char* msg);
+
+      void failure(const char* test, const std::string& what_failed)
+         {
+         std::cout << "FAIL " << test << " " << what_failed << "\n";
+         m_tests_failed++;
+         }
+
+      size_t ran() const { return m_tests_run; }
+      size_t failed() const { return m_tests_failed; }
+   private:
+      size_t m_tests_run = 0, m_tests_failed = 0;
+   };
+
+#define BOTAN_CONFIRM_NOTHROW(block) do {                              \
+   try { block }                                                        \
+   catch(std::exception& e) {                                           \
+      _test.failure(BOTAN_CURRENT_FUNCTION, e.what());  \
+   } } while(0)                                                         \
+
+#define BOTAN_TEST(lhs, rhs, msg) do {                                     \
+   _test.started(msg);                                                  \
+   BOTAN_CONFIRM_NOTHROW({                                              \
+      const auto lhs_val = lhs;                                         \
+      const auto rhs_val = rhs;                                         \
+      const bool cmp = lhs_val == rhs_val;                              \
+      if(!cmp)                                                          \
+         {                                                              \
+         std::ostringstream fmt;                                        \
+         fmt << "expr '" << #lhs << " == " << #rhs << "' false, "       \
+             << "actually " << lhs_val << " " << rhs_val                \
+             << " (" << msg << ")";                                     \
+         _test.failure(BOTAN_CURRENT_FUNCTION, fmt.str()); \
+         }                                                              \
+      });                                                               \
+   } while(0)
+
+#define BOTAN_TEST_CASE(name, descr, block) size_t test_ ## name() {     \
+   Test_State _test;                                                    \
+   BOTAN_CONFIRM_NOTHROW(block);                                           \
+   test_report(descr, _test.ran(), _test.failed());                     \
+   return _test.failed();                                   \
+   }
+
+BOTAN_TEST_CASE(bigint_to_u32bit, "BigInt to_u32bit", {
+   for(size_t i = 0; i != 32; ++i)
+      {
+      const u32bit in = 1 << i;
+      BOTAN_TEST(in, BigInt(in).to_u32bit(), "in range round trips");
+      }
+   });
+
+BigInt test_integer(RandomNumberGenerator& rng, size_t bits, BigInt max)
+   {
+   /*
+   Produces integers with long runs of ones and zeros, for testing for
+   carry handling problems.
+   */
+   BigInt x = 0;
+
+   auto flip_prob = [](size_t i) {
+      if(i % 64 == 0)
+         return .5;
+      if(i % 32 == 0)
+         return .4;
+      if(i % 8 == 0)
+         return .05;
+      return .01;
+   };
+
+   bool active = rng.next_byte() % 2;
+   for(size_t i = 0; i != bits; ++i)
+      {
+      x <<= 1;
+      x += static_cast<int>(active);
+
+      const double prob = flip_prob(i);
+      const double sample = double(rng.next_byte() % 100) / 100.0; // biased
+
+      if(sample < prob)
+         active = !active;
+      }
+
+   if(max > 0)
+      {
+      while(x >= max)
+         {
+         const size_t b = x.bits() - 1;
+         BOTAN_ASSERT(x.get_bit(b) == true, "Set");
+         x.clear_bit(b);
+         }
+      }
+
+   return x;
+   }
+
+#if defined(BOTAN_HAS_EC_CURVE_GFP)
+
+void nist_redc_test(Test_State& _test,
+                    const std::string& prime_name,
+                    const BigInt& p,
+                    std::function<void (BigInt&, secure_vector<word>&)> redc_fn)
+   {
+   auto& rng = test_rng();
+   const BigInt p2 = p*p;
+   const size_t trials = 100;
+   const size_t p_bits = p.bits();
+
+   Modular_Reducer p_redc(p);
+   secure_vector<word> ws;
+
+   for(size_t i = 0; i != trials; ++i)
+      {
+      const BigInt x = test_integer(rng, 2*p_bits, p2);
+
+      // TODO: time and report all three approaches
+      const BigInt v1 = x % p;
+      const BigInt v2 = p_redc.reduce(x);
+
+      BigInt v3 = x;
+      redc_fn(v3, ws);
+
+      BOTAN_TEST(v1, v2, "reference");
+      BOTAN_TEST(v2, v3, "specialized");
+
+      if(v1 != v2 || v2 != v3)
+         std::cout << "Prime " << prime_name << " input " << x << "\n";
+      }
+   }
+
+#if defined(BOTAN_HAS_NIST_PRIME_REDUCERS_W32)
+
+BOTAN_TEST_CASE(bigint_redc_p192, "P-192 reduction", {
+   nist_redc_test(_test, "P-192", prime_p192(), redc_p192);
+   });
+
+BOTAN_TEST_CASE(bigint_redc_p224, "P-224 reduction", {
+   nist_redc_test(_test, "P-224", prime_p224(), redc_p224);
+   });
+
+BOTAN_TEST_CASE(bigint_redc_p256, "P-256 reduction", {
+   nist_redc_test(_test, "P-256", prime_p256(), redc_p256);
+   });
+
+BOTAN_TEST_CASE(bigint_redc_p384, "P-384 reduction", {
+   nist_redc_test(_test, "P-384", prime_p384(), redc_p384);
+   });
+
+#endif
+
+BOTAN_TEST_CASE(bigint_redc_p521, "P-521 reduction", {
+   nist_redc_test(_test, "P-521", prime_p521(), redc_p521);
+   });
+
+#endif
 
 void strip_comments(std::string& line)
    {
@@ -288,7 +458,7 @@ size_t is_primetest(const std::vector<std::string>& args,
 size_t test_bigint()
    {
    const std::string filename = TEST_DATA_DIR "/mp_valid.dat";
-   std::ifstream test_data(filename.c_str());
+   std::ifstream test_data(filename);
 
    if(!test_data)
       throw Botan::Stream_IO_Error("Couldn't open test file " + filename);
@@ -342,9 +512,7 @@ size_t test_bigint()
 
       std::vector<std::string> substr = parse(line);
 
-#if DEBUG
-      std::cout << "Testing: " << algorithm << std::endl;
-#endif
+      // std::cout << "Testing: " << algorithm << std::endl;
 
       size_t new_errors = 0;
       if(algorithm.find("Addition") != std::string::npos)
@@ -379,6 +547,31 @@ size_t test_bigint()
                    << std::dec << alg_count << std::endl;
       }
 
+   total_errors += test_bigint_to_u32bit();
+
+#if defined(BOTAN_HAS_EC_CURVE_GFP)
+
+#if defined(BOTAN_HAS_NIST_PRIME_REDUCERS_W32)
+   total_errors += test_bigint_redc_p192();
+   total_errors += test_bigint_redc_p224();
+   total_errors += test_bigint_redc_p256();
+   total_errors += test_bigint_redc_p384();
+ #endif
+
+   total_errors += test_bigint_redc_p521();
+#endif
+
    return total_errors;
    }
 
+#else
+
+UNTESTED_WARNING(bigint);
+
+#endif // BOTAN_HAS_NUMBERTHEORY
+
+#else
+
+SKIP_TEST(bigint);
+
+#endif // BOTAN_HAS_BIGINT

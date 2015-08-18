@@ -6,6 +6,8 @@
 
 #include "apps.h"
 
+#if defined(BOTAN_HAS_ASN1) && defined(BOTAN_HAS_PEM_CODEC)
+
 #include <botan/bigint.h>
 #include <botan/hex.h>
 #include <botan/der_enc.h>
@@ -90,7 +92,7 @@ void emit(const std::string& type, size_t level, size_t length, const std::strin
       out << value;
       }
 
-   std::cout << out.str() << "\n";
+   std::cout << out.str() << std::endl;
    }
 
 std::string type_name(ASN1_Tag type)
@@ -308,7 +310,7 @@ void decode(BER_Decoder& decoder, size_t level)
          std::cout << "Unknown ASN.1 tag class="
                    << static_cast<int>(class_tag)
                    << " type="
-                   << static_cast<int>(type_tag) << "\n";
+                   << static_cast<int>(type_tag) << std::endl;
          }
 
       obj = decoder.get_next_object();
@@ -319,7 +321,7 @@ int asn1(int argc, char* argv[])
    {
    if(argc != 2)
       {
-      std::cout << "Usage: " << argv[0] << " <file>\n";
+      std::cout << "Usage: " << argv[0] << " <file>" << std::endl;
       return 1;
       }
 
@@ -340,7 +342,7 @@ int asn1(int argc, char* argv[])
    }
    catch(std::exception& e)
       {
-      std::cout << "Error: " << e.what() << "\n";
+      std::cout << "Error: " << e.what() << std::endl;
       return 2;
       }
 
@@ -350,3 +352,5 @@ int asn1(int argc, char* argv[])
 REGISTER_APP(asn1);
 
 }
+
+#endif // BOTAN_HAS_ASN1 && BOTAN_HAS_PEM_CODEC

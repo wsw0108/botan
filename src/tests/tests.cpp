@@ -8,11 +8,18 @@
 #include <iostream>
 #include <fstream>
 #include <botan/auto_rng.h>
-#include <botan/fs.h>
+#include <botan/internal/filesystem.h>
+
+#define CATCH_CONFIG_RUNNER
+#define CATCH_CONFIG_CONSOLE_WIDTH 60
+#define CATCH_CONFIG_COLOUR_NONE
+#include "catchy/catch.hpp"
 
 #if defined(BOTAN_HAS_SYSTEM_RNG)
   #include <botan/system_rng.h>
 #endif
+
+using namespace Botan;
 
 Botan::RandomNumberGenerator& test_rng()
    {
@@ -28,33 +35,50 @@ size_t run_tests_in_dir(const std::string& dir, std::function<size_t (const std:
    {
    size_t fails = 0;
 
-   for(auto vec: Botan::list_all_readable_files_in_or_under(dir))
-      fails += fn(vec);
+   try
+      {
+      auto files = get_files_recursive(dir);
+      
+      if (files.empty())
+         std::cout << "Warning: No test files found in '" << dir << "'" << std::endl;
+      
+      for(const auto file: files)
+         fails += fn(file);
+      }
+   catch(No_Filesystem_Access)
+      {
+      std::cout << "Warning: No filesystem access available to read test files in '" << dir << "'" << std::endl;
+      }
+
    return fails;
    }
 
-size_t run_tests(const std::vector<test_fn>& tests)
+size_t run_tests(const std::vector<std::pair<std::string, test_fn>>& tests)
    {
    size_t fails = 0;
 
-   for(auto& test : tests)
+   for(const auto& row : tests)
       {
+      auto name = row.first;
+      auto test = row.second;
       try
          {
          fails += test();
          }
       catch(std::exception& e)
          {
-         std::cout << "Exception escaped test: " << e.what() << std::endl;
+         std::cout << name << ": Exception escaped test: " << e.what() << std::endl;
          ++fails;
          }
       catch(...)
          {
-         std::cout << "Exception escaped test" << std::endl;
+         std::cout << name << ": Exception escaped test" << std::endl;
          ++fails;
          }
       }
 
+   // Summary for test suite
+   std::cout << "===============" << std::endl;
    test_report("Tests", 0, fails);
 
    return fails;
@@ -209,6 +233,17 @@ int help(char* argv0)
    return 1;
    }
 
+int test_catchy()
+   {
+   // drop arc and arv for now
+   int catchy_result = Catch::Session().run();
+   if (catchy_result != 0)
+      {
+      std::exit(EXIT_FAILURE);
+      }
+   return 0;
+   }
+
 }
 
 int main(int argc, char* argv[])
@@ -224,11 +259,14 @@ int main(int argc, char* argv[])
    if(target == "-h" || target == "--help" || target == "help")
       return help(argv[0]);
 
-   std::vector<test_fn> tests;
+   std::vector<std::pair<std::string, test_fn>> tests;
 
 #define DEF_TEST(test) do { if(target == "all" || target == #test) \
-      tests.push_back(test_ ## test);                              \
+      tests.push_back(std::make_pair(#test, test_ ## test));       \
    } while(0)
+
+   // unittesting framework in sub-folder tests/catchy
+   DEF_TEST(catchy);
 
    DEF_TEST(block);
    DEF_TEST(modes);
@@ -274,6 +312,7 @@ int main(int argc, char* argv[])
    DEF_TEST(nist_x509);
    DEF_TEST(tls);
    DEF_TEST(compression);
+   DEF_TEST(fuzzer);
 
    if(tests.empty())
       {

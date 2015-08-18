@@ -35,7 +35,6 @@ if is_website_build and use_disqus:
 files_dir = 'http://botan.randombit.net/releases'
 
 extlinks = {
-    'pr': ('http://bugs.randombit.net/show_bug.cgi?id=%s', 'PR '),
     'wikipedia': ('https://en.wikipedia.org/wiki/%s', ''),
     'botan-devel': ('http://lists.randombit.net/pipermail/botan-devel/%s.html', None),
 
@@ -113,8 +112,8 @@ html_theme_options = {
     'headercolor1': 'darkblue',
     'headercolor2': 'darkblue',
     'textalign': 'left',
-    'pagewidth': '80em',
-    'documentwidth': '60em'
+    'pagewidth': '70em',
+    'documentwidth': '50em'
     }
 
 # Add any paths that contain custom themes here, relative to this directory.

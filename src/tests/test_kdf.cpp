@@ -6,6 +6,8 @@
 
 #include "tests.h"
 
+#if defined(BOTAN_HAS_KDF_BASE)
+
 #include <botan/kdf.h>
 #include <botan/lookup.h>
 #include <botan/hex.h>
@@ -33,5 +35,11 @@ size_t test_kdf()
              });
       };
 
-   return run_tests_in_dir(TEST_DATA_DIR "kdf", test);
+   return run_tests_in_dir(TEST_DATA_DIR "/kdf", test);
    }
+
+#else
+
+SKIP_TEST(kdf);
+
+#endif // BOTAN_HAS_KDF_BASE

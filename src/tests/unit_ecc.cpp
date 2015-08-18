@@ -6,13 +6,12 @@
 
 #include "tests.h"
 
-#include <botan/hex.h>
-#include <iostream>
-#include <memory>
-
 #if defined(BOTAN_HAS_ECC_GROUP)
 
+#include <iostream>
+#include <memory>
 #include <botan/bigint.h>
+#include <botan/hex.h>
 #include <botan/numthry.h>
 #include <botan/curve_gfp.h>
 #include <botan/point_gfp.h>
@@ -75,9 +74,9 @@ size_t test_point_turn_on_sp_red_mul()
    std::vector<byte> sv_a_secp = hex_decode(a_secp);
    std::vector<byte> sv_b_secp = hex_decode(b_secp);
    std::vector<byte> sv_G_secp_comp = hex_decode(G_secp_comp);
-   BigInt bi_p_secp = BigInt::decode(&sv_p_secp[0], sv_p_secp.size());
-   BigInt bi_a_secp = BigInt::decode(&sv_a_secp[0], sv_a_secp.size());
-   BigInt bi_b_secp = BigInt::decode(&sv_b_secp[0], sv_b_secp.size());
+   BigInt bi_p_secp = BigInt::decode(sv_p_secp.data(), sv_p_secp.size());
+   BigInt bi_a_secp = BigInt::decode(sv_a_secp.data(), sv_a_secp.size());
+   BigInt bi_b_secp = BigInt::decode(sv_b_secp.data(), sv_b_secp.size());
    CurveGFp secp160r1(bi_p_secp, bi_a_secp, bi_b_secp);
    PointGFp p_G = OS2ECP(sv_G_secp_comp, secp160r1);
 
@@ -140,9 +139,9 @@ size_t test_coordinates()
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_comp = hex_decode ( G_secp_comp );
 
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
    CurveGFp secp160r1 (bi_p_secp, bi_a_secp, bi_b_secp);
    PointGFp p_G = OS2ECP ( sv_G_secp_comp, secp160r1 );
    PointGFp p0 = p_G;
@@ -218,9 +217,9 @@ size_t test_point_negative()
    std::vector<byte> sv_a_secp = hex_decode ( a_secp );
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_comp = hex_decode ( G_secp_comp );
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
    CurveGFp secp160r1(bi_p_secp, bi_a_secp, bi_b_secp);
    PointGFp p_G = OS2ECP ( sv_G_secp_comp, secp160r1 );
 
@@ -332,9 +331,9 @@ size_t test_add_point()
    std::vector<byte> sv_a_secp = hex_decode ( a_secp );
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_comp = hex_decode ( G_secp_comp );
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
    CurveGFp secp160r1(bi_p_secp, bi_a_secp, bi_b_secp);
    PointGFp p_G = OS2ECP ( sv_G_secp_comp, secp160r1 );
 
@@ -369,9 +368,9 @@ size_t test_sub_point()
    std::vector<byte> sv_a_secp = hex_decode ( a_secp );
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_comp = hex_decode ( G_secp_comp );
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
    CurveGFp secp160r1(bi_p_secp, bi_a_secp, bi_b_secp);
    PointGFp p_G = OS2ECP ( sv_G_secp_comp, secp160r1 );
 
@@ -405,9 +404,9 @@ size_t test_mult_point()
    std::vector<byte> sv_a_secp = hex_decode ( a_secp );
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_comp = hex_decode ( G_secp_comp );
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
    CurveGFp secp160r1(bi_p_secp, bi_a_secp, bi_b_secp);
    PointGFp p_G = OS2ECP ( sv_G_secp_comp, secp160r1 );
 
@@ -435,9 +434,9 @@ size_t test_basic_operations()
    std::vector<byte> sv_a_secp = hex_decode ( a_secp );
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_comp = hex_decode ( G_secp_comp );
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
    CurveGFp secp160r1(bi_p_secp, bi_a_secp, bi_b_secp);
 
    PointGFp p_G = OS2ECP ( sv_G_secp_comp, secp160r1 );
@@ -499,9 +498,9 @@ size_t test_enc_dec_compressed_160()
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_comp = hex_decode ( G_secp_comp );
 
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
 
    CurveGFp secp160r1(bi_p_secp, bi_a_secp, bi_b_secp);
 
@@ -528,9 +527,9 @@ size_t test_enc_dec_compressed_256()
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_comp = hex_decode ( G_secp_comp );
 
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
 
    CurveGFp curve(bi_p_secp, bi_a_secp, bi_b_secp);
 
@@ -559,9 +558,9 @@ size_t test_enc_dec_uncompressed_112()
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_uncomp = hex_decode ( G_secp_uncomp );
 
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
 
    CurveGFp curve(bi_p_secp, bi_a_secp, bi_b_secp);
 
@@ -588,17 +587,17 @@ size_t test_enc_dec_uncompressed_521()
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_uncomp = hex_decode ( G_secp_uncomp );
 
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
 
    CurveGFp curve(bi_p_secp, bi_a_secp, bi_b_secp);
 
    PointGFp p_G = OS2ECP ( sv_G_secp_uncomp, curve );
 
    std::vector<byte> sv_result = unlock(EC2OSP(p_G, PointGFp::UNCOMPRESSED));
-   std::string result = hex_encode(&sv_result[0], sv_result.size());
-   std::string exp_result = hex_encode(&sv_G_secp_uncomp[0], sv_G_secp_uncomp.size());
+   std::string result = hex_encode(sv_result.data(), sv_result.size());
+   std::string exp_result = hex_encode(sv_G_secp_uncomp.data(), sv_G_secp_uncomp.size());
 
    CHECK_MESSAGE(sv_result == sv_G_secp_uncomp, "calc. result = " << result << "\nexp. result = " << exp_result);
    return fails;
@@ -620,9 +619,9 @@ size_t test_enc_dec_uncompressed_521_prime_too_large()
    std::vector<byte> sv_b_secp = hex_decode ( b_secp );
    std::vector<byte> sv_G_secp_uncomp = hex_decode ( G_secp_uncomp );
 
-   BigInt bi_p_secp = BigInt::decode ( &sv_p_secp[0], sv_p_secp.size() );
-   BigInt bi_a_secp = BigInt::decode ( &sv_a_secp[0], sv_a_secp.size() );
-   BigInt bi_b_secp = BigInt::decode ( &sv_b_secp[0], sv_b_secp.size() );
+   BigInt bi_p_secp = BigInt::decode ( sv_p_secp.data(), sv_p_secp.size() );
+   BigInt bi_a_secp = BigInt::decode ( sv_a_secp.data(), sv_a_secp.size() );
+   BigInt bi_b_secp = BigInt::decode ( sv_b_secp.data(), sv_b_secp.size() );
 
    CurveGFp secp521r1 (bi_p_secp, bi_a_secp, bi_b_secp);
    std::unique_ptr<PointGFp> p_G;
@@ -901,7 +900,6 @@ size_t ecc_randomized_test()
    test_report("ECC Randomized", tests, fails);
    return fails;
    }
-#endif
 
 }
 
@@ -909,7 +907,6 @@ size_t test_ecc_unit()
    {
    size_t fails = 0;
 
-#if defined(BOTAN_HAS_ECC_GROUP)
    fails += test_point_turn_on_sp_red_mul();
    fails += test_coordinates();
    fails += test_point_transformation ();
@@ -938,7 +935,12 @@ size_t test_ecc_unit()
    test_report("ECC", 0, fails);
 
    ecc_randomized_test();
-#endif
 
    return fails;
    }
+
+#else
+
+SKIP_TEST(ecc_unit);
+
+#endif // BOTAN_HAS_ECC_GROUP

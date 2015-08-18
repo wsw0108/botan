@@ -6,8 +6,17 @@
 
 #include "tests.h"
 
-#include <botan/filters.h>
+#if defined(BOTAN_HAS_X509_CERTIFICATES)
 
+#if defined(BOTAN_HAS_RSA) && defined(BOTAN_HAS_DSA)
+
+#include <botan/calendar.h>
+#include <botan/filters.h>
+#include <botan/pkcs8.h>
+#include <botan/pkcs10.h>
+#include <botan/x509self.h>
+#include <botan/x509path.h>
+#include <botan/x509_ca.h>
 
 #if defined(BOTAN_HAS_RSA)
   #include <botan/rsa.h>
@@ -21,24 +30,18 @@
   #include <botan/ecdsa.h>
 #endif
 
-#if defined(BOTAN_HAS_X509_CERTIFICATES)
-  #include <botan/x509self.h>
-  #include <botan/x509path.h>
-  #include <botan/x509_ca.h>
-  #include <botan/pkcs10.h>
-#endif
-
-using namespace Botan;
-
 #include <iostream>
 #include <memory>
 
-
-#if defined(BOTAN_HAS_X509_CERTIFICATES) && \
-    defined(BOTAN_HAS_RSA) && \
-    defined(BOTAN_HAS_DSA)
+using namespace Botan;
 
 namespace {
+
+X509_Time from_date(const int y, const int m, const int d)
+   {
+   auto t = calendar_point(y, m, d, 0, 0, 0);
+   return X509_Time(t.to_std_timepoint());
+   }
 
 u64bit key_id(const Public_Key* key)
    {
@@ -170,11 +173,11 @@ size_t test_x509()
    /* Sign the requests to create the certs */
    X509_Certificate user1_cert =
       ca.sign_request(user1_req, rng,
-                      X509_Time("2008-01-01"), X509_Time("2100-01-01"));
+                      from_date(2008, 01, 01), from_date(2033, 01, 01));
 
    X509_Certificate user2_cert = ca.sign_request(user2_req, rng,
-                                                 X509_Time("2008-01-01"),
-                                                 X509_Time("2100-01-01"));
+                                                 from_date(2008, 01, 01),
+                                                 from_date(2033, 01, 01));
    X509_CRL crl1 = ca.new_crl(rng);
 
    /* Verify the certs */
@@ -251,7 +254,12 @@ size_t test_x509()
 
 #else
 
-size_t test_x509() { return 0; }
+UNTESTED_WARNING(x509);
 
-#endif
+#endif // BOTAN_HAS_RSA && BOTAN_HAS_DSA
 
+#else
+
+SKIP_TEST(x509);
+
+#endif // BOTAN_HAS_X509_CERTIFICATES

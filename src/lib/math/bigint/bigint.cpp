@@ -34,7 +34,7 @@ BigInt::BigInt(u64bit n)
 */
 BigInt::BigInt(Sign s, size_t size)
    {
-   m_reg.resize(round_up<size_t>(size, 8));
+   m_reg.resize(round_up(size, 8));
    m_signedness = s;
    }
 
@@ -87,9 +87,9 @@ BigInt::BigInt(const byte input[], size_t length, Base base)
 /*
 * Construct a BigInt from an encoded BigInt
 */
-BigInt::BigInt(RandomNumberGenerator& rng, size_t bits)
+BigInt::BigInt(RandomNumberGenerator& rng, size_t bits, bool set_high_bit)
    {
-   randomize(rng, bits);
+   randomize(rng, bits, set_high_bit);
    }
 
 /*
@@ -142,7 +142,7 @@ u32bit BigInt::to_u32bit() const
    {
    if(is_negative())
       throw Encoding_Error("BigInt::to_u32bit: Number is negative");
-   if(bits() >= 32)
+   if(bits() > 32)
       throw Encoding_Error("BigInt::to_u32bit: Number is too big to convert");
 
    u32bit out = 0;
@@ -171,6 +171,11 @@ void BigInt::clear_bit(size_t n)
    const word mask = static_cast<word>(1) << (n % MP_WORD_BITS);
    if(which < size())
       m_reg[which] &= ~mask;
+   }
+
+size_t BigInt::bytes() const
+   {
+   return round_up(bits(), 8) / 8;
    }
 
 /*
@@ -253,6 +258,12 @@ BigInt BigInt::abs() const
    return x;
    }
 
+void BigInt::grow_to(size_t n)
+   {
+   if(n > size())
+      m_reg.resize(round_up(n, 8));
+   }
+
 /*
 * Encode this number into bytes
 */
@@ -271,7 +282,7 @@ void BigInt::binary_decode(const byte buf[], size_t length)
    const size_t WORD_BYTES = sizeof(word);
 
    clear();
-   m_reg.resize(round_up<size_t>((length / WORD_BYTES) + 1, 8));
+   m_reg.resize(round_up((length / WORD_BYTES) + 1, 8));
 
    for(size_t i = 0; i != length / WORD_BYTES; ++i)
       {

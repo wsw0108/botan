@@ -4,16 +4,20 @@
 * Botan is released under the Simplified BSD License (see license.txt)
 */
 
-#include "speed.h"
 #include "apps.h"
+
+#if defined(BOTAN_HAS_RUNTIME_BENCHMARKING)
+
+#include "speed.h"
 #include <iostream>
 #include <iomanip>
 
 #include <botan/benchmark.h>
-#include <botan/aead.h>
 #include <botan/auto_rng.h>
+#include <botan/cipher_mode.h>
 #include <botan/parsing.h>
 #include <botan/symkey.h>
+#include <botan/transform.h>
 #include <botan/hex.h>
 
 #include <chrono>
@@ -151,7 +155,7 @@ void time_transform(std::unique_ptr<Transform> tf,
       const double Mbps = ((reps / seconds_used) * buf_size) / 1024 / 1024;
 
       std::cout << tf->name() << " " << std::setprecision(4) << Mbps
-                << " MiB / sec with " << buf_size << " byte blocks\n";
+                << " MiB / sec with " << buf_size << " byte blocks" << std::endl;
       }
    }
 
@@ -188,11 +192,14 @@ void bench_algo(const std::string& algo,
       return;
       }
 
+#if defined(BOTAN_HAS_PUBLIC_KEY_CRYPTO)
    bench_pk(rng, algo, seconds);
+#endif
    }
 
 int speed(int argc, char* argv[])
    {
+   BOTAN_UNUSED(argc);
    OptionParser opts("seconds=|buf-size=");
    opts.parse(argv);
 
@@ -204,7 +211,7 @@ int speed(int argc, char* argv[])
       seconds = std::atof(opts.value("seconds").c_str());
       if(seconds < 0.1 || seconds > (5 * 60))
          {
-         std::cout << "Invalid argument to --seconds\n";
+         std::cout << "Invalid argument to --seconds" << std::endl;
          return 2;
          }
       }
@@ -214,7 +221,7 @@ int speed(int argc, char* argv[])
       buf_size = std::atoi(opts.value("buf-size").c_str());
       if(buf_size == 0 || buf_size > 1024)
          {
-         std::cout << "Invalid argument to --buf-size\n";
+         std::cout << "Invalid argument to --buf-size" << std::endl;
          return 2;
          }
       }
@@ -226,7 +233,7 @@ int speed(int argc, char* argv[])
 
    if(args[0] == "help" || args[0] == "-h")
       {
-      std::cout << "Usage: " << argv[0] << " [algo name...]\n";
+      std::cout << "Usage: " << argv[0] << " [algo name...]" << std::endl;
       return 1;
       }
 
@@ -241,3 +248,4 @@ int speed(int argc, char* argv[])
 REGISTER_APP(speed);
 
 }
+#endif // BOTAN_HAS_RUNTIME_BENCHMARKING

@@ -34,10 +34,18 @@ size_t DataSource::peek_byte(byte& out) const
 */
 size_t DataSource::discard_next(size_t n)
    {
+   byte buf[64] = { 0 };
    size_t discarded = 0;
-   byte dummy;
-   for(size_t j = 0; j != n; ++j)
-      discarded += read_byte(dummy);
+
+   while(n)
+      {
+      const size_t got = this->read(buf, std::min(n, sizeof(buf)));
+      discarded += got;
+
+      if(got == 0)
+         break;
+      }
+
    return discarded;
    }
 
@@ -47,9 +55,14 @@ size_t DataSource::discard_next(size_t n)
 size_t DataSource_Memory::read(byte out[], size_t length)
    {
    size_t got = std::min<size_t>(source.size() - offset, length);
-   copy_mem(out, &source[offset], got);
+   copy_mem(out, source.data() + offset, got);
    offset += got;
    return got;
+   }
+
+bool DataSource_Memory::check_available(size_t n)
+   {
+   return (n <= (source.size() - offset));
    }
 
 /*
@@ -99,6 +112,15 @@ size_t DataSource_Stream::read(byte out[], size_t length)
    return got;
    }
 
+bool DataSource_Stream::check_available(size_t n)
+   {
+   const std::streampos orig_pos = source.tellg();
+   source.seekg(0, std::ios::end);
+   const size_t avail = source.tellg() - orig_pos;
+   source.seekg(orig_pos);
+   return (avail >= n);
+   }
+
 /*
 * Peek into a stream
 */
@@ -112,7 +134,7 @@ size_t DataSource_Stream::peek(byte out[], size_t length, size_t offset) const
    if(offset)
       {
       secure_vector<byte> buf(offset);
-      source.read(reinterpret_cast<char*>(&buf[0]), buf.size());
+      source.read(reinterpret_cast<char*>(buf.data()), buf.size());
       if(source.bad())
          throw Stream_IO_Error("DataSource_Stream::peek: Source failure");
       got = source.gcount();
@@ -155,9 +177,8 @@ std::string DataSource_Stream::id() const
 DataSource_Stream::DataSource_Stream(const std::string& path,
                                      bool use_binary) :
    identifier(path),
-   source_p(new std::ifstream(
-               path.c_str(),
-               use_binary ? std::ios::binary : std::ios::in)),
+   source_p(new std::ifstream(path,
+                              use_binary ? std::ios::binary : std::ios::in)),
    source(*source_p),
    total_read(0)
    {

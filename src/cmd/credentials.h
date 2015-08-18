@@ -7,6 +7,7 @@
 #ifndef EXAMPLE_CREDENTIALS_MANAGER_H__
 #define EXAMPLE_CREDENTIALS_MANAGER_H__
 
+#include <botan/pkcs8.h>
 #include <botan/credentials_manager.h>
 #include <botan/x509self.h>
 #include <botan/rsa.h>
@@ -82,7 +83,7 @@ class Basic_Credentials_Manager : public Credentials_Manager
 
       std::vector<Botan::Certificate_Store*>
       trusted_certificate_authorities(const std::string& type,
-                                      const std::string& /*hostname*/)
+                                      const std::string& /*hostname*/) override
          {
          std::vector<Botan::Certificate_Store*> v;
 
@@ -99,7 +100,7 @@ class Basic_Credentials_Manager : public Credentials_Manager
       void verify_certificate_chain(
          const std::string& type,
          const std::string& purported_hostname,
-         const std::vector<X509_Certificate>& cert_chain)
+         const std::vector<X509_Certificate>& cert_chain) override
          {
          try
             {
@@ -109,7 +110,7 @@ class Basic_Credentials_Manager : public Credentials_Manager
             }
          catch(std::exception& e)
             {
-            std::cout << e.what() << "\n";
+            std::cout << e.what() << std::endl;
             //throw;
             }
          }
@@ -117,8 +118,10 @@ class Basic_Credentials_Manager : public Credentials_Manager
       std::vector<X509_Certificate> cert_chain(
          const std::vector<std::string>& algos,
          const std::string& type,
-         const std::string& hostname)
+         const std::string& hostname) override
          {
+         BOTAN_UNUSED(type);
+
          for(auto&& i : m_creds)
             {
             if(std::find(algos.begin(), algos.end(), i.key->algo_name()) == algos.end())
@@ -135,7 +138,7 @@ class Basic_Credentials_Manager : public Credentials_Manager
 
       Private_Key* private_key_for(const X509_Certificate& cert,
                                    const std::string& /*type*/,
-                                   const std::string& /*context*/)
+                                   const std::string& /*context*/) override
          {
          for(auto&& i : m_creds)
             {

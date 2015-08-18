@@ -5,6 +5,9 @@
 */
 
 #include "tests.h"
+
+#if defined(BOTAN_HAS_PUBLIC_KEY_CRYPTO)
+
 #include "test_rng.h"
 #include "test_pubkey.h"
 
@@ -16,13 +19,9 @@
 #include <memory>
 
 #include <botan/oids.h>
-
-#if defined(BOTAN_HAS_PUBLIC_KEY_CRYPTO)
-  #include <botan/x509_key.h>
-  #include <botan/pkcs8.h>
-  #include <botan/pubkey.h>
-  
-#endif
+#include <botan/x509_key.h>
+#include <botan/pkcs8.h>
+#include <botan/pubkey.h>
 
 #if defined(BOTAN_HAS_RSA)
   #include <botan/rsa.h>
@@ -254,7 +253,7 @@ size_t validate_signature(PK_Verifier& v, PK_Signer& s, const std::string& algo,
 
    PK_TEST(v.verify_message(message, sig), "Correct signature is valid");
 
-   zero_mem(&sig[0], sig.size());
+   zero_mem(sig.data(), sig.size());
 
    PK_TEST(!v.verify_message(message, sig), "All-zero signature is invalid");
 
@@ -401,3 +400,9 @@ size_t test_pk_keygen()
 
    return fails;
    }
+
+#else
+
+SKIP_TEST(pk_keygen);
+
+#endif // BOTAN_HAS_PUBLIC_KEY_CRYPTO

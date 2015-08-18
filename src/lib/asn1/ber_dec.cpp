@@ -1,6 +1,7 @@
+
 /*
 * BER Decoder
-* (C) 1999-2008 Jack Lloyd
+* (C) 1999-2008,2015 Jack Lloyd
 *
 * Botan is released under the Simplified BSD License (see license.txt)
 */
@@ -103,11 +104,11 @@ size_t find_eoc(DataSource* ber)
 
    while(true)
       {
-      const size_t got = ber->peek(&buffer[0], buffer.size(), data.size());
+      const size_t got = ber->peek(buffer.data(), buffer.size(), data.size());
       if(got == 0)
          break;
 
-      data += std::make_pair(&buffer[0], got);
+      data += std::make_pair(buffer.data(), got);
       }
 
    DataSource_Memory source(data);
@@ -218,9 +219,12 @@ BER_Object BER_Decoder::get_next_object()
    if(next.type_tag == NO_OBJECT)
       return next;
 
-   size_t length = decode_length(source);
+   const size_t length = decode_length(source);
+   if(!source->check_available(length))
+      throw BER_Decoding_Error("Value truncated");
+
    next.value.resize(length);
-   if(source->read(&next.value[0], length) != length)
+   if(source->read(next.value.data(), length) != length)
       throw BER_Decoding_Error("Value truncated");
 
    if(next.type_tag == EOC && next.class_tag == UNIVERSAL)
@@ -254,7 +258,7 @@ BER_Decoder BER_Decoder::start_cons(ASN1_Tag type_tag,
    BER_Object obj = get_next_object();
    obj.assert_is_a(type_tag, ASN1_Tag(class_tag | CONSTRUCTED));
 
-   BER_Decoder result(&obj.value[0], obj.value.size());
+   BER_Decoder result(obj.value.data(), obj.value.size());
    result.parent = this;
    return result;
    }
@@ -309,7 +313,7 @@ BER_Decoder::BER_Decoder(const secure_vector<byte>& data)
 */
 BER_Decoder::BER_Decoder(const std::vector<byte>& data)
    {
-   source = new DataSource_Memory(&data[0], data.size());
+   source = new DataSource_Memory(data.data(), data.size());
    owns = true;
    pushed.type_tag = pushed.class_tag = NO_OBJECT;
    parent = nullptr;
@@ -391,7 +395,7 @@ BER_Decoder& BER_Decoder::decode_octet_string_bigint(BigInt& out)
    {
    secure_vector<byte> out_vec;
    decode(out_vec, OCTET_STRING);
-   out = BigInt::decode(&out_vec[0], out_vec.size());
+   out = BigInt::decode(out_vec.data(), out_vec.size());
    return (*this);
    }
 
@@ -526,11 +530,13 @@ BER_Decoder& BER_Decoder::decode(secure_vector<byte>& buffer,
       buffer = obj.value;
    else
       {
+      if(obj.value.empty())
+         throw BER_Decoding_Error("Invalid BIT STRING");
       if(obj.value[0] >= 8)
          throw BER_Decoding_Error("Bad number of unused bits in BIT STRING");
 
       buffer.resize(obj.value.size() - 1);
-      copy_mem(&buffer[0], &obj.value[1], obj.value.size() - 1);
+      copy_mem(buffer.data(), &obj.value[1], obj.value.size() - 1);
       }
    return (*this);
    }
@@ -549,11 +555,13 @@ BER_Decoder& BER_Decoder::decode(std::vector<byte>& buffer,
       buffer = unlock(obj.value);
    else
       {
+      if(obj.value.empty())
+         throw BER_Decoding_Error("Invalid BIT STRING");
       if(obj.value[0] >= 8)
          throw BER_Decoding_Error("Bad number of unused bits in BIT STRING");
 
       buffer.resize(obj.value.size() - 1);
-      copy_mem(&buffer[0], &obj.value[1], obj.value.size() - 1);
+      copy_mem(buffer.data(), &obj.value[1], obj.value.size() - 1);
       }
    return (*this);
    }

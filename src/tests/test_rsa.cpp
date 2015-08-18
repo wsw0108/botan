@@ -5,6 +5,9 @@
 */
 
 #include "tests.h"
+
+#if defined(BOTAN_HAS_RSA)
+
 #include "test_pubkey.h"
 
 #include <botan/pubkey.h>
@@ -88,9 +91,9 @@ size_t rsa_sig_verify(const std::string& e,
 
 size_t test_rsa()
    {
-   std::ifstream rsa_enc(PK_TEST_DATA_DIR "/rsaes.vec");
-   std::ifstream rsa_sig(PK_TEST_DATA_DIR "/rsa_sig.vec");
-   std::ifstream rsa_verify(PK_TEST_DATA_DIR "/rsa_verify.vec");
+   std::ifstream rsa_enc(TEST_DATA_DIR_PK "/rsaes.vec");
+   std::ifstream rsa_sig(TEST_DATA_DIR_PK "/rsa_sig.vec");
+   std::ifstream rsa_verify(TEST_DATA_DIR_PK "/rsa_verify.vec");
 
    size_t fails = 0;
 
@@ -118,3 +121,8 @@ size_t test_rsa()
    return fails;
    }
 
+#else
+
+SKIP_TEST(rsa);
+
+#endif // BOTAN_HAS_RSA

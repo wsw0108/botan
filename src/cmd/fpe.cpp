@@ -6,7 +6,7 @@
 
 #include "apps.h"
 
-#if defined(BOTAN_HAS_FPE_FE1)
+#if defined(BOTAN_HAS_FPE_FE1) && defined(BOTAN_HAS_SHA1)
 
 #include <botan/fpe_fe1.h>
 #include <botan/sha160.h>
@@ -111,7 +111,7 @@ int fpe(int argc, char* argv[])
    {
    if(argc != 4)
       {
-      std::cout << "Usage: " << argv[0] << " cc-number acct-name passwd\n";
+      std::cout << "Usage: " << argv[0] << " cc-number acct-name passwd" << std::endl;
       return 1;
       }
 
@@ -120,7 +120,7 @@ int fpe(int argc, char* argv[])
    std::string passwd = argv[3];
 
    std::cout << "Input was: " << cc_number << ' '
-             << luhn_check(cc_number) << '\n';
+             << luhn_check(cc_number) << std::endl;
 
    /*
    * In practice something like PBKDF2 with a salt and high iteration
@@ -131,16 +131,16 @@ int fpe(int argc, char* argv[])
    u64bit enc_cc = encrypt_cc_number(cc_number, key, acct_name);
 
    std::cout << "Encrypted: " << enc_cc
-             << ' ' << luhn_check(enc_cc) << '\n';
+             << ' ' << luhn_check(enc_cc) << std::endl;
 
    u64bit dec_cc = decrypt_cc_number(enc_cc, key, acct_name);
 
    std::cout << "Decrypted: " << dec_cc
-             << ' ' << luhn_check(dec_cc) << '\n';
+             << ' ' << luhn_check(dec_cc) << std::endl;
 
    if(dec_cc != cc_number)
       {
-      std::cout << "Something went wrong :( Bad CC checksum?\n";
+      std::cout << "Something went wrong :( Bad CC checksum?" << std::endl;
       return 2;
       }
 
@@ -151,5 +151,4 @@ REGISTER_APP(fpe);
 
 }
 
-#endif
-
+#endif // BOTAN_HAS_FPE_FE1 && BOTAN_HAS_SHA1

@@ -13,9 +13,12 @@
 #include <botan/mac.h>
 #include <botan/pbkdf.h>
 #include <botan/version.h>
+#include <botan/pkcs8.h>
 #include <botan/pubkey.h>
 #include <botan/data_src.h>
+#include <botan/hex.h>
 #include <botan/mem_ops.h>
+#include <botan/x509_key.h>
 #include <cstring>
 #include <memory>
 
@@ -55,7 +58,7 @@ struct botan_struct
          {
          if(m_magic != MAGIC)
             throw std::runtime_error("Bad magic " + std::to_string(m_magic) +
-                                     " in ffi object expected" + std::to_string(MAGIC));
+                                     " in ffi object expected " + std::to_string(MAGIC));
          return m_obj.get();
          }
    private:
@@ -109,7 +112,7 @@ inline int write_output(uint8_t out[], size_t* out_len, const uint8_t buf[], siz
    *out_len = buf_len;
    if(avail >= buf_len)
       {
-      Botan::copy_mem(out, &buf[0], buf_len);
+      Botan::copy_mem(out, buf, buf_len);
       return 0;
       }
    return -1;
@@ -118,7 +121,7 @@ inline int write_output(uint8_t out[], size_t* out_len, const uint8_t buf[], siz
 template<typename Alloc>
 int write_vec_output(uint8_t out[], size_t* out_len, const std::vector<uint8_t, Alloc>& buf)
    {
-   return write_output(out, out_len, &buf[0], buf.size());
+   return write_output(out, out_len, buf.data(), buf.size());
    }
 
 inline int write_str_output(uint8_t out[], size_t* out_len, const std::string& str)
@@ -177,6 +180,27 @@ uint32_t botan_version_minor() { return Botan::version_minor(); }
 uint32_t botan_version_patch() { return Botan::version_patch(); }
 uint32_t botan_version_datestamp()  { return Botan::version_datestamp(); }
 
+int botan_same_mem(const uint8_t* x, const uint8_t* y, size_t len)
+   {
+   return Botan::same_mem(x, y, len) ? 0 : 1;
+   }
+
+int botan_hex_encode(const uint8_t* in, size_t len, char* out, uint32_t flags)
+   {
+   try
+      {
+      const bool uppercase = (flags & BOTAN_FFI_HEX_LOWER_CASE) == 0;
+      Botan::hex_encode(out, in, len, uppercase);
+      return 0;
+      }
+   catch(std::exception& e)
+      {
+      log_exception(BOTAN_CURRENT_FUNCTION, e.what());
+      }
+
+   return 1;
+   }
+
 int botan_rng_init(botan_rng_t* rng_out, const char* rng_type)
    {
    // Just gives unique_ptr something to delete, really
@@ -187,9 +211,9 @@ int botan_rng_init(botan_rng_t* rng_out, const char* rng_type)
          void randomize(Botan::byte out[], size_t len) override { m_rng.randomize(out, len); }
          bool is_seeded() const override { return m_rng.is_seeded(); }
          void clear() override { m_rng.clear(); }
-         std::string name() const { return m_rng.name(); }
-         void reseed(size_t poll_bits = 256) { m_rng.reseed(poll_bits); }
-         void add_entropy(const Botan::byte in[], size_t len) { m_rng.add_entropy(in, len); }
+         std::string name() const override { return m_rng.name(); }
+         void reseed(size_t poll_bits = 256) override { m_rng.reseed(poll_bits); }
+         void add_entropy(const Botan::byte in[], size_t len) override { m_rng.add_entropy(in, len); }
       private:
          Botan::RandomNumberGenerator& m_rng;
       };
@@ -450,7 +474,7 @@ int botan_cipher_update(botan_cipher_t cipher_obj,
 
          if(mbuf.size() <= output_size)
             {
-            copy_mem(output, &mbuf[0], mbuf.size());
+            copy_mem(output, mbuf.data(), mbuf.size());
             mbuf.clear();
             return 0;
             }
@@ -464,7 +488,7 @@ int botan_cipher_update(botan_cipher_t cipher_obj,
          *output_written = mbuf.size();
          if(output_size >= mbuf.size())
             {
-            copy_mem(output, &mbuf[0], mbuf.size());
+            copy_mem(output, mbuf.data(), mbuf.size());
             mbuf.clear();
             return 0;
             }
@@ -482,7 +506,7 @@ int botan_cipher_update(botan_cipher_t cipher_obj,
          const size_t taken = round_down(input_size, ud);
          *input_consumed = taken;
          *output_size = taken;
-         copy_mem(&output[0], input, taken);
+         copy_mem(output, input, taken);
          ocm->update_in_place(output, taken);
          return 0;
          }
@@ -493,7 +517,7 @@ int botan_cipher_update(botan_cipher_t cipher_obj,
 
       while(input_size >= ud && output_size >= ud)
          {
-         copy_mem(&mbuf[0], input, ud);
+         copy_mem(mbuf.data(), input, ud);
          cipher.update(mbuf);
 
          input_size -= ud;
@@ -559,6 +583,7 @@ int botan_pbkdf(const char* pbkdf_algo, uint8_t out[], size_t out_len,
       {
       std::unique_ptr<Botan::PBKDF> pbkdf(Botan::get_pbkdf(pbkdf_algo));
       pbkdf->pbkdf_iterations(out, out_len, pass, salt, salt_len, iterations);
+      return 0;
       }
    catch(std::exception& e)
       {
@@ -581,6 +606,7 @@ int botan_pbkdf_timed(const char* pbkdf_algo,
       pbkdf->pbkdf_timed(out, out_len, password, salt, salt_len,
                          std::chrono::milliseconds(ms_to_run),
                          *iterations_used);
+      return 0;
       }
    catch(std::exception& e)
       {
@@ -599,6 +625,7 @@ int botan_kdf(const char* kdf_algo,
       {
       std::unique_ptr<Botan::KDF> kdf(Botan::get_kdf(kdf_algo));
       kdf->kdf(out, out_len, secret, secret_len, salt, salt_len);
+      return 0;
       }
    catch(std::exception& e)
       {

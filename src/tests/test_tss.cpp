@@ -6,11 +6,10 @@
 
 #include "tests.h"
 
-#include <botan/hex.h>
-#include <iostream>
-
 #if defined(BOTAN_HAS_THRESHOLD_SECRET_SHARING)
 
+#include <iostream>
+#include <botan/hex.h>
 #include <botan/tss.h>
 
 size_t test_tss()
@@ -28,7 +27,7 @@ size_t test_tss()
    const secure_vector<byte> S = hex_decode_locked("7465737400");
 
    std::vector<RTSS_Share> shares =
-      RTSS_Share::split(2, 4, &S[0], S.size(), id, rng);
+      RTSS_Share::split(2, 4, S.data(), S.size(), id, rng);
 
    auto back = RTSS_Share::reconstruct(shares);
 
@@ -48,12 +47,13 @@ size_t test_tss()
       ++fails;
       }
 
+   test_report("TSS", 2, fails);
+
    return fails;
    }
+
 #else
-size_t test_tss()
-   {
-   std::cout << "Skipping TSS tests" << std::endl;
-   return 1;
-   }
-#endif
+
+SKIP_TEST(tss);
+
+#endif // BOTAN_HAS_THRESHOLD_SECRET_SHARING

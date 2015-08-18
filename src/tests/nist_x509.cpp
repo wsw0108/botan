@@ -18,7 +18,7 @@
 #if defined(BOTAN_HAS_X509_CERTIFICATES)
 
 #include <botan/x509path.h>
-#include <botan/fs.h>
+#include <botan/internal/filesystem.h>
 
 #include <algorithm>
 #include <iostream>
@@ -37,10 +37,14 @@ size_t test_nist_x509()
    const std::string root_test_dir = "src/tests/data/nist_x509/";
    const size_t total_tests = 76;
 
-   if(list_all_readable_files_in_or_under(root_test_dir).empty())
+   try
       {
-      std::cout << "No FS access, skipping NIST X.509 validation tests" << std::endl;
-      test_report("NIST X.509 path validation", 0, 0);
+      // Do nothing, just test filesystem access
+      get_files_recursive(root_test_dir);
+      }
+   catch(No_Filesystem_Access)
+      {
+      std::cout << "Warning: No filesystem access, skipping NIST X.509 validation tests" << std::endl;
       return 0;
       }
 
@@ -57,17 +61,17 @@ size_t test_nist_x509()
    for(size_t test_no = 1; test_no <= total_tests; ++test_no)
       {
       const std::string test_dir = root_test_dir + "/test" + (test_no <= 9 ? "0" : "") + std::to_string(test_no);
-      const std::vector<std::string> all_files = list_all_readable_files_in_or_under(test_dir);
+      
+      const std::vector<std::string> all_files = get_files_recursive(test_dir);    
+      if (all_files.empty())
+         std::cout << "Warning: No test files found in '" << test_dir << "'" << std::endl;
 
       std::vector<std::string> certs, crls;
       std::string root_cert, to_verify;
 
-      for(size_t k = 0; k != all_files.size(); k++)
+      for(const auto &current : all_files)
          {
-         const std::string current = all_files[k];
-
-         if(current.find("int") != std::string::npos &&
-            current.find(".crt") != std::string::npos)
+         if(current.find("int") != std::string::npos && current.find(".crt") != std::string::npos)
             certs.push_back(current);
          else if(current.find("root.crt") != std::string::npos)
             root_cert = current;
@@ -96,7 +100,7 @@ size_t test_nist_x509()
 
       for(size_t i = 0; i != crls.size(); i++)
          {
-         DataSource_Stream in(crls[i]);
+         DataSource_Stream in(crls[i], true);
          X509_CRL crl(in);
          store.add_crl(crl);
          }
@@ -208,14 +212,14 @@ std::map<size_t, Path_Validation_Result::Code> get_expected()
 
     In the case of the tests currently in the suite, the default
     method (with acceptable policy being "any-policy" and with no
-    explict policy required), will almost always result in a verified
+    explicit policy required), will almost always result in a verified
     status. This is not particularly helpful. So, we should do several
     different tests for each test set:
 
        1) With the user policy as any-policy and no explicit policy
        2) With the user policy as any-policy and an explicit policy required
        3) With the user policy as test-policy-1 (2.16.840.1.101.3.1.48.1) and
-          an explict policy required
+          an explicit policy required
        4) With the user policy as either test-policy-1 or test-policy-2 and an
           explicit policy required
 
@@ -234,9 +238,9 @@ std::map<size_t, Path_Validation_Result::Code> get_expected()
    expected_results[43] = Certificate_Status_Code::VERIFIED;
    expected_results[44] = Certificate_Status_Code::VERIFIED;
 
-   //expected_results[45] = Certificate_Status_Code::EXPLICT_POLICY_REQUIRED;
+   //expected_results[45] = Certificate_Status_Code::EXPLICIT_POLICY_REQUIRED;
    //expected_results[46] = Certificate_Status_Code::ACCEPT;
-   //expected_results[47] = Certificate_Status_Code::EXPLICT_POLICY_REQUIRED;
+   //expected_results[47] = Certificate_Status_Code::EXPLICIT_POLICY_REQUIRED;
 
    expected_results[48] = Certificate_Status_Code::VERIFIED;
    expected_results[49] = Certificate_Status_Code::VERIFIED;

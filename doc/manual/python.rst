@@ -110,7 +110,7 @@ Ciphers
     .. py:method:: update_granularity()
 
                    Returns update block size. Call to update() must provide
-                  input of exactly this many bytes
+                   input of exactly this many bytes
 
     .. py:method:: is_authenticated()
 
@@ -190,7 +190,7 @@ Public Key
 
 .. py:class:: private_key(algo, param, rng)
 
-    Constructor creates a new private key. The paramater type/value
+    Constructor creates a new private key. The parameter type/value
     depends on the algorithm. For "rsa" is is the size of the key in
     bits.  For "ecdsa" and "ecdh" it is a group name (for instance
     "secp256r1"). For "ecdh" there is also a special case for group
